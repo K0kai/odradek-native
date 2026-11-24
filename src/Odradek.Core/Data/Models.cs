@@ -16,7 +16,8 @@ public static class Json
 }
 
 public sealed record AssessmentItem(string Id, string Text, string Kind, string Status, string Realism, string RealismReason,
-    string Bridge, string ResumeQuote, string JobQuote, string Note, double YearsRequired = 0, int ProvenMonths = 0);
+    string Bridge, string ResumeQuote, string JobQuote, string Note, double YearsRequired = 0, int ProvenMonths = 0,
+    [property: JsonIgnore] string Category = "");
 
 public sealed record Objection(string Severity, string Reason);
 

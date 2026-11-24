@@ -13,19 +13,19 @@ public sealed record QueueRow(string Title, string Subtitle, QueueItem Item);
 
 public partial class MainWindow : Window
 {
-    private enum Page { Jobs, Queue, Assistant, Logs, Usage, Resumes, Settings, Rules }
+    private enum Page { Overview, Jobs, Triage, Queue, Assistant, Logs, Usage, Resumes, Settings, Rules }
 
     /// <summary>Ícones do menu (Segoe Fluent Icons; no Windows 10 cai para Segoe MDL2 Assets).</summary>
     private static readonly Dictionary<Page, string> NavGlyphs = new()
     {
-        [Page.Jobs] = "\uE8FD", [Page.Queue] = "\uE895", [Page.Assistant] = "\uE8BD", [Page.Logs] = "\uE81C",
+        [Page.Overview] = "\uE80F", [Page.Triage] = "\uE71C", [Page.Jobs] = "\uE8FD", [Page.Queue] = "\uE895", [Page.Assistant] = "\uE8BD", [Page.Logs] = "\uE81C",
         [Page.Usage] = "\uE9D2", [Page.Resumes] = "\uE8A5", [Page.Settings] = "\uE713", [Page.Rules] = "\uE70F",
     };
 
     private static readonly (Page Page, string Label)[] Pages =
     [
-        (Page.Jobs, "Vagas"), (Page.Queue, "Filas de IA"), (Page.Assistant, "Assistente"), (Page.Logs, "Logs"),
-        (Page.Usage, "Uso e cotas"), (Page.Resumes, "Currículos"), (Page.Settings, "Configurações"), (Page.Rules, "Regras de formulário"),
+        (Page.Overview, "Visão geral"), (Page.Jobs, "Vagas"), (Page.Triage, "Não selecionadas"), (Page.Queue, "Filas de IA"), (Page.Assistant, "Assistente"),
+        (Page.Logs, "Logs"), (Page.Usage, "Uso e cotas"), (Page.Resumes, "Currículos"), (Page.Settings, "Configurações"), (Page.Rules, "Regras de formulário"),
     ];
 
     private Page _page = Page.Jobs;
@@ -40,9 +40,17 @@ public partial class MainWindow : Window
     private int _minMatch;
     private string _query = "";
     private string _jobsTitle = "Vale a pena olhar";
-    // Os status das vagas mais as duas abas de "Não selecionadas" (consulta de triagem).
-    private static readonly (string Key, string Label)[] Views =
-        [.. Defaults.Statuses, ("triage:discarded", "Descartadas pela IA"), ("triage:pending", "Aguardando triagem"), (PanelQueries.AllStatuses, "Todas as vagas")];
+    private long _jobsTotal;
+    private bool _jobsLoaded;
+    private DateTime _jobsUpdatedAt = DateTime.Now;
+    private string _loadedKey = ""; // chave da consulta da última leitura: igual → só reconcilia a lista; diferente → troca inteira
+    private NavItem? _jobsNav;
+    // "Vagas" lista os status das vagas; "Não selecionadas" as duas abas de triagem (consulta própria). Cada página lembra a visão escolhida.
+    private static readonly (string Key, string Label)[] JobViews = [.. Defaults.Statuses, (PanelQueries.AllStatuses, "Todas as vagas")];
+    private static readonly (string Key, string Label)[] TriageViews = [("triage:discarded", "Descartadas pela IA"), ("triage:pending", "Aguardando triagem")];
+    private static readonly (string Key, string Label)[] Views = [.. JobViews, .. TriageViews];
+    private string _jobsStatus = "worth", _triageStatus = "triage:discarded";
+    private bool _swappingViews;
     private string _dateFrom = "", _dateTo = ""; // lidos das caixas na thread da tela; a consulta roda em outra
     private static readonly int[] MinOptions = [0, 50, 60, 70, 80, 90];
     private readonly ObservableCollection<LogEntry> _logs = [];
@@ -57,8 +65,9 @@ public partial class MainWindow : Window
     private void Navigate(Page page)
     {
         _page = page;
-        var onJobs = page == Page.Jobs;
+        var onJobs = page is Page.Jobs or Page.Triage;
         JobsPane.IsVisible = onJobs; JobsControls.IsVisible = onJobs; FilterHost.IsVisible = onJobs;
+        OverviewPane.IsVisible = page == Page.Overview;
         QueuePane.IsVisible = page == Page.Queue;
         LogsPane.IsVisible = page == Page.Logs;
         UsagePane.IsVisible = page == Page.Usage;
@@ -68,14 +77,17 @@ public partial class MainWindow : Window
         RulesPane.IsVisible = page == Page.Rules;
         if (!onJobs) JobsTitle.Text = Pages.First(p => p.Page == page).Label;
         JobsSubtitle.IsVisible = false;
+        JobsSubtitle.ClearValue(TextBlock.ForegroundProperty);
+        if (onJobs) ShowViews(page);
         FadeIn(page switch
         {
-            Page.Jobs => JobsPane, Page.Queue => QueuePane, Page.Logs => LogsPane, Page.Usage => UsagePane, Page.Assistant => AssistantPane,
+            Page.Overview => OverviewPane, Page.Jobs or Page.Triage => JobsPane, Page.Queue => QueuePane, Page.Logs => LogsPane, Page.Usage => UsagePane, Page.Assistant => AssistantPane,
             Page.Resumes => ResumesPane, Page.Settings => SettingsTabs, _ => RulesPane,
         });
         switch (page)
         {
-            case Page.Jobs: JobsTitle.Text = _jobsTitle; UpdateJobControls(); _ = ReloadJobsAsync(); break;
+            case Page.Overview: JobsTitle.Text = "Visão geral"; _ = LoadOverviewAsync(); break;
+            case Page.Jobs or Page.Triage: UpdateJobControls(); RenderJobsHeader(); _ = ReloadJobsAsync(); break;
             case Page.Queue: _ = LoadQueueAsync(); break;
             case Page.Logs: _ = LoadLogsAsync(); break;
             case Page.Usage: _ = LoadUsageAsync(); break;
@@ -111,6 +123,7 @@ public partial class MainWindow : Window
         try
         {
             var queries = new PanelQueries(_database);
+            var key = $"{_status}|{_pageNumber}|{_minMatch}|{_sort}|{_dateFrom}|{_dateTo}|{_query}";
             var page = await Task.Run(() =>
             {
                 if (!_status.StartsWith("triage:", StringComparison.Ordinal))
@@ -126,20 +139,121 @@ public partial class MainWindow : Window
             Dispatcher.UIThread.Post(() =>
             {
                 CountsList.ItemsSource = sidebar;
+                if (_jobsNav is not null) _jobsNav.Badge = counts.TryGetValue("worth", out var worth) ? worth : 0;
                 JobsEmpty.Text = "Nenhuma vaga nesta lista."; JobsEmpty.IsVisible = page.Items.Count == 0;
                 _pageNumber = page.Page; _pages = page.Pages;
                 PageText.Text = $"{_pageNumber} / {_pages}";
                 PrevButton.IsEnabled = _pageNumber > 1; NextButton.IsEnabled = _pageNumber < _pages;
                 var selectedId = (JobsList.SelectedItem as JobRecord)?.Id;
-                _jobs.Clear();
-                foreach (var job in page.Items) _jobs.Add(job);
+                var sameQuery = key == _loadedKey && _jobsLoaded;
+                _loadedKey = key;
+                if (!sameQuery)
+                {
+                    // Outra consulta (aba, filtro, página): troca a lista inteira.
+                    _jobs.Clear();
+                    foreach (var job in page.Items) _jobs.Add(job);
+                    _jobsUpdatedAt = DateTime.Now;
+                }
+                else if (ReconcileJobs(page.Items) is { } added)
+                {
+                    // Mesma consulta: só as linhas que mudaram. Quem chegou agora entra com o destaque.
+                    _jobsUpdatedAt = DateTime.Now;
+                    if (added.Count > 0) Dispatcher.UIThread.Post(() => FlashJobs(added), DispatcherPriority.Background);
+                }
                 JobsList.SelectedItem = selectedId is null ? null : _jobs.FirstOrDefault(j => j.Id == selectedId); // a seleção sobrevive às ações
-                _jobsTitle = $"{Views.First(v => v.Key == _status).Label} ({page.Total})";
-                if (_page == Page.Jobs) JobsTitle.Text = _jobsTitle;
+                _jobsLoaded = true;
+                _jobsTotal = page.Total;
+                _jobsTitle = Views.First(v => v.Key == _status).Label;
+                RenderJobsHeader();
                 Program.Log($"Lista carregada: {page.Items.Count} de {page.Total} vagas.");
             });
         }
-        catch (Exception ex) { Dispatcher.UIThread.Post(() => { if (_page == Page.Jobs) JobsTitle.Text = "Não foi possível ler o banco"; }); Program.Log("Lista de vagas: " + ex.Message); }
+        catch (Exception ex) { Dispatcher.UIThread.Post(() => { if (_page is Page.Jobs or Page.Triage) JobsTitle.Text = "Não foi possível ler o banco"; }); Program.Log("Lista de vagas: " + ex.Message); }
+    }
+
+    /// <summary>Páginas "Vagas" e "Não selecionadas": troca as visões do seletor e volta à que a página tinha escolhido.</summary>
+    private void ShowViews(Page page)
+    {
+        var views = page == Page.Triage ? TriageViews : JobViews;
+        var wanted = page == Page.Triage ? _triageStatus : _jobsStatus;
+        var previous = _status;
+        _swappingViews = true; // trocar a lista do seletor não é uma escolha do usuário: não recarrega por conta própria
+        try
+        {
+            StatusBox.ItemsSource = views.Select(v => v.Label).ToList();
+            StatusBox.SelectedIndex = Math.Max(0, Array.FindIndex(views, v => v.Key == wanted));
+        }
+        finally { _swappingViews = false; }
+        _status = views[StatusBox.SelectedIndex].Key;
+        _jobsTitle = views[StatusBox.SelectedIndex].Label;
+        if (_status != previous) _pageNumber = 1;
+    }
+
+    /// <summary>Abre a página certa (Vagas ou Não selecionadas) já na visão pedida.</summary>
+    private void SelectStatus(string key)
+    {
+        var page = key.StartsWith("triage:", StringComparison.Ordinal) ? Page.Triage : Page.Jobs;
+        if (_page != page) NavList.SelectedIndex = Array.FindIndex(Pages, p => p.Page == page);
+        var views = page == Page.Triage ? TriageViews : JobViews;
+        StatusBox.SelectedIndex = Array.FindIndex(views, v => v.Key == key);
+    }
+
+    /// <summary>Título da visão e "N vagas · atualizado há X min" (verde enquanto é recente).</summary>
+    private void RenderJobsHeader()
+    {
+        if (_page is not (Page.Jobs or Page.Triage)) return;
+        JobsTitle.Text = _jobsTitle;
+        if (!_jobsLoaded) { JobsSubtitle.IsVisible = false; return; }
+        var age = DateTime.Now - _jobsUpdatedAt;
+        var recent = age.TotalSeconds < 45;
+        var ago = recent ? "atualizado agora" : age.TotalMinutes < 60 ? $"atualizado há {Math.Max(1, (int)Math.Round(age.TotalMinutes))} min" : $"atualizado há {(int)age.TotalHours} h";
+        JobsSubtitle.Text = $"{(_jobsTotal == 1 ? "1 vaga" : $"{_jobsTotal} vagas")} · {ago}";
+        JobsSubtitle.Foreground = Palette.Brush(recent ? "Success" : "Muted");
+        JobsSubtitle.IsVisible = true;
+    }
+
+    /// <summary>Dois registros da mesma vaga que a tela mostraria igual (a comparação por valor do record não serve: as listas internas são instâncias novas).</summary>
+    private static bool SameJob(JobRecord a, JobRecord b) =>
+        a.Id == b.Id && a.Title == b.Title && a.Company == b.Company && a.Location == b.Location && a.Status == b.Status && a.MatchScore == b.MatchScore
+        && a.Notes == b.Notes && a.CoverLetter == b.CoverLetter && a.Description == b.Description
+        && (a.Assessment?.Requirements.Select(r => r.Kind + r.Status).SequenceEqual(b.Assessment?.Requirements.Select(r => r.Kind + r.Status) ?? []) ?? b.Assessment is null);
+
+    /// <summary>Acerta <see cref="_jobs"/> com a lista lida mexendo só no que mudou. Devolve null se nada mudou, senão os ids que acabaram de chegar.</summary>
+    private IReadOnlyList<long>? ReconcileJobs(IReadOnlyList<JobRecord> items)
+    {
+        var changed = false;
+        var wanted = items.Select(j => j.Id).ToHashSet();
+        for (var i = _jobs.Count - 1; i >= 0; i--)
+            if (!wanted.Contains(_jobs[i].Id)) { _jobs.RemoveAt(i); changed = true; }
+        var added = new List<long>();
+        for (var i = 0; i < items.Count; i++)
+        {
+            var item = items[i];
+            if (i < _jobs.Count && _jobs[i].Id == item.Id)
+            {
+                if (!SameJob(_jobs[i], item)) { _jobs[i] = item; changed = true; }
+                continue;
+            }
+            var elsewhere = -1;
+            for (var k = i + 1; k < _jobs.Count; k++) if (_jobs[k].Id == item.Id) { elsewhere = k; break; }
+            if (elsewhere >= 0) _jobs.RemoveAt(elsewhere); else added.Add(item.Id);
+            _jobs.Insert(i, item);
+            changed = true;
+        }
+        while (_jobs.Count > items.Count) { _jobs.RemoveAt(_jobs.Count - 1); changed = true; }
+        return changed ? added : null;
+    }
+
+    /// <summary>Realça por um instante as linhas que acabaram de chegar (o fundo esmaece quando a classe sai).</summary>
+    private void FlashJobs(IReadOnlyList<long> ids)
+    {
+        foreach (var id in ids)
+        {
+            var index = _jobs.ToList().FindIndex(j => j.Id == id);
+            if (index < 0 || JobsList.ContainerFromIndex(index) is not ListBoxItem row) continue;
+            row.Classes.Add("fresh");
+            DispatcherTimer.RunOnce(() => row.Classes.Remove("fresh"), TimeSpan.FromMilliseconds(900));
+        }
     }
 
     // ---------- filas de IA ----------
@@ -288,14 +402,17 @@ public partial class MainWindow : Window
         _settingsEditor = new SettingsEditor(_database, Notify);
         _rulesEditor = new RulesEditor(_database, RulesHost, RulesState, RulesSaveButton, Notify);
         JobsList.ItemsSource = _jobs;
-        StatusBox.ItemsSource = Views.Select(v => v.Label).ToList();
-        StatusBox.SelectedIndex = 2; // "Vale a pena olhar"
+        ShowViews(Page.Jobs); // abre em "Vagas › Vale a pena olhar"
         StatusBox.SelectionChanged += (_, _) =>
         {
-            if (StatusBox.SelectedIndex < 0) return;
-            _status = Views[StatusBox.SelectedIndex].Key;
+            if (_swappingViews || StatusBox.SelectedIndex < 0) return;
+            var views = _page == Page.Triage ? TriageViews : JobViews;
+            _status = views[StatusBox.SelectedIndex].Key;
+            _jobsTitle = views[StatusBox.SelectedIndex].Label;
+            if (_page == Page.Triage) _triageStatus = _status; else _jobsStatus = _status;
             _pageNumber = 1;
             UpdateJobControls();
+            RenderJobsHeader();
             _ = ReloadJobsAsync();
         };
         JobsList.SelectionChanged += (_, _) => ShowDetail(JobsList.SelectedItem as JobRecord);
@@ -323,9 +440,15 @@ public partial class MainWindow : Window
         WireActions();
         WireEngines();
 
-        NavList.ItemsSource = Pages.Select((p, i) => new NavItem(NavGlyphs[p.Page], p.Label, $"{p.Label} (Ctrl+{i + 1})")).ToList();
-        NavList.SelectedIndex = 0;
+        var navItems = Pages.Select((p, i) => new NavItem(NavGlyphs[p.Page], p.Label, $"{p.Label} (Ctrl+{(i + 1) % 10})")).ToList();
+        _jobsNav = navItems[Array.FindIndex(Pages, p => p.Page == Page.Jobs)];
+        NavList.ItemsSource = navItems;
+        NavList.SelectedIndex = Array.FindIndex(Pages, p => p.Page == Page.Jobs);
         NavList.SelectionChanged += (_, _) => { if (NavList.SelectedIndex >= 0) Navigate(Pages[NavList.SelectedIndex].Page); };
+        // "atualizado há X min" envelhece sozinho
+        var ageTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
+        ageTimer.Tick += (_, _) => RenderJobsHeader();
+        ageTimer.Start();
 
         // Cada tela se atualiza sozinha quando o que ela mostra muda (e só então).
         ChangeBus.Shared.Published += change => Dispatcher.UIThread.Post(() =>
@@ -335,10 +458,10 @@ public partial class MainWindow : Window
                 case QueueChanged when _page == Page.Queue: _ = LoadQueueAsync(); break;
                 case LogAppended appended: _logs.Insert(0, appended.Entry); if (_logs.Count > 500) _logs.RemoveAt(_logs.Count - 1); break;
                 case LogsCleared: _logs.Clear(); break;
-                case JobsChanged: _ = ReloadJobsAsync(); break;
+                case JobsChanged: _ = ReloadJobsAsync(); if (_page == Page.Overview) _ = LoadOverviewAsync(); break;
                 case SettingsChanged when _page == Page.Usage: _ = LoadUsageAsync(); break;
                 case QuotaChanged when _page == Page.Usage: _ = LoadUsageAsync(); break;
-                case CollectorChanged: RefreshCollector(); break;
+                case CollectorChanged: RefreshCollector(); if (_page == Page.Overview) _ = LoadOverviewAsync(); break;
                 case ResumesChanged when _page == Page.Resumes: _ = LoadResumesAsync(); break;
             }
         });
@@ -379,6 +502,8 @@ public partial class MainWindow : Window
                         QueueList.SelectedIndex = _queueRows.Count > 0 ? 0 : -1; await Task.Delay(900);
                         Program.Log($"SMOKE {label}: {_queueRows.Count} itens, título='{JobsTitle.Text}', detalhe {QueueDetailBody.Text?.Length ?? 0} caracteres");
                         break;
+                    case Page.Overview: Program.Log($"SMOKE {label}: {OverviewHost.Children.Count} blocos"); break;
+                    case Page.Triage: Program.Log($"SMOKE {label}: {_jobs.Count} vagas, título='{JobsTitle.Text}', subtítulo='{JobsSubtitle.Text}'"); break;
                     case Page.Logs: Program.Log($"SMOKE {label}: {_logs.Count} linhas"); break;
                     case Page.Usage: Program.Log($"SMOKE {label}: apify='{ApifyText.Text}' barra={ApifyBar.Value:0} ia='{AiTitle.Text}' backup={BackupText.Text?.Length}"); break;
                     case Page.Resumes: Program.Log($"SMOKE {label}: {ResumesHost.Children.Count} cartões"); break;

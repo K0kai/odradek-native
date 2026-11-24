@@ -22,8 +22,8 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var theme = Environment.GetEnvironmentVariable("ODRADEK_THEME")?.ToLowerInvariant(); // só para conferir o visual
-        if (theme is "light" or "dark")
-            RequestedThemeVariant = theme == "dark" ? Avalonia.Styling.ThemeVariant.Dark : Avalonia.Styling.ThemeVariant.Light;
+        if (theme is "light" or "dark" or "dracula")
+            RequestedThemeVariant = theme switch { "dark" => Avalonia.Styling.ThemeVariant.Dark, "dracula" => Palette.Dracula, _ => Avalonia.Styling.ThemeVariant.Light };
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown; // fechar a janela só esconde; "Sair" encerra

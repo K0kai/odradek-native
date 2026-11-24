@@ -26,7 +26,7 @@ internal static class Toast
     private static void Open(string text)
     {
         _current?.Close();
-        var dark = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+        var dark = Palette.IsDark(Application.Current?.ActualThemeVariant);
         var window = new Window
         {
             WindowDecorations = WindowDecorations.None,
@@ -38,7 +38,7 @@ internal static class Toast
             MaxWidth = 380,
             Opacity = 0,
             Transitions = new Transitions { new DoubleTransition { Property = Visual.OpacityProperty, Duration = TimeSpan.FromMilliseconds(180) } },
-            Background = new SolidColorBrush(Color.Parse(dark ? "#141417" : "#F7F7F7")),
+            Background = Palette.Brush("CardBg") is ISolidColorBrush card && dark ? card : new SolidColorBrush(Color.Parse("#F7F7F7")),
             Content = new Border
             {
                 Padding = new Thickness(16, 12),

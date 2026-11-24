@@ -35,6 +35,7 @@ public partial class MainWindow
         ("system", "Igual ao Windows", Avalonia.Styling.ThemeVariant.Default),
         ("light", "Claro", Avalonia.Styling.ThemeVariant.Light),
         ("dark", "Escuro", Avalonia.Styling.ThemeVariant.Dark),
+        ("dracula", "Dracula", Palette.Dracula),
     ];
 
     /// <summary>Seletor de tema na lateral; a escolha fica em <c>ui_theme</c> (tabela settings). <c>ODRADEK_THEME</c> (testes) tem prioridade.</summary>
@@ -73,7 +74,7 @@ public partial class MainWindow
     private void ApplyBackdrop()
     {
         // No escuro o Mica não entra: o material clareia o fundo com a cor do papel de parede e o tema deixa de ser realmente escuro.
-        var mica = ActualTransparencyLevel == WindowTransparencyLevel.Mica && ActualThemeVariant != Avalonia.Styling.ThemeVariant.Dark;
+        var mica = ActualTransparencyLevel == WindowTransparencyLevel.Mica && !Palette.IsDark(ActualThemeVariant);
         if (!mica)
         {
             ClearValue(BackgroundProperty);
@@ -91,18 +92,18 @@ public partial class MainWindow
     private static IBrush Veil(string key, double opacity) =>
         Palette.Brush(key) is ISolidColorBrush solid ? new SolidColorBrush(solid.Color, opacity) : Palette.Brush(key);
 
-    /// <summary>Ctrl+1…8 abre a tela do menu, F5 relê a tela atual, Ctrl+F vai para a busca de vagas.</summary>
+    /// <summary>Ctrl+1…9 e Ctrl+0 abrem a tela do menu (na ordem), F5 relê a tela atual, Ctrl+F vai para a busca de "Não selecionadas".</summary>
     private void OnShortcut(object? sender, KeyEventArgs e)
     {
-        if (e.KeyModifiers == KeyModifiers.Control && e.Key is >= Key.D1 and <= Key.D8)
+        if (e.KeyModifiers == KeyModifiers.Control && e.Key is >= Key.D0 and <= Key.D9)
         {
-            var index = e.Key - Key.D1;
+            var index = e.Key == Key.D0 ? 9 : e.Key - Key.D1;
             if (index < Pages.Length) { NavList.SelectedIndex = index; e.Handled = true; }
         }
         else if (e.KeyModifiers == KeyModifiers.None && e.Key == Key.F5) { Navigate(_page); e.Handled = true; }
         else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
         {
-            NavList.SelectedIndex = 0;
+            NavList.SelectedIndex = Array.FindIndex(Pages, p => p.Page == Page.Triage); // a busca por texto só vale nas abas de triagem
             SearchBox.Focus();
             e.Handled = true;
         }

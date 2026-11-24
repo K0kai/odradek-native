@@ -1,5 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Odradek.App"
              x:Class="Odradek.App.App"
              RequestedThemeVariant="Default">
   <Application.Resources>
@@ -40,6 +41,33 @@
           <SolidColorBrush x:Key="WarningSoft" Color="#2A2411" />
           <SolidColorBrush x:Key="DangerSoft" Color="#2B1614" />
           <SolidColorBrush x:Key="NeutralSoft" Color="#1E1E23" />
+        </ResourceDictionary>
+        <!-- Dracula: escuro com fundos de tom vinho, vermelho como destaque e branco quente no texto (o laranja em Danger não se confunde com o destaque) -->
+        <ResourceDictionary x:Key="{x:Static local:Palette.Dracula}">
+          <SolidColorBrush x:Key="AppBg" Color="#0E0809" />
+          <SolidColorBrush x:Key="SidebarBg" Color="#130A0C" />
+          <SolidColorBrush x:Key="CardBg" Color="#1B0F12" />
+          <SolidColorBrush x:Key="CardBorder" Color="#3A1A20" />
+          <SolidColorBrush x:Key="Muted" Color="#B39CA1" />
+          <SolidColorBrush x:Key="Accent" Color="#E5323F" />
+          <SolidColorBrush x:Key="AccentHover" Color="#F2525E" />
+          <SolidColorBrush x:Key="AccentSoft" Color="#3D1117" />
+          <SolidColorBrush x:Key="HoverBg" Color="#26151A" />
+          <SolidColorBrush x:Key="Danger" Color="#FF7A59" />
+          <SolidColorBrush x:Key="Success" Color="#5FD38D" />
+          <SolidColorBrush x:Key="Warning" Color="#EBB34E" />
+          <SolidColorBrush x:Key="SuccessSoft" Color="#12261B" />
+          <SolidColorBrush x:Key="WarningSoft" Color="#2B2210" />
+          <SolidColorBrush x:Key="DangerSoft" Color="#34170F" />
+          <SolidColorBrush x:Key="NeutralSoft" Color="#241619" />
+          <!-- O Fluent só aceita paletas claro/escuro; o realce dos controles dele (foco, caixas marcadas, seleção) vira vermelho por aqui -->
+          <Color x:Key="SystemAccentColor">#E5323F</Color>
+          <Color x:Key="SystemAccentColorLight1">#F2525E</Color>
+          <Color x:Key="SystemAccentColorLight2">#F77882</Color>
+          <Color x:Key="SystemAccentColorLight3">#FA9AA2</Color>
+          <Color x:Key="SystemAccentColorDark1">#C42532</Color>
+          <Color x:Key="SystemAccentColorDark2">#9E1B26</Color>
+          <Color x:Key="SystemAccentColorDark3">#78141D</Color>
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
@@ -261,6 +289,46 @@
     <Style Selector="ListBox.cards ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AccentSoft}" /><Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
     </Style>
+    <!-- Lista de vagas densa: linhas separadas por divisórias, sem cartões -->
+    <Style Selector="ListBox.rows"><Setter Property="Background" Value="Transparent" /><Setter Property="Padding" Value="0" /></Style>
+    <Style Selector="ListBox.rows ListBoxItem">
+      <Setter Property="Padding" Value="8,9" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Transitions"><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.14" /></Transitions></Setter>
+    </Style>
+    <Style Selector="ListBox.rows ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Transitions"><Transitions><BrushTransition Property="Background" Duration="0:0:0.6" /></Transitions></Setter>
+    </Style>
+    <Style Selector="ListBox.rows ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource HoverBg}" /></Style>
+    <Style Selector="ListBox.rows ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource AccentSoft}" /></Style>
+    <!-- Vaga que acabou de chegar: entra com o fundo realçado e esmaece quando a classe sai -->
+    <Style Selector="ListBox.rows ListBoxItem.fresh /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource AccentSoft}" /></Style>
+
+    <!-- Pílulas de skills (contornadas) e botões compactos da linha -->
+    <Style Selector="Border.pill">
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+      <Setter Property="Padding" Value="7,1" />
+      <Setter Property="Margin" Value="0,0,4,0" />
+    </Style>
+    <Style Selector="Border.pill > TextBlock"><Setter Property="FontSize" Value="11" /><Setter Property="Foreground" Value="{DynamicResource Muted}" /></Style>
+    <Style Selector="Border.pill.good"><Setter Property="BorderBrush" Value="{DynamicResource Success}" /></Style>
+    <Style Selector="Border.pill.good > TextBlock"><Setter Property="Foreground" Value="{DynamicResource Success}" /></Style>
+    <Style Selector="Border.pill.partial"><Setter Property="BorderBrush" Value="{DynamicResource Warning}" /></Style>
+    <Style Selector="Border.pill.partial > TextBlock"><Setter Property="Foreground" Value="{DynamicResource Warning}" /></Style>
+    <Style Selector="Border.pill.bad"><Setter Property="BorderBrush" Value="{DynamicResource Danger}" /></Style>
+    <Style Selector="Border.pill.bad > TextBlock"><Setter Property="Foreground" Value="{DynamicResource Danger}" /></Style>
+    <Style Selector="Button.row"><Setter Property="MinHeight" Value="0" /><Setter Property="Height" Value="24" /><Setter Property="Padding" Value="10,0" /><Setter Property="FontSize" Value="12" /></Style>
+    <Style Selector="Button.row.ghost"><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Foreground" Value="{DynamicResource Muted}" /></Style>
+    <Style Selector="Button.row.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Foreground" Value="{DynamicResource Danger}" /></Style>
+    <Style Selector="ListBox.nav ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style>
+
     <Style Selector="ListBox.log ListBoxItem"><Setter Property="Padding" Value="10,3" /><Setter Property="Margin" Value="0" /><Setter Property="CornerRadius" Value="4" /></Style>
 
     <!-- Troca de tela: a tela nova aparece com um fade curto (a opacidade é zerada e devolvida em MainWindow.Navigate) -->

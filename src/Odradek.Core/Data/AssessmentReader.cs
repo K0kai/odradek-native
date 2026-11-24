@@ -37,7 +37,7 @@ public static class AssessmentReader
         string Field(string key) => Text.Take(Text.PyStr(entry[key]), 240);
         return new AssessmentItem(Field("id"), Field("text"), Field("kind"), Field("status"), Field("realism"),
             Field("realism_reason"), Field("bridge"), Field("resume_quote"), Field("job_quote"), Field("note"),
-            YearsRequired: Number(entry["years_required"]), ProvenMonths: (int)Number(entry["proven_months"]));
+            YearsRequired: Number(entry["years_required"]), ProvenMonths: (int)Number(entry["proven_months"]), Category: Field("category"));
     }
 
     private static IEnumerable<JsonNode?> Items(JsonNode? node) => node is JsonArray array ? array : [];

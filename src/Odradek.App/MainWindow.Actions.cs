@@ -104,6 +104,45 @@ public partial class MainWindow
         }
     }
 
+    /// <summary>
+    /// Muda o status e atualiza a tela na hora: a linha sai da lista (ou troca de status), o total e o contador do menu acompanham, e a gravação
+    /// segue em segundo plano. Se falhar, avisa e relê a lista, que devolve a linha.
+    /// </summary>
+    private async Task SetJobStatusAsync(JobRecord job, string status)
+    {
+        var index = _jobs.ToList().FindIndex(j => j.Id == job.Id);
+        if (index >= 0)
+        {
+            var inTriage = _status.StartsWith("triage:", StringComparison.Ordinal);
+            var leaves = inTriage || (_status != PanelQueries.AllStatuses && status != _status);
+            if (leaves)
+            {
+                if (JobsList.ContainerFromIndex(index) is { } row) row.Opacity = 0; // sai com um esmaecer curto
+                _jobsTotal = Math.Max(0, _jobsTotal - 1);
+                var id = job.Id;
+                DispatcherTimer.RunOnce(() =>
+                {
+                    var at = _jobs.ToList().FindIndex(j => j.Id == id);
+                    if (at >= 0) _jobs.RemoveAt(at);
+                    JobsEmpty.IsVisible = _jobs.Count == 0;
+                }, TimeSpan.FromMilliseconds(150));
+            }
+            else
+            {
+                var selected = ReferenceEquals(JobsList.SelectedItem, _jobs[index]);
+                _jobs[index] = job with { Status = status };
+                if (selected) JobsList.SelectedIndex = index;
+            }
+        }
+        if (_jobsNav is not null && job.Status != status)
+            _jobsNav.Badge = Math.Max(0, _jobsNav.Badge + (status == "worth" ? 1 : job.Status == "worth" ? -1 : 0));
+        _jobsUpdatedAt = DateTime.Now;
+        RenderJobsHeader();
+        try { Notify(await Task.Run(() => new JobActions(_database).SetStatus(job.Id, status)), false); }
+        catch (ActionException ex) { Notify(ex.Message, true); _ = ReloadJobsAsync(); }
+        catch (Exception ex) { Notify($"Não foi possível concluir: {ex.Message}", true); _ = ReloadJobsAsync(); }
+    }
+
     private IReadOnlyList<string> PickedEmails() => EmailList.Children.OfType<CheckBox>().Where(c => c.IsChecked == true).Select(c => (string)c.Tag!).ToList();
 
     private async Task SaveLetterAsync(string format)
@@ -179,7 +218,15 @@ public partial class MainWindow
     private void WireActions()
     {
         // vaga: status e anotação
-        void SetStatus(string status) { if (_detailJob is { } job) _ = RunAsync(() => new JobActions(_database).SetStatus(job.Id, status)); }
+        void SetStatus(string status) { if (_detailJob is { } job) _ = SetJobStatusAsync(job, status); }
+        // Botões da linha (Candidatar, Salvar, Ignorar): um só tratador para a lista; o Tag do botão traz o status.
+        JobsList.AddHandler(Button.ClickEvent, (_, e) =>
+        {
+            if (e.Source is not Button { Tag: string status, DataContext: JobRecord job }) return;
+            e.Handled = true;
+            if (status == "applied") Format.OpenInBrowser(job.Url); // Candidatar abre a vaga e marca como aplicada
+            _ = SetJobStatusAsync(job, status);
+        });
         AppliedButton.Click += (_, _) => SetStatus("applied");
         SavedButton.Click += (_, _) => SetStatus("saved");
         IgnoredButton.Click += (_, _) => SetStatus("ignored");
@@ -390,6 +437,18 @@ public partial class MainWindow
             Click(SavedButton);
         }, () => $"vaga {(jobId > 0 ? "escolhida" : "NENHUMA")}, status no banco={Q<string>("SELECT status FROM jobs WHERE id=@jobId", new { jobId })}, aviso='{NoticeText.Text}'");
 
+        long rowJob = 0; long totalBefore = 0, badgeBefore = 0;
+        await Step("linha-ignorar", async () =>
+        {
+            SelectStatus("worth"); await Task.Delay(1200);
+            totalBefore = _jobsTotal; badgeBefore = _jobsNav?.Badge ?? 0;
+            var button = Descendants(JobsList).OfType<Button>().FirstOrDefault(b => b.IsVisible && b.Tag as string == "ignored");
+            rowJob = (button?.DataContext as JobRecord)?.Id ?? 0;
+            if (button is not null) Click(button);
+            await Task.Delay(400); // a linha sai e o total/contador caem antes da gravação voltar
+            Program.Log($"SMOKE2 linha-ignorar: logo após o clique → lista={_jobs.Count}, total={_jobsTotal} (antes {totalBefore}), contador={_jobsNav?.Badge} (antes {badgeBefore}), linha ainda na lista={_jobs.Any(j => j.Id == rowJob)}");
+        }, () => $"vaga {(rowJob > 0 ? "escolhida" : "NENHUMA")}, status no banco={Q<string>("SELECT status FROM jobs WHERE id=@rowJob", new { rowJob })}, contador={_jobsNav?.Badge}, aviso='{NoticeText.Text}'");
+
         long noteJob = 0;
         await Step("notas", async () =>
         {
@@ -399,17 +458,17 @@ public partial class MainWindow
         }, () => $"vaga {(noteJob > 0 ? "escolhida" : "NENHUMA")}, notas gravadas={Q<string>("SELECT notes FROM jobs WHERE id=@noteJob", new { noteJob }) == "anotação do teste de fumaça ç 😀"}, aviso='{NoticeText.Text}'");
 
         string F() => $"lista={JobsList.ItemCount}, título='{JobsTitle.Text}', limpar visível={ClearFiltersButton.IsVisible}, busca ativa={SearchBox.IsEnabled}, página={PageText.Text}";
-        await Step("filtro-nota", async () => { StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == "ignored"); await Task.Delay(900); MinBox.SelectedIndex = 3; }, () => "nota ≥ 70 → " + F());
+        await Step("filtro-nota", async () => { SelectStatus("ignored"); await Task.Delay(900); MinBox.SelectedIndex = 3; }, () => "nota ≥ 70 → " + F());
         await Step("filtro-data", async () => { DateFromBox.SelectedDate = new DateTime(2026, 10, 1); }, () => $"de 01/10/2026 (_dateFrom={_dateFrom}) → " + F());
         await Step("filtro-data-futura", async () => { DateFromBox.SelectedDate = new DateTime(2030, 1, 1); }, () => "de 2030 → " + F());
         await Step("filtro-limpar", async () => { Click(ClearFiltersButton); }, () => $"limpo (nota={MinBox.SelectedIndex}, de={DateFromBox.SelectedDate}) → " + F());
-        await Step("filtro-busca", async () => { StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == "triage:discarded"); await Task.Delay(900); SearchBox.Text = "zzzz-nada"; await Task.Delay(600); }, () => "busca 'zzzz-nada' → " + F());
+        await Step("filtro-busca", async () => { SelectStatus("triage:discarded"); await Task.Delay(900); SearchBox.Text = "zzzz-nada"; await Task.Delay(600); }, () => "busca 'zzzz-nada' → " + F());
         await Step("filtro-busca-limpar", async () => { Click(SearchClearButton); }, () => $"busca limpa (texto='{SearchBox.Text}') → " + F());
-        StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == "worth"); await Task.Delay(500);
+        SelectStatus("worth"); await Task.Delay(500);
 
         await Step("lote", async () =>
         {
-            StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == "worth"); await Task.Delay(500);
+            SelectStatus("worth"); await Task.Delay(500);
             BulkAll.IsChecked = true; await Task.Delay(100);
             Click(BulkPreviewButton); await Task.Delay(500);
         }, () => $"prévia='{BulkPreviewText.Text}', botão confirmar visível={BulkApplyButton.IsVisible} ('{BulkApplyButton.Content}')");

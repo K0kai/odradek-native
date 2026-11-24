@@ -22,7 +22,7 @@ public partial class MainWindow
                 {
                     foreach (var key in new[] { "ignored", "applied" })
                     {
-                        StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == key); await Task.Delay(1200);
+                        SelectStatus(key); await Task.Delay(1200);
                         JobsList.SelectedIndex = _jobs.Count > 0 ? 0 : -1; await Task.Delay(500);
                         Save(Path.Combine(folder, $"0-Jobs-{key}.png"));
                         // o detalhe é longo: mais duas capturas, rolando até o meio e o fim
@@ -33,7 +33,7 @@ public partial class MainWindow
                                 Save(Path.Combine(folder, $"0-Jobs-{key}-rolagem{part}.png"));
                             }
                     }
-                    StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == "worth"); await Task.Delay(800);
+                    SelectStatus("worth"); await Task.Delay(800);
                 }
                 if (page == Page.Queue) { QueueList.SelectedIndex = _queueRows.Count > 0 ? 0 : -1; await Task.Delay(900); }
                 if (page == Page.Assistant && AssistantHost.Children.Contains(AssistantEmpty))
@@ -50,10 +50,12 @@ public partial class MainWindow
                         Save(Path.Combine(folder, $"{(int)page}-{page}-{tab}.png"));
                     }
             }
-            NavList.SelectedIndex = 0; Width = 1280; Height = 860; ThemeBox.SelectedIndex = 1; await Task.Delay(1000);
+            NavList.SelectedIndex = Array.FindIndex(Pages, p => p.Page == Page.Jobs); Width = 1280; Height = 860; ThemeBox.SelectedIndex = 1; await Task.Delay(1000);
             Save(Path.Combine(folder, "11-Tema-claro.png"));
             ThemeBox.SelectedIndex = 2; await Task.Delay(1000);
             Save(Path.Combine(folder, "12-Tema-escuro.png"));
+            ThemeBox.SelectedIndex = 3; await Task.Delay(1000);
+            Save(Path.Combine(folder, "13-Tema-dracula.png"));
             Toast.Show("O Odradek continua rodando na bandeja. Use Sair no menu do ícone para encerrar."); await Task.Delay(1200);
             if (Toast.Current is { } toast)
             {
@@ -61,7 +63,7 @@ public partial class MainWindow
                 using var shot = new RenderTargetBitmap(new PixelSize((int)toast.Bounds.Width, (int)toast.Bounds.Height), new Vector(96, 96));
                 shot.Render(toast); shot.Save(Path.Combine(folder, "10-Toast.png"));
             }
-            NavList.SelectedIndex = 0; Width = 900; Height = 600; await Task.Delay(1200);
+            NavList.SelectedIndex = Array.FindIndex(Pages, p => p.Page == Page.Jobs); Width = 900; Height = 600; await Task.Delay(1200);
             Save(Path.Combine(folder, "9-Jobs-minimo.png"));
         }
         catch (Exception ex) { Program.Log("SHOTS erro: " + ex); }

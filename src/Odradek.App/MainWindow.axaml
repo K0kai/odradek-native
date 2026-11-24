@@ -23,10 +23,14 @@
             <ListBox x:Name="NavList" Classes="nav">
               <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="local:NavItem">
-                  <StackPanel Orientation="Horizontal" Spacing="12" Background="Transparent" ToolTip.Tip="{Binding Hint}">
-                    <TextBlock Classes="glyph" Text="{Binding Glyph}" Width="20" TextAlignment="Center" />
-                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
-                  </StackPanel>
+                  <Grid ColumnDefinitions="Auto,*,Auto" Background="Transparent" ToolTip.Tip="{Binding Hint}">
+                    <TextBlock Classes="glyph" Text="{Binding Glyph}" Width="20" TextAlignment="Center" Margin="0,0,12,0" />
+                    <TextBlock Grid.Column="1" Text="{Binding Label}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <!-- contador (vagas para revisar, em "Vagas") -->
+                    <Border Grid.Column="2" Classes="badge" MinWidth="22" Padding="6,1" Background="{DynamicResource Accent}" IsVisible="{Binding HasBadge}">
+                      <TextBlock Text="{Binding BadgeText}" FontSize="11" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" />
+                    </Border>
+                  </Grid>
                 </DataTemplate>
               </ListBox.ItemTemplate>
             </ListBox>
@@ -223,6 +227,9 @@
         <ScrollViewer Grid.Row="1"><StackPanel x:Name="RulesHost" Spacing="8" MaxWidth="1000" HorizontalAlignment="Left" /></ScrollViewer>
       </Grid>
 
+      <!-- Visão geral (montada em código a partir do resumo do banco) -->
+      <ScrollViewer Grid.Row="3" x:Name="OverviewPane" Classes="page" IsVisible="False" Margin="28,0"><StackPanel x:Name="OverviewHost" Spacing="14" MaxWidth="1000" HorizontalAlignment="Left" /></ScrollViewer>
+
       <!-- Uso e cotas -->
       <ScrollViewer Grid.Row="3" x:Name="UsagePane" Classes="page" IsVisible="False" Margin="28,0">
         <StackPanel Spacing="12" MaxWidth="760" HorizontalAlignment="Left">
@@ -280,25 +287,39 @@
       <!-- Vagas -->
       <Grid Grid.Row="3" x:Name="JobsPane" Classes="page" ColumnDefinitions="*,12,1.1*" Margin="28,0">
         <Grid>
-          <ListBox x:Name="JobsList" Classes="cards">
+          <ListBox x:Name="JobsList" Classes="rows" Margin="0,0,6,0">
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="d:JobRecord">
-                <Grid ColumnDefinitions="*,Auto">
-                  <StackPanel Spacing="2">
-                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Classes="muted" TextTrimming="CharacterEllipsis">
-                      <Run Text="{Binding Company}" /><Run Text=" · " /><Run Text="{Binding Location}" />
+                <Grid ColumnDefinitions="34,12,*" RowDefinitions="Auto,Auto,Auto">
+                  <!-- anel da nota: trilha + arco proporcional (cor pela faixa da nota) -->
+                  <Grid Grid.RowSpan="3" Width="34" Height="34" VerticalAlignment="Top">
+                    <Ellipse Stroke="{DynamicResource NeutralSoft}" StrokeThickness="3" />
+                    <Arc StartAngle="-90" SweepAngle="{Binding MatchScore, Converter={x:Static local:Palette.ScoreSweep}}" StrokeThickness="3" StrokeLineCap="Round"
+                         Stroke="{Binding MatchScore, Converter={x:Static local:Palette.ScoreForeground}}" />
+                    <TextBlock Text="{Binding MatchScore, Converter={x:Static local:Palette.ScoreText}}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Grid>
+                  <TextBlock Grid.Column="2" Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <Grid Grid.Row="1" Grid.Column="2" ColumnDefinitions="*,Auto" Margin="0,1,0,0">
+                    <TextBlock Classes="muted" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
+                      <Run Text="{Binding Company}" /><Run Text=" · " /><Run Text="{Binding Location}" /><Run Text=" · " /><Run Text="{Binding Source, Converter={x:Static local:Palette.SourceLabel}}" />
                     </TextBlock>
-                    <Border Classes="badge" HorizontalAlignment="Left" Padding="6,1" Margin="0,2,0,0" Background="{DynamicResource NeutralSoft}">
-                      <TextBlock Text="{Binding Source, Converter={x:Static local:Palette.SourceLabel}}" FontSize="11" Foreground="{DynamicResource Muted}" />
-                    </Border>
-                  </StackPanel>
-                  <Border Grid.Column="1" Classes="badge" MinWidth="36" Margin="10,0,0,0"
-                          IsVisible="{Binding MatchScore, Converter={x:Static local:Palette.HasScore}}"
-                          Background="{Binding MatchScore, Converter={x:Static local:Palette.ScoreBackground}}">
-                    <TextBlock Text="{Binding MatchScore}" FontWeight="SemiBold" HorizontalAlignment="Center"
-                               Foreground="{Binding MatchScore, Converter={x:Static local:Palette.ScoreForeground}}" />
-                  </Border>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="8,0,0,0">
+                      <Button Classes="row primary" Content="Candidatar" Tag="applied" IsVisible="{Binding Status, Converter={x:Static local:Palette.CanApply}}" />
+                      <Button Classes="row" Content="Salvar" Tag="saved" IsVisible="{Binding Status, Converter={x:Static local:Palette.CanSave}}" />
+                      <Button Classes="row ghost" Content="Ignorar" Tag="ignored" IsVisible="{Binding Status, Converter={x:Static local:Palette.CanIgnore}}" />
+                    </StackPanel>
+                  </Grid>
+                  <!-- skills da análise da IA: verde atende, âmbar em parte, laranja/vermelho não atende -->
+                  <ItemsControl Grid.Row="2" Grid.Column="2" Margin="0,5,0,0" ItemsSource="{Binding Assessment, Converter={x:Static local:Palette.SkillPills}}">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="local:SkillPill">
+                        <Border Classes="pill" Classes.good="{Binding IsGood}" Classes.partial="{Binding IsPartial}" Classes.bad="{Binding IsBad}" ToolTip.Tip="{Binding Tip}" Margin="0,0,4,3">
+                          <TextBlock Text="{Binding Text}" />
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
                 </Grid>
               </DataTemplate>
             </ListBox.ItemTemplate>
