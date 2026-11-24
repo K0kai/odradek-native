@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Odradek</AssemblyName>
     <RootNamespace>Odradek.App</RootNamespace>
-    <ApplicationIcon>..\..\..\assets\public\favicon.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\favicon.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <InvariantGlobalization>false</InvariantGlobalization>
@@ -28,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- ícone do app: o mesmo do app Python (assets/public) -->
-    <AvaloniaResource Include="..\..\..\assets\public\odradek-icon.png" Link="Assets\odradek-icon.png" />
+    <!-- ícone do app (o mesmo do app Python) -->
+    <AvaloniaResource Include="Assets\odradek-icon.png" />
   </ItemGroup>
 
 </Project>
