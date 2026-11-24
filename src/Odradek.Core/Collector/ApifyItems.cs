@@ -122,7 +122,7 @@ public static partial class ApifyItems
             if (node is not JsonObject item) continue;
             if (IndicatesClosed(item)) { skippedClosed++; continue; }
             var url = ItemUrl(item);
-            var title = S(First(item, "title", "position", "jobTitle", "displayTitle")).Trim();
+            var title = S(First(item, "title", "position", "positionName", "jobTitle", "displayTitle")).Trim();
             if (url.Length == 0 || title.Length == 0) continue;
             var description = S(First(item, "descriptionText", "descriptionHtml", "description", "jobDescription", "jobDescriptionHTML"));
             var companyNode = First(item, "companyName", "company", "companyDetails", "jobSourceName");

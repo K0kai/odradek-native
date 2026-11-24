@@ -47,8 +47,9 @@ public static class SettingsLayout
         ]),
         new("Perfil",
         [
-            new("Contato", "",
-                [new("candidate_name", "Nome"), new("candidate_email", "E-mail"), new("candidate_phone", "Telefone"),
+            new("Contato", "Telefone sem o código do país (ex.: 11 99999-0000); o código (ex.: 55) vai à parte, para os sites que têm um campo para cada. Com + na frente o telefone já traz o próprio código.",
+                [new("candidate_name", "Nome"), new("candidate_email", "E-mail"),
+                 new("candidate_phone_country_code", "Código do país (DDI)"), new("candidate_phone", "Telefone"),
                  new("candidate_linkedin", "LinkedIn"), new("candidate_current_company", "Empresa atual"), new("candidate_cpf", "CPF")]),
             new("Endereço", "A cidade e o país definem a elegibilidade geográfica e onde o LinkedIn é pesquisado.",
                 [new("candidate_city", "Cidade"), new("candidate_state", "Estado"), new("candidate_country", "País"),
@@ -89,6 +90,14 @@ public static class SettingsLayout
     ];
 
     /// <summary>Campos de texto longo (várias linhas) na edição.</summary>
+    /// <summary>Campos de instruções da IA: vazio no banco significa "usar o padrão"; a tela mostra o texto padrão para ele poder ser lido e editado.</summary>
+    public static readonly IReadOnlyDictionary<string, string> PromptDefaults = new Dictionary<string, string>
+    {
+        ["linkedin_filter_prompt"] = Odradek.Core.Collector.FilterPrompts.DefaultMain,
+        ["transferable_prompt"] = Odradek.Core.Collector.FilterPrompts.DefaultSecondary,
+        ["job_selection_prompt"] = Odradek.Core.Engines.TriageService.DefaultJobSelectionPrompt,
+    };
+
     public static readonly HashSet<string> MultiLine =
     [
         "keywords", "locations", "apify_actors_json", "linkedin_filter_prompt", "transferable_prompt", "job_selection_prompt",
@@ -134,6 +143,10 @@ public static class SettingsLayout
         return $"gerado ({raw.Length} caracteres)";
     }
 
+    /// <summary>Nome do segredo no cofre: o da chave da IA depende do provedor escolhido (Gemini quando não há nenhum).</summary>
+    public static string SecretName(SettingField field, string? provider) =>
+        field.Secret == "@provider" ? (string.IsNullOrEmpty(provider) ? "gemini" : provider.ToLowerInvariant()) : field.Secret;
+
     /// <summary>O valor como aparece na tela. Segredos nunca são lidos para a tela: só "configurada" ou "não configurada".</summary>
     public static string Display(SettingField field, IReadOnlyDictionary<string, string> values)
     {
@@ -143,8 +156,7 @@ public static class SettingsLayout
         {
             case FieldKind.Secret:
                 if (field.Key == "__extension_token_hash__") return raw.Length > 0 ? "configurado" : "não gerado";
-                var name = field.Secret == "@provider" ? (values.TryGetValue("ai_provider", out var p) && p.Length > 0 ? p.ToLowerInvariant() : "gemini") : field.Secret;
-                return SecretStore.Has(name) ? "configurada" : "não configurada";
+                return SecretStore.Has(SecretName(field, values.TryGetValue("ai_provider", out var p) ? p : null)) ? "configurada" : "não configurada";
             case FieldKind.Toggle:
                 return raw == "1" ? "Ligado" : "Desligado"; // o painel grava sempre "1" ou "0"
             case FieldKind.Select:

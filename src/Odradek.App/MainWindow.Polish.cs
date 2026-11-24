@@ -11,6 +11,7 @@ public partial class MainWindow
     private void WirePolish()
     {
         KeyDown += OnShortcut;
+        WireChrome();
         WireTheme();
         SizeChanged += (_, e) => LayoutHeader(e.NewSize.Width);
         if (Environment.GetEnvironmentVariable("ODRADEK_SHOTS") is { Length: > 0 }) return; // a captura da tela transparente sai manchada: nos testes o fundo é liso
@@ -71,17 +72,20 @@ public partial class MainWindow
     /// <summary>Com Mica a janela fica transparente e o conteúdo ganha um véu do fundo do app; sem Mica volta tudo ao fundo liso.</summary>
     private void ApplyBackdrop()
     {
-        var mica = ActualTransparencyLevel == WindowTransparencyLevel.Mica;
+        // No escuro o Mica não entra: o material clareia o fundo com a cor do papel de parede e o tema deixa de ser realmente escuro.
+        var mica = ActualTransparencyLevel == WindowTransparencyLevel.Mica && ActualThemeVariant != Avalonia.Styling.ThemeVariant.Dark;
         if (!mica)
         {
             ClearValue(BackgroundProperty);
             Sidebar.Background = Palette.Brush("SidebarBg");
             ContentHost.Background = Brushes.Transparent;
+            TitleBar.Background = Brushes.Transparent;
             return;
         }
         Background = Brushes.Transparent;
         Sidebar.Background = Veil("SidebarBg", 0.55);
         ContentHost.Background = Veil("AppBg", 0.72);
+        TitleBar.Background = ContentHost.Background; // a barra de título tem o mesmo véu do conteúdo, sem emenda
     }
 
     private static IBrush Veil(string key, double opacity) =>

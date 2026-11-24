@@ -23,6 +23,8 @@ public static partial class ResumeAnalysis
     }
 
     private static JsonObject Fact() => ObjectOf(("text", Type("string")), ("quote", Type("string")));
+    /// <summary>Formação: o fato mais o período, que a avaliação usa quando uma vaga aceita curso no lugar de experiência.</summary>
+    private static JsonObject EducationFact() => ObjectOf(("text", Type("string")), ("quote", Type("string")), ("start", Type("string")), ("end", Type("string")));
 
     public static JsonObject ProfileSchema()
     {
@@ -35,7 +37,7 @@ public static partial class ResumeAnalysis
                 ("responsibilities", ListOf(Fact())), ("skills_used", ListOf(Type("string")))))),
             ("skills", ListOf(ObjectOf(("name", Type("string")), ("canonical", Type("string")), ("category", category), ("quotes", ListOf(Type("string")))))),
             ("transferable_skills", ListOf(ObjectOf(("capability", Type("string")), ("from_roles", ListOf(Type("string"))), ("quotes", ListOf(Type("string")))))),
-            ("education", ListOf(Fact())), ("certifications", ListOf(Fact())), ("projects", ListOf(Fact())), ("achievements", ListOf(Fact())),
+            ("education", ListOf(EducationFact())), ("certifications", ListOf(Fact())), ("projects", ListOf(Fact())), ("achievements", ListOf(Fact())),
             ("languages", ListOf(ObjectOf(("language", Type("string")), ("level", Type("string")), ("quote", Type("string"))))),
             ("location_notes", Type("string")), ("work_authorization_notes", Type("string")));
     }
@@ -48,6 +50,7 @@ HARD RULES
 - Never invent employers, dates, skills, tools, metrics or claims. If unsure, omit the item.
 - Include EVERY role (newest first), including non-IT roles such as administrative assistant. Do not drop any.
 - roles[].start / roles[].end use "YYYY-MM" (or "YYYY" if only the year is known, written as "YYYY-01" for start and "YYYY-12" for end). Use "present" as end for an ongoing role. Use "" when the resume gives no date. Never guess dates.
+- education[].start / education[].end use the same date format as roles ("present" for a course still in progress); "" when the resume gives no dates.
 - roles[].quote = the line(s) naming the title/employer/period. roles[].skills_used = canonical skill names used in that role, only if the resume ties them to it.
 - skills[]: every technology, language, framework, tool, platform, database, methodology or domain explicitly named. `canonical` = lowercase, no version, no punctuation variants (e.g. "node.js" -> "nodejs", "Postgres" -> "postgresql"). `quotes` = where it appears.
 - transferable_skills[]: abstract capabilities the candidate DEMONSTRATED in any role, including non-technical ones (e.g. user support, document/process control, spreadsheets and reporting, routine automation, communication with clients/suppliers, scheduling, financial/administrative routines). `from_roles` = titles of the roles where shown. Each needs a verbatim quote.

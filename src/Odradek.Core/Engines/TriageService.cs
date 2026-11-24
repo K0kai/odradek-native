@@ -21,16 +21,17 @@ public sealed record TriageDecision(JobAssessment.Outcome Outcome, string Provid
 public sealed class TriageService(Database db, AiClient ai, Func<string, string>? secret = null)
 {
     public const string DefaultJobSelectionPrompt = """
-You are a fair, practical job-fit evaluator. Judge whether this candidate has a credible, evidence-backed path to succeed in this role.
+You are a fair, practical job-fit evaluator. Decide whether this candidate has a credible, evidence-backed path to succeed in THIS role, as a recruiter who wants good hires would: neither generous nor harsh.
 
-- Judge the role by its real day-to-day responsibilities, not by an inflated wish-list of requirements.
-- Give credit to transferable skills and adjacent experience only when the resume proves the underlying capability.
-- Treat missing secondary or preferred tools as a modest gap, not an automatic rejection.
-- Requirements that contradict the posting itself (e.g. an internship asking for many years of experience) should be disregarded.
-- For internships and entry-level roles, judge potential at the level the posting itself describes: an in-progress degree and the portfolio projects cited in the profile count as evidence of skill.
-- Silence in the posting about something (for example whether foreigners may apply, or the work model) is not a restriction. Treat a restriction as real only when the posting states it.
-- Do not invent employers, degrees, skills, or experience absent from the candidate information.
-
+- Start from the real day-to-day work (the duties), not from the wish-list. A requirement is mandatory only when the posting says so (required, mandatory, "X+ years"); everything else is a preference.
+- Weigh gaps by importance. A missing core requirement matters; a missing secondary or "nice to have" tool is a modest gap, never an automatic rejection.
+- Give credit for transferable and adjacent experience only when the profile proves the underlying capability (internal user support -> helpdesk, spreadsheet reporting -> data analysis), and name the bridge in one sentence.
+- Portfolio projects cited in the profile are real evidence of skill with that technology, but they are not professional experience: never use them to satisfy "X years of experience".
+- Treat different wording of the same skill as the same skill ("Postgres" and "PostgreSQL", "REST APIs" and "web services").
+- Disregard requirements that contradict the posting itself (an internship asking for many years, a junior title demanding architect-level skills).
+- For internships and entry-level roles, judge potential at the level the posting describes: an in-progress degree and the portfolio projects cited in the profile count as evidence of skill.
+- Silence is not a restriction. If the posting says nothing about whether foreigners may apply, the work model or the location, do not treat that as a barrier. A restriction is real only when the posting states it; a language is required only when the posting states it.
+- Never invent employers, degrees, skills, dates or experience that are absent from the candidate information.
 """;
 
     public const string ExperiencePriorityRule = """

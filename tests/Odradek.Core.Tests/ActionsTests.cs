@@ -296,6 +296,21 @@ public class SettingsActionsTests
     }
 
     [Fact]
+    public void The_selection_prompt_equal_to_the_default_is_not_stored_but_a_custom_one_is()
+    {
+        using var t = new TempDb();
+        var a = new SettingsActions(t.Db);
+        var store = new Odradek.Core.Data.SettingsStore(t.Db);
+        a.Save(new Dictionary<string, string> { ["job_selection_prompt"] = Odradek.Core.Engines.TriageService.DefaultJobSelectionPrompt + "   " });
+        Assert.Equal("", store.Get("job_selection_prompt"));
+        a.Save(new Dictionary<string, string> { ["job_selection_prompt"] = "Seja rigoroso com senioridade." });
+        Assert.Equal("Seja rigoroso com senioridade.", store.Get("job_selection_prompt"));
+        Assert.Equal("Seja rigoroso com senioridade.", Odradek.Core.Engines.TriageService.EffectivePrompt(store.All()));
+        a.Save(new Dictionary<string, string> { ["job_selection_prompt"] = "" });
+        Assert.Equal(Odradek.Core.Engines.TriageService.DefaultJobSelectionPrompt, Odradek.Core.Engines.TriageService.EffectivePrompt(store.All()));
+    }
+
+    [Fact]
     public void Search_group_normalizes_countries_toggles_and_saves_only_known_keys()
     {
         using var t = new TempDb();

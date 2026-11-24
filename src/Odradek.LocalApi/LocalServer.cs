@@ -22,6 +22,10 @@ public sealed class LocalServer : IAsyncDisposable
     private WebApplication? _app;
     private readonly ApiServices? _services;
     private readonly int _port;
+    private long _lastRequestTicks;
+
+    /// <summary>Quando a extensão ou o Qpid fizeram a última requisição (UTC; <see cref="DateTime.MinValue"/> se nunca). A atualização automática só reinicia com o servidor quieto.</summary>
+    public DateTime LastRequestUtc => new(Interlocked.Read(ref _lastRequestTicks), DateTimeKind.Utc);
 
     /// <param name="services">As rotas da extensão e do Qpid; sem isso só o <c>/health</c> responde (como na etapa 0).</param>
     /// <param name="port">Porta de escuta; o padrão é a fixa (8765, ou <c>PORT</c>). Os testes usam outra.</param>
@@ -44,6 +48,11 @@ public sealed class LocalServer : IAsyncDisposable
         builder.Host.ConfigureHostOptions(options => options.ShutdownTimeout = TimeSpan.FromSeconds(5));
 
         var app = builder.Build();
+        app.Use(async (context, next) =>
+        {
+            if (context.Request.Path != "/health") Interlocked.Exchange(ref _lastRequestTicks, DateTime.UtcNow.Ticks); // o /health é só sonda (inclusive a do atualizador)
+            await next();
+        });
         MapRoutes(app, _services);
         await app.StartAsync(cancellation);
         _app = app;

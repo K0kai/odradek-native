@@ -63,17 +63,20 @@ public sealed partial class PanelQueries(Database db)
         return new DashboardData(counts, jobs, runs);
     }
 
+    /// <summary>Valor de <c>status</c> que lista as vagas de todos os status (a tela de vagas; nenhuma rota da API o usa).</summary>
+    public const string AllStatuses = "all";
+
     public JobPage Jobs(int page = 1, int pageSize = 15, string status = "worth", int minMatch = 0, string sort = "", string dateFrom = "", string dateTo = "")
     {
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 5, 50);
         minMatch = Math.Clamp(minMatch, 0, 100);
-        status = Defaults.IsStatus(status) ? status : "worth";
+        status = status == AllStatuses || Defaults.IsStatus(status) ? status : "worth";
         sort = JobSort.Normalize(sort);
         if (dateFrom.Length > 0 && dateTo.Length > 0 && string.CompareOrdinal(dateFrom, dateTo) > 0) (dateFrom, dateTo) = (dateTo, dateFrom);
         var (lo, hi) = JobSort.DateBoundsUtc(dateFrom, dateTo);
 
-        var where = "jobs.status = @status";
+        var where = status == AllStatuses ? "1 = 1" : "jobs.status = @status";
         var parameters = new DynamicParameters();
         parameters.Add("status", status);
         if (minMatch > 0) { where += $" AND COALESCE({JobSort.MatchExpr}, 0) >= @minMatch"; parameters.Add("minMatch", minMatch); }

@@ -9,7 +9,9 @@ namespace Odradek.App;
 
 internal static class Program
 {
-    private const string ShowEventName = @"Local\Odradek.ShowWindow";
+    /// <summary><c>ODRADEK_INSTANCE</c> dá outro nome à instância única: só para conferir uma cópia de teste ao lado do app instalado (com <c>PORT</c> e <c>ODRADEK_DATA_DIR</c> próprios).</summary>
+    private static readonly string InstanceSuffix = (Environment.GetEnvironmentVariable("ODRADEK_INSTANCE") ?? "").Trim();
+    private static readonly string ShowEventName = @"Local\Odradek.ShowWindow" + InstanceSuffix;
     private static readonly object LogLock = new();
     private static EventWaitHandle? _showEvent;
     private static Mutex? _instanceMutex; // mantido vivo (e preso) até o fim do processo
@@ -20,8 +22,12 @@ internal static class Program
     private static readonly Lazy<OdradekEngines> LazyEngines = new(() => new OdradekEngines(Database, secret: Environment.GetEnvironmentVariable("ODRADEK_SMOKE") is null ? null : _ => "")); // teste de fumaça: sem segredos, nada vai à rede paga
     public static OdradekEngines Engines => LazyEngines.Value; // montado só quando alguém usa (fora do caminho da abertura da janela)
     private static readonly Lazy<string> QpidTokenValue = new(() => Odradek.Core.Api.QpidToken.Resolve());
+    /// <summary>Token das rotas <c>/api/qpid/*</c> (o mesmo que o servidor local confere); o Qpid precisa guardar este valor.</summary>
+    public static string QpidApiToken => QpidTokenValue.Value;
     public static bool EnginesCreated => LazyEngines.IsValueCreated;
     public static Task ServerStart { get; private set; } = Task.CompletedTask;
+    /// <summary><c>null</c> quando a atualização automática está desligada (o app não foi instalado por <c>install.ps1</c>).</summary>
+    public static Odradek.Core.Update.Updater? AutoUpdater { get; private set; }
 
     public static double ProcessAgeMs() => (DateTime.Now - Process.GetCurrentProcess().StartTime).TotalMilliseconds;
 
@@ -34,13 +40,19 @@ internal static class Program
         // Instância única: quem decide é a porta fixa, como no app Python (a extensão e o Qpid precisam dela).
         // Segunda execução do app novo: o mutex nomeado responde na hora. (Sondar a porta custava ~3 s quando ela está livre,
         // porque o Windows demora a recusar a conexão.) A sonda só roda se a porta não puder ser aberta, para escolher a mensagem.
-        _instanceMutex = new Mutex(true, @"Local\Odradek.Instance", out var firstInstance);
+        _instanceMutex = new Mutex(true, @"Local\Odradek.Instance" + InstanceSuffix, out var firstInstance);
         if (!firstInstance)
         {
             if (EventWaitHandle.TryOpenExisting(ShowEventName, out var existing)) existing.Set(); // traz a janela da primeira para a frente
             return 0;
         }
         Log($"Main a {ProcessAgeMs():F0} ms do início do processo.");
+
+        // Uma atualização já baixada e ainda não aplicada (o app saiu antes da troca): aplica agora, antes de abrir qualquer coisa. O script de troca
+        // espera este processo terminar, troca as pastas e reabre o app; se a troca falhar ele reabre a versão antiga e nunca repete a tentativa.
+        AutoUpdater = Odradek.Core.Update.Updater.FromEnvironment(Log);
+        if (AutoUpdater?.Staged() is { } pending && AutoUpdater.LaunchApply(pending, Environment.ProcessId, restart: true, background: false, LocalServer.Port))
+            return 0;
 
         _showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName);
 

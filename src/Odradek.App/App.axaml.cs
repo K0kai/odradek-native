@@ -14,6 +14,8 @@ public partial class App : Application
 
     private MainWindow? _window;
     private TrayIcon? _tray;
+    private UpdateCoordinator? _updates;
+    private NativeMenuItem? _updateItem;
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
@@ -26,7 +28,8 @@ public partial class App : Application
         {
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown; // fechar a janela só esconde; "Sair" encerra
             _window = new MainWindow();
-            desktop.MainWindow = _window;
+            // --background (o reinício da atualização automática): sobe só na bandeja; a janela abre pelo ícone, como depois do X.
+            if (desktop.Args?.Contains("--background") != true) desktop.MainWindow = _window;
             desktop.Exit += (_, _) => Quitting = true;
             _tray = BuildTray();
             _ = StartServerAsync();
@@ -53,11 +56,58 @@ public partial class App : Application
                   "feche o programa que a usa e abra o Odradek de novo.";
             Program.Log($"Porta {LocalServer.Port}: {state}.");
             await Task.Run(() => NativeMessage.Show(message));
-            await Dispatcher.UIThread.InvokeAsync(QuitAsync);
+            await Dispatcher.UIThread.InvokeAsync(() => QuitAsync());
             return;
         }
         StartEngines();
+        StartUpdates();
         if (_window is not null) await _window.LoadDbSummaryAsync();
+    }
+
+    /// <summary>Atualização automática (só no app instalado): procura versões novas e aplica quando o app está ocioso.</summary>
+    private void StartUpdates()
+    {
+        if (Program.AutoUpdater is not { } updater) return;
+        Program.Log($"Atualização automática ligada (versão {updater.Current}, feed {updater.FeedDir}).");
+        _updates = new UpdateCoordinator(updater,
+            () => Dispatcher.UIThread.Invoke(() => _window?.IsVisible == true),
+            async () => { await Dispatcher.UIThread.InvokeAsync(() => QuitAsync(restartForUpdate: true)); return Quitting; });
+        _updates.Start();
+        _window?.AttachUpdates(_updates);
+        if (_updateItem is { } item)
+        {
+            item.IsVisible = true;
+            _updates.Changed += () => Dispatcher.UIThread.Post(RenderUpdateItem);
+            RenderUpdateItem();
+        }
+    }
+
+    private void RenderUpdateItem()
+    {
+        if (_updateItem is null || _updates is null) return;
+        _updateItem.Header = _updates.Staged is { } staged ? $"Atualizar agora ({staged.Version.ToString(3)})" : "Procurar atualizações";
+    }
+
+    /// <summary>Item da bandeja: com versão pronta, aplica (reabrindo com a janela); sem ela, procura e avisa o resultado.</summary>
+    private async Task UpdateFromTrayAsync()
+    {
+        if (_updates is null) return;
+        try
+        {
+            if (_updates.Staged is not null)
+            {
+                await QuitAsync(restartForUpdate: true, background: false);
+                _updates.Revalidate();
+                return;
+            }
+            Toast.Show("Procurando atualizações…");
+            Toast.Show(UpdateCoordinator.Describe(await _updates.CheckNowAsync()));
+        }
+        catch (Exception ex)
+        {
+            Program.Log("Update: falha ao procurar pela bandeja: " + ex);
+            Toast.Show("Não foi possível procurar atualizações.");
+        }
     }
 
     /// <summary>Liga a fila de IA, a rotina diária e a reanálise de perfis antigos. Falha aqui não derruba a janela: vai para o log.</summary>
@@ -69,7 +119,7 @@ public partial class App : Application
 
     private TrayIcon BuildTray()
     {
-        using var stream = AssetLoader.Open(new Uri("avares://Odradek/Assets/odradek-icon.png"));
+        using var stream = AssetLoader.Open(new Uri("avares://Odradek/Assets/odradek-256.png"));
         var open = new NativeMenuItem("Abrir Odradek");
         open.Click += (_, _) => ShowWindow();
         var backup = new NativeMenuItem("Fazer backup agora");
@@ -78,12 +128,15 @@ public partial class App : Application
         folder.Click += (_, _) => Program.OpenDataFolder();
         var quit = new NativeMenuItem("Sair");
         quit.Click += async (_, _) => await QuitAsync();
+        // Só no app instalado (atualização automática ligada): StartUpdates o mostra e acerta o texto.
+        _updateItem = new NativeMenuItem("Procurar atualizações") { IsVisible = false };
+        _updateItem.Click += async (_, _) => await UpdateFromTrayAsync();
 
         var tray = new TrayIcon
         {
             Icon = new WindowIcon(stream),
-            ToolTipText = "Odradek",
-            Menu = new NativeMenu { open, backup, folder, new NativeMenuItemSeparator(), quit },
+            ToolTipText = Program.AutoUpdater is { } updater ? $"Odradek {updater.Current.ToString(3)}" : "Odradek",
+            Menu = new NativeMenu { open, backup, folder, _updateItem, new NativeMenuItemSeparator(), quit },
         };
         tray.Clicked += (_, _) => ShowWindow();
         TrayIcon.SetIcons(this, new TrayIcons { tray });
@@ -119,10 +172,22 @@ public partial class App : Application
         _window.Activate();
     }
 
-    public async Task QuitAsync()
+    /// <param name="restartForUpdate">
+    /// Saída pedida pela atualização automática: o script de troca reabre o app já atualizado (na bandeja). Sem isso, uma versão já preparada
+    /// também é aplicada ao sair, mas sem reabrir. O script espera este processo terminar antes de mexer em qualquer pasta.
+    /// </param>
+    /// <param name="background">Só vale com <paramref name="restartForUpdate"/>: reabre o app só na bandeja (atualização automática) ou com a janela (botão Atualizar agora).</param>
+    public async Task QuitAsync(bool restartForUpdate = false, bool background = true)
     {
         if (Quitting) return;
+        var updater = Program.AutoUpdater;
+        var staged = updater?.Staged();
+        if (restartForUpdate && (updater is null || staged is null)) return; // nada a aplicar: não fecha o app à toa
+        // Entrega a troca antes de parar tudo: se o script não subir, o app ainda não parou e segue funcionando.
+        if (staged is not null && !updater!.LaunchApply(staged, Environment.ProcessId, restartForUpdate, background, LocalServer.Port) && restartForUpdate)
+            return;
         Quitting = true;
+        _updates?.Stop();
         if (_tray is not null) _tray.IsVisible = false;
         try { if (Program.EnginesCreated) await Program.Engines.StopAsync(); }
         catch (Exception ex) { Program.Log("Falha ao parar os motores: " + ex.Message); }

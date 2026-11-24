@@ -147,12 +147,36 @@ public sealed class JobSources(Database db, ApifyClient client, Func<string, str
         var results = new List<CollectedJob>();
         var errors = new List<string>();
         var planned = LinkedInSearch.PlanApifyRuns(actors, mainFilter, secondaryFilter, scope, mainShare, LinkedInSearch.MaxAgeDays(cfg), customLocations, LinkedInSearch.Terms(cfg.GetValueOrDefault("keywords")));
+        var enabledFilters = new[] { mainFilter, secondaryFilter }.Where(f => f is not null && (f["enabled"] is null || Text.Truthy(f["enabled"]))).Select(f => f!).ToList();
+        planned = LinkedInSearch.FitCustomRunsToLimit(planned, actors, enabledFilters, mainShare);
         var activeCount = new[] { mainFilter, secondaryFilter }.Count(f => f is not null);
         Log("info", $"Coleta planejada: Principal{(secondaryFilter is not null ? " + Secundário" : "")} ({activeCount} filtro(s)), {planned.Count} execução(ões) Apify.");
         var attempted = 0;
-        foreach (var (runActor, linkedinFilter, linkedinUrls) in planned)
+        // As buscas do LinkedIn se repetem por janela (24h, 7d, teto) e por lote, cada uma pedindo "count": o total do actor é o seu count,
+        // não a soma das execuções. Cada execução pede só o que ainda falta e, esgotado o saldo, as demais nem começam (nada é cobrado).
+        var budget = actors.GroupBy(a => Text.PyStr(a["id"])).ToDictionary(g => g.Key, g => g.Sum(a => ApifyClient.RunLimit(a)));
+        var spent = new Dictionary<string, int>();
+        var exhausted = new HashSet<string>();
+        foreach (var plannedRun in planned)
         {
+            var (runActor, linkedinFilter, linkedinUrls) = plannedRun;
             if (stop.IsCancellationRequested) break;
+            var actorId = Text.PyStr(runActor["id"]);
+            if (budget.TryGetValue(actorId, out var total))
+            {
+                var remaining = total - spent.GetValueOrDefault(actorId);
+                if (remaining <= 0)
+                {
+                    attempted++; // coberto pelo limite, não é cobertura perdida
+                    if (exhausted.Add(actorId)) Log("info", $"{(Text.Truthy(runActor["label"]) ? Text.PyStrRaw(runActor["label"]).Split(':')[0] : actorId)}: limite de {total} vaga(s) por busca atingido; as execuções restantes não foram iniciadas.");
+                    continue;
+                }
+                if (ApifyClient.RunLimit(runActor) > remaining)
+                {
+                    runActor = (JsonObject)runActor.DeepClone();
+                    runActor["count"] = remaining;
+                }
+            }
             var runLabel = Text.Truthy(runActor["label"]) ? Text.PyStrRaw(runActor["label"]) : Text.PyStrRaw(runActor["id"]);
             double usedNow; // uma checagem de uso que falha não pode iniciar mais lotes pagos às cegas
             try { (usedNow, _) = await client.MonthlyUsageAsync(token).ConfigureAwait(false); }
@@ -180,6 +204,7 @@ public sealed class JobSources(Database db, ApifyClient client, Func<string, str
                     batch = batch.Select(job => job with { FilterId = Text.PyStrRaw(linkedinFilter["id"]), SearchRemote = remoteSearch }).ToList();
                 }
                 results.AddRange(batch);
+                spent[actorId] = spent.GetValueOrDefault(actorId) + batch.Count;
             }
             catch (Exception ex)
             {

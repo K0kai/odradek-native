@@ -18,7 +18,7 @@ public sealed partial class SettingsActions(Database db)
         ["search"] = ["keywords", "locations", "sources", "adzuna_countries", "apify_monthly_credit_limit_usd", "apify_job_count", "apify_actors_json",
             "geo_eligibility_enabled", "linkedin_main_share", "linkedin_max_age_days", "linkedin_preferred_countries", "linkedin_filter_prompt",
             "linkedin_main_filter_json", "transferable_prompt", "secondary_area_hint", "linkedin_secondary_filter_json"],
-        ["profile"] = ["candidate_name", "candidate_email", "candidate_phone", "candidate_linkedin", "candidate_city", "candidate_street",
+        ["profile"] = ["candidate_name", "candidate_email", "candidate_phone", "candidate_phone_country_code", "candidate_linkedin", "candidate_city", "candidate_street",
             "candidate_postal_code", "candidate_state", "candidate_country", "candidate_current_company", "candidate_cpf", "salary_expectation_brl",
             "salary_expectation_usd", "salary_currency_preference", "salary_pj_multiplier", "candidate_contract_type", "candidate_gender",
             "candidate_race", "candidate_lgbtq", "candidate_pcd", "candidate_diversity_note", "portfolio_profile_url"],
@@ -71,6 +71,8 @@ public sealed partial class SettingsActions(Database db)
                     throw new ActionException("Modelos do TokenHarbor: use até 6 IDs separados por vírgula (ex.: deepseek-v4.1-flash:free)");
                 form["tokenharbor_fallback_models"] = string.Join(", ", models);
             }
+            // O texto igual ao padrão não é guardado: assim o app acompanha o padrão quando ele melhora.
+            if (form.TryGetValue("job_selection_prompt", out var selectionPrompt) && selectionPrompt.Trim() == Engines.TriageService.DefaultJobSelectionPrompt.Trim()) form["job_selection_prompt"] = "";
             if (form.TryGetValue("job_selection_optimism", out var optimism)) form["job_selection_optimism"] = NormalizeOptimism(optimism).ToString(CultureInfo.InvariantCulture);
             var effectiveProvider = form.GetValueOrDefault("ai_provider") is { Length: > 0 } p ? p
                 : (new SettingsStore(db).Get("ai_provider") is { Length: > 0 } stored ? stored : "gemini");
@@ -101,6 +103,13 @@ public sealed partial class SettingsActions(Database db)
         }
         if (Has("profile"))
         {
+            if (form.TryGetValue("candidate_phone_country_code", out var dialCode))
+            {
+                var digits = PhoneNumber.NormalizeCountryCode(dialCode); // aceita "+55", "0055" e " 55 "; grava só os dígitos
+                if (dialCode.Trim().Length > 0 && !PhoneNumber.IsValidCountryCode(digits))
+                    throw new ActionException("Código do país inválido: use de 1 a 3 números, sem zero na frente (ex.: 55)");
+                form["candidate_phone_country_code"] = digits;
+            }
             if (form.TryGetValue("portfolio_profile_url", out var url) && url.Trim().Length > 0)
             {
                 form["portfolio_profile_url"] = url.Trim();

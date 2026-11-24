@@ -16,7 +16,21 @@ public class FilterGeneratorTests
 
     private static readonly JsonObject ProfilePt = (JsonObject)JsonNode.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "fixtures", "resume_profile_cases.json")))!["profile_pt"]!;
 
+    // Os textos padrão dos prompts foram reescritos no app nativo; o fixture guarda os do Python. Os casos de paridade que usavam o padrão passam a usar
+    // o texto antigo como prompt personalizado: o mecanismo (marcadores, perfil, instrução de saída, verificação) continua comparado byte a byte.
+    private static readonly JsonObject PythonPrompts = (JsonObject)JsonNode.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "fixtures", "filter_prompts.json")))!;
+    private static string PythonMain => PythonPrompts["main"]!.GetValue<string>();
+    private static string PythonSecondary => PythonPrompts["secondary"]!.GetValue<string>();
+
     private static Dictionary<string, string> Cfg(JsonObject source) => source.ToDictionary(kv => kv.Key, kv => kv.Value!.GetValue<string>());
+
+    private static Dictionary<string, string> CfgWithPythonDefaults(JsonObject source)
+    {
+        var cfg = Cfg(source);
+        if (string.IsNullOrWhiteSpace(cfg.GetValueOrDefault("linkedin_filter_prompt"))) cfg["linkedin_filter_prompt"] = PythonMain;
+        if (string.IsNullOrWhiteSpace(cfg.GetValueOrDefault("transferable_prompt"))) cfg["transferable_prompt"] = PythonSecondary;
+        return cfg;
+    }
 
     [Fact]
     public void Effective_prompts_and_rendering_match_python()
@@ -24,14 +38,19 @@ public class FilterGeneratorTests
         foreach (var item in Cases["effective"]!.AsArray().OfType<JsonObject>())
         {
             var cfg = Cfg(item["cfg"]!.AsObject());
-            Assert.Equal(item["main"]!.GetValue<string>(), FilterGenerator.EffectiveMainPrompt(cfg));
-            Assert.Equal(item["secondary"]!.GetValue<string>(), FilterGenerator.EffectiveSecondaryPrompt(cfg));
+            // sem prompt personalizado vale o padrão NOVO; com personalizado, o texto salvo (como no Python)
+            var customMain = !string.IsNullOrWhiteSpace(cfg.GetValueOrDefault("linkedin_filter_prompt"));
+            var customSecondary = !string.IsNullOrWhiteSpace(cfg.GetValueOrDefault("transferable_prompt"));
+            Assert.Equal(customMain ? item["main"]!.GetValue<string>() : FilterPrompts.DefaultMain, FilterGenerator.EffectiveMainPrompt(cfg));
+            Assert.Equal(customSecondary ? item["secondary"]!.GetValue<string>() : FilterPrompts.DefaultSecondary, FilterGenerator.EffectiveSecondaryPrompt(cfg));
         }
         foreach (var item in Cases["render"]!.AsArray().OfType<JsonObject>())
         {
             var a = item["args"]!.AsObject();
             string Arg(string key) => a[key]?.GetValue<string>() ?? "";
-            var actual = FilterGenerator.RenderPrompt(Arg("template"), Arg("pref_keywords"), Arg("facts_pt"), Arg("facts_en"), Arg("resume_pt"), Arg("resume_en"), Arg("profile"), Arg("area_hint"), Arg("main_filter"));
+            var template = Arg("template");
+            if (template.Length == 0) template = PythonMain; // o Python renderizava o padrão dele; aqui o mesmo texto entra como modelo explícito
+            var actual = FilterGenerator.RenderPrompt(template, Arg("pref_keywords"), Arg("facts_pt"), Arg("facts_en"), Arg("resume_pt"), Arg("resume_en"), Arg("profile"), Arg("area_hint"), Arg("main_filter"));
             Assert.True(item["result"]!.GetValue<string>() == actual, a.ToJsonString());
         }
     }
@@ -42,7 +61,7 @@ public class FilterGeneratorTests
         foreach (var item in Cases["cases"]!.AsArray().OfType<JsonObject>())
         {
             using var t = new TempDb();
-            var cfg = Cfg(item["cfg"]!.AsObject());
+            var cfg = CfgWithPythonDefaults(item["cfg"]!.AsObject());
             var slot = item["slot"]!.GetValue<string>();
             var handler = new FakeAiHandler().Gemini(item["decision"]!.ToJsonString());
             var generator = new FilterGenerator(t.Db, new AiClient(new HttpClient(handler)), _ => "KEY-gemini");
@@ -59,7 +78,9 @@ public class FilterGeneratorTests
             }
             var request = handler.Requests.Single();
             var call = item["call"]!.AsObject();
-            Assert.True(call["prompt"]!.GetValue<string>() == request.Body["contents"]![0]!["parts"]![0]!["text"]!.GetValue<string>(), $"{name}: prompt");
+            // o padrão antigo (agora um prompt personalizado) é aparado ao ler; só o espaço antes de "OUTPUT:" muda, o resto é idêntico
+            static string Squash(string s) => System.Text.RegularExpressions.Regex.Replace(s, @"\n+OUTPUT:", "\nOUTPUT:");
+            Assert.True(Squash(call["prompt"]!.GetValue<string>()) == Squash(request.Body["contents"]![0]!["parts"]![0]!["text"]!.GetValue<string>()), $"{name}: prompt");
             Assert.Equal(call["max_output_tokens"]!.GetValue<int>(), request.Body["generationConfig"]!["maxOutputTokens"]!.GetValue<int>());
             var logs = t.Db.Open().Query<(string Level, string Source, string Message)>("SELECT level, source, message FROM event_logs ORDER BY id").Select(l => new[] { l.Level, l.Source, l.Message }).ToList();
             Assert.Equal(item["logs"]!.AsArray().Select(l => l!.AsArray().Select(x => x!.GetValue<string>()).ToArray()), logs);

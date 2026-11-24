@@ -61,7 +61,8 @@ public static partial class JobAssessment
     public static JsonObject AssessSchema() => Obj(
         ("requirements", ArrayOf(Obj(
             ("id", Prop("string")), ("text", Prop("string")), ("kind", Prop("string", "must", "nice")),
-            ("category", Prop("string", Categories)), ("job_quote", Prop("string")), ("realism", Prop("string", "core", "inflated")),
+            ("category", Prop("string", Categories)), ("years_required", Prop("number")), ("education_credit_years", Prop("number")),
+            ("job_quote", Prop("string")), ("realism", Prop("string", "core", "inflated")),
             ("realism_basis_quote", Prop("string")), ("realism_reason", Prop("string"))))),
         ("role_core", Obj(
             ("level_label", Prop("string")), ("level_quote", Prop("string")),
@@ -128,6 +129,7 @@ You audit ONE job posting against ONE candidate profile. You EXTRACT and CITE; a
 QUOTES: every `job_quote`, `realism_basis_quote`, `level_quote`, `*_quote` must be a SHORT fragment copied VERBATIM from the JOB TEXT. `resume_quote` must be copied VERBATIM from a quote/text of the candidate PROFILE evidence you cite. Items whose quotes cannot be found are discarded.
 
 1. requirements[]: the posting's requirements (ids Q1, Q2, ...). `kind`=must only when the posting states it as required/mandatory/"X+ years"/obligatório; when in doubt use nice. `category` as listed.
+   Duration requirements (category experience_years, e.g. "5+ years of Python"): set `years_required` = the years asked FOR THAT requirement (0 for any other requirement). Set `education_credit_years` only when the posting says a degree/course can replace or add to experience for it (e.g. "3 years of experience or a related degree"), with the years it grants; otherwise 0. Never compute the candidate's years: the program does it from the dated roles.
 2. role_core: what the person will ACTUALLY DO day to day (responsibilities J1, J2, ... from the duties section, not the requirements list) and the posting's stated level label (intern/junior/senior...) with its quote.
 3. REALISM: judge each requirement against the posting ITSELF. Mark `inflated` only when the posting contradicts or does not support it, and give `realism_basis_quote` = verbatim quote from the posting that shows the contradiction (e.g. an "Internship" title next to "5+ years", a junior role demanding architect-level skills, a requirement unrelated to any listed duty). Otherwise `core`. location/authorization/language/clearance requirements are never inflated.
 4. matches[]: one per requirement id (Q*) AND per responsibility id (J*). status:
@@ -135,6 +137,7 @@ QUOTES: every `job_quote`, `realism_basis_quote`, `level_quote`, `*_quote` must 
    - `evidence_ids`: ids from the profile ([R1], [R1.2], [S3], [T1]...). `resume_quote`: a SHORT fragment copied verbatim from the cited evidence's own text (a role line, a responsibility, a project, a certification...). For a SKILL id ([S*]) quote ONLY the skill name (e.g. "PostgreSQL", "React"): NEVER the usage statistics after the colon ("5m, last 2026-11", "portfolio projects 3m (P1)") and never a paraphrase, because those are not in the resume. met/transferable/partial WITHOUT valid evidence ids will be downgraded to unmet; a quote that cannot be found downgrades met/transferable to partial.
    - Credit transferable capabilities generously but only when truly equivalent and evidenced (e.g. internal user support -> helpdesk, spreadsheet reporting -> data analysis).
    - Portfolio projects ([P*] items, or a skill line saying "portfolio projects") are real evidence the candidate can use that skill: they may support met/partial for a SKILL requirement. They do NOT count as professional experience: never use them to satisfy "X years of experience" requirements.
+   - For an experience_years requirement, cite as `evidence_ids` the skill ([S*]) or role ([R*]) the duration must be measured on; the program checks the dated months against `years_required` and downgrades the status when the dates do not support it. With no skill or role cited, total professional experience is used.
 5. stated: min_years (number, 0 if none) with quote; workplace (remote/hybrid/onsite) with `workplace_quote`, or "unspecified" when the posting does not say; job_country and job_city where the job is based, each with a quote from the JOB TEXT or the Location line (empty when not stated); foreign_eligibility for the candidate living in {(where.Length > 0 ? where : "an unknown location")}: open_to_candidate ONLY when the posting explicitly says people there (or anyone/worldwide/"work from anywhere"/the candidate's region) can apply, restricted when it limits applicants to places that exclude the candidate, otherwise unstated; always with `eligibility_quote`. Do not guess any of these. authorization = candidate_lacks ONLY if the posting requires work authorization the candidate does not have per the profile, with quote; required_languages (languages the posting requires for the job, with quotes).
 6. role_family_fit: same (same occupation family as candidate's roles), adjacent (neighbouring family, skills clearly overlap), different. Be honest; adjacent/different is acceptable when transferable capabilities exist.
 7. cover_letter_required: true only if the posting explicitly asks for a cover letter.
@@ -217,6 +220,64 @@ JOB TEXT
 
     private static string Cut(JsonNode? value, int limit) => Core.Text.Take(S(value), limit);
 
+    private const double MaxRequiredYears = 40, MaxEducationCreditYears = 10, DurationToleranceYears = 0.25;
+
+    /// <summary>"2 anos e 3 meses" (o tempo comprovado que aparece no cartão e no aviso).</summary>
+    public static string Duration(long months)
+    {
+        var (years, rest) = (months / 12, months % 12);
+        var parts = new List<string>();
+        if (years > 0) parts.Add($"{years} ano{(years == 1 ? "" : "s")}");
+        if (rest > 0 || years == 0) parts.Add($"{rest} {(rest == 1 ? "mês" : "meses")}");
+        return string.Join(" e ", parts);
+    }
+
+    /// <summary>
+    /// Confere, pelas datas do currículo, as exigências de tempo ("5+ anos de Python"). O tempo vem das skills e cargos citados como evidência (ou da
+    /// experiência total, sem citação) e, quando a vaga aceita curso no lugar de experiência, soma a formação até o limite que ela concede. Se o
+    /// tempo comprovado não sustenta o status dado pela IA, o status cai: com ao menos metade do exigido vira parcial, com menos vira não atende.
+    /// Cargos sem datas não provam nada contra o candidato: nesse caso o status fica e o aviso explica.
+    /// </summary>
+    private static void CheckDurations(IEnumerable<JsonObject> requirements, JsonObject profile, Action downgraded)
+    {
+        var asked = requirements.Where(r => r["years_required"] is not null && S(r["realism"]) != "inflated").ToList();
+        if (asked.Count == 0) return;
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var skillStats = (profile["derived"] as JsonObject)?["skills"] as JsonObject ?? [];
+        var roleIds = Arr(profile["roles"]).OfType<JsonObject>().Select(r => S(r["id"])).ToList();
+        var totalMonths = ResumeProfile.MonthsForRoles(profile, roleIds, today);
+        var educationMonths = ResumeProfile.EducationMonths(profile, today);
+        var undated = ResumeProfile.HasUndatedRoles(profile, today);
+
+        foreach (var req in asked)
+        {
+            var required = Number(req["years_required"]);
+            var measured = new HashSet<string>();
+            var specific = false;
+            foreach (var id in Arr(req["evidence_ids"]).Select(S))
+            {
+                if (skillStats[id] is JsonObject stat) { specific = true; foreach (var role in Arr(stat["role_ids"])) measured.Add(S(role)); }
+                else if (id.Length > 1 && id[0] == 'R') { specific = true; measured.Add(id.Split('.')[0]); }
+            }
+            var months = specific ? ResumeProfile.MonthsForRoles(profile, measured, today) : totalMonths;
+            var credit = Math.Min(Number(req["education_credit_years"]) * 12, educationMonths);
+            var proven = (int)Math.Round(months + credit);
+            req["proven_months"] = proven;
+
+            var status = S(req["status"]);
+            if (status is not ("met" or "transferable" or "partial") || proven / 12.0 + DurationToleranceYears >= required) continue;
+            if (undated && months == 0)
+            {
+                req["note"] = "o currículo tem cargos sem datas: não foi possível medir o tempo de experiência";
+                continue;
+            }
+            var ratio = proven / 12.0 / required;
+            var target = status == "partial" ? (ratio < 0.5 ? "unmet" : "partial") : (ratio >= 0.5 ? "partial" : "unmet");
+            if (target != status) { req["status"] = target; req["bridge"] = ""; downgraded(); }
+            req["note"] = $"exige {General(required)}+ anos; comprovado {(proven == 0 ? "nenhum tempo" : Duration(proven))}";
+        }
+    }
+
     public static Verified Verify(JsonObject raw, NormalizedText jobNorm, NormalizedText resumeNorm, JsonObject profile)
     {
         var index = ResumeProfile.EvidenceIndex(profile);
@@ -240,12 +301,18 @@ JOB TEXT
                 reason = "";
                 Bump("realism_reverted");
             }
-            requirements.Add(new JsonObject
+            var requirement = new JsonObject
             {
                 ["id"] = rid, ["text"] = Cut(item["text"], 300), ["kind"] = S(item["kind"]) == "must" ? "must" : "nice",
                 ["category"] = category, ["job_quote"] = Cut(item["job_quote"], 300), ["realism"] = realism,
                 ["realism_basis_quote"] = realism == "inflated" ? Cut(item["realism_basis_quote"], 300) : "", ["realism_reason"] = reason,
-            });
+            };
+            if (category == "experience_years" && Math.Min(ParseYears(item["years_required"]), MaxRequiredYears) is var yearsAsked and > 0)
+            {
+                requirement["years_required"] = yearsAsked; // só quando a vaga pede um tempo: as demais exigências mantêm o formato de antes
+                if (Math.Min(ParseYears(item["education_credit_years"]), MaxEducationCreditYears) is var credit and > 0) requirement["education_credit_years"] = credit;
+            }
+            requirements.Add(requirement);
         }
 
         var roleCore = raw["role_core"] as JsonObject ?? [];
@@ -325,6 +392,7 @@ JOB TEXT
             item["note"] = match["note"]!.DeepClone();
             item["resume_quote"] = match["resume_quote"]!.DeepClone();
         }
+        CheckDurations(requirements, profile, () => Bump("matches_downgraded"));
 
         var statedRaw = raw["stated"] as JsonObject ?? [];
         var workplace = S(statedRaw["workplace"]) is "remote" or "hybrid" or "onsite" ? S(statedRaw["workplace"]) : "unspecified";
@@ -521,7 +589,10 @@ JOB TEXT
         var minYears = stated["min_years"]!.GetValue<double>();
         var yearsApplies = minYears > 0 && (yearsReqs.Count == 0 || yearsReqs.Any(r => S(r["realism"]) == "core"));
         var totalMonths = Number((profile["derived"] as JsonObject)?["total_months"]);
+        if (totalMonths == 0 && ResumeProfile.HasUndatedRoles(profile)) yearsApplies = false; // sem datas não dá para dizer que falta experiência
         var candidateYears = totalMonths / 12;
+        var educationCredit = yearsReqs.Select(r => Number(r["education_credit_years"])).DefaultIfEmpty(0).Max(); // curso que a vaga aceita no lugar de experiência
+        if (educationCredit > 0) candidateYears += Math.Min(educationCredit, ResumeProfile.EducationMonths(profile) / 12.0);
         if (yearsApplies && minYears > candidateYears + YearsTolerance)
             blocks.Add($"experiência exigida {General(minYears)}+ anos > {Fixed1(candidateYears)} anos comprovados");
         var haveLanguages = CandidateLanguages(profile);

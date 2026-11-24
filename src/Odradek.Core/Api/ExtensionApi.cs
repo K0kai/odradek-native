@@ -15,7 +15,7 @@ public sealed partial class ExtensionApi(Database db, Func<Assistant> assistant)
 
     private static readonly (string Rule, string Field)[] ExtensionKeys =
     [
-        ("full_name", "fullName"), ("email", "email"), ("phone", "phone"), ("linkedin", "linkedin"), ("city", "city"), ("street_address", "streetAddress"),
+        ("full_name", "fullName"), ("email", "email"), ("phone", "phone"), ("phone_country_code", "phoneCountryCode"), ("linkedin", "linkedin"), ("city", "city"), ("street_address", "streetAddress"),
         ("postal_code", "zip"), ("state", "state"), ("country", "country"), ("current_company", "currentCompany"), ("cpf", "cpf"),
         ("salary", "salaryExpectation"), ("contract_type", "contractType"),
     ];
@@ -28,12 +28,16 @@ public sealed partial class ExtensionApi(Database db, Func<Assistant> assistant)
         string Value(string key) => (cfg.GetValueOrDefault(key) ?? "").Trim();
         var name = Value("candidate_name");
         var parts = name.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        // O telefone vai de duas formas: inteiro em "phone" (+DDI quando o DDI é conhecido) e separado em DDI + número nacional, para os sites
+        // que têm um campo para cada. Sem telefone, nada disso vai (a extensão não deve preencher só o código do país).
+        var (countryCode, national) = PhoneNumber.Split(Value("candidate_phone"), Value("candidate_phone_country_code"));
+        var phone = countryCode.Length > 0 ? "+" + countryCode + national : Value("candidate_phone");
         return ApiResult.Ok(new JsonObject
         {
             ["profile"] = new JsonObject
             {
                 ["firstName"] = parts.Length > 0 ? parts[0] : "", ["lastName"] = string.Join(' ', parts.Skip(1)), ["fullName"] = name,
-                ["email"] = Value("candidate_email"), ["phone"] = Value("candidate_phone"), ["city"] = Value("candidate_city"), ["state"] = Value("candidate_state"),
+                ["email"] = Value("candidate_email"), ["phone"] = phone, ["phoneCountryCode"] = countryCode, ["phoneNational"] = national, ["city"] = Value("candidate_city"), ["state"] = Value("candidate_state"),
                 ["country"] = Value("candidate_country"), ["zip"] = Value("candidate_postal_code"), ["linkedin"] = Value("candidate_linkedin"),
             },
         });

@@ -46,6 +46,25 @@ public static partial class Geo
         return key.Length > 0 ? [key] : [];
     }
 
+    private static readonly (string Code, string[] Names)[] CountryCodes =
+    [
+        ("BR", ["brazil", "brasil"]), ("US", ["united states", "usa", "eua", "estados unidos", "united states of america"]),
+        ("GB", ["united kingdom", "uk", "reino unido", "great britain"]), ("PT", ["portugal"]), ("ES", ["spain", "espanha", "espana"]),
+        ("DE", ["germany", "alemanha"]), ("CA", ["canada"]), ("AR", ["argentina"]), ("MX", ["mexico", "méxico"]), ("FR", ["france", "franca", "frança"]),
+        ("NL", ["netherlands", "holanda", "paises baixos"]), ("IE", ["ireland", "irlanda"]), ("IT", ["italy", "italia", "itália"]),
+        ("CL", ["chile"]), ("CO", ["colombia", "colômbia"]), ("AU", ["australia", "austrália"]), ("IN", ["india", "índia"]),
+    ];
+
+    /// <summary>Código ISO de 2 letras do país (nome em português ou inglês); <c>""</c> se não for um país conhecido ("remote", uma cidade).</summary>
+    public static string CountryCode(string? name)
+    {
+        var key = Text.NormalizeText(name);
+        if (key.Length == 0) return "";
+        foreach (var (code, names) in CountryCodes)
+            if (names.Any(n => Text.NormalizeText(n) == key)) return code;
+        return "";
+    }
+
     public static bool LocationInCountries(string? location, IReadOnlyList<string> countries)
     {
         var haystack = $" {Text.NormalizeText(location)} ";
@@ -59,7 +78,7 @@ public static partial class Geo
         var raw = postedAt.Trim();
         if (Clock.TryParse(raw, out var when)) return Math.Max(0, (DateTime.UtcNow - when).TotalSeconds / 86400.0);
         var low = raw.ToLowerInvariant();
-        if (new[] { "just now", "agora", "moments ago", "seconds ago", "second ago" }.Any(low.Contains)) return 0.0;
+        if (new[] { "just now", "agora", "moments ago", "seconds ago", "second ago", "today", "hoje" }.Any(low.Contains)) return 0.0;
         var m = RelativeLong().Match(low);
         if (!m.Success)
         {

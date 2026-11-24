@@ -147,6 +147,17 @@ public static class Schema
         MigrateFilterPrompts(db, tx);
         MigrateSelectionPrompt(db, tx);
         MigrateDiscardExcludedRegionJobs(db, tx);
+        MigrateIndeedActor(db, tx);
+    }
+
+    /// <summary>Uma vez: quem ainda tem só o actor do LinkedIn (a lista padrão antiga) ganha o Indeed; listas editadas à mão não são tocadas.</summary>
+    private static void MigrateIndeedActor(SqliteConnection db, SqliteTransaction tx)
+    {
+        if (Marked(db, tx, "indeed_actor_v2_migrated")) return;
+        var value = db.ExecuteScalar<string?>("SELECT value FROM settings WHERE key='apify_actors_json'", transaction: tx);
+        if (value is not null && Odradek.Core.Collector.ApifyActors.IsLegacyDefault(value))
+            db.Execute("UPDATE settings SET value=@value WHERE key='apify_actors_json'", new { value = Odradek.Core.Collector.ApifyActors.DefaultsJson() }, tx);
+        Mark(db, tx, "indeed_actor_v2_migrated");
     }
 
     private static IEnumerable<string> SplitStatements(string script) =>

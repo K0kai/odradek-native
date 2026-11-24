@@ -14,7 +14,7 @@ public static class Defaults
         ("ai_model", "gemini-3.5-flash-lite"),
         // Último recurso quando todos os modelos do provedor falham; só vale com a chave do TokenHarbor salva.
         ("tokenharbor_fallback_models", "deepseek-v4.1-flash:free,mimo-v2.6-flash:free"),
-        ("candidate_name", ""), ("candidate_email", ""), ("candidate_phone", ""), ("candidate_linkedin", ""),
+        ("candidate_name", ""), ("candidate_email", ""), ("candidate_phone", ""), ("candidate_phone_country_code", "55"), ("candidate_linkedin", ""),
         ("candidate_city", ""), ("candidate_street", ""), ("candidate_postal_code", ""), ("candidate_state", ""),
         ("candidate_country", ""), ("candidate_current_company", ""), ("candidate_cpf", ""),
         // Expectativa salarial: o robô escolhe BRL x USD pela moeda do campo/vaga
@@ -36,7 +36,7 @@ public static class Defaults
         ("transferable_minimum_score", "60"), ("transferable_prompt", ""), ("job_selection_prompt", ""),
         ("maximum_applications_per_run", "5"), ("adzuna_countries", "br,us,gb,ca"),
         ("apify_monthly_credit_limit_usd", "5"), ("apify_job_count", "25"),
-        ("apify_actors_json", """[{"id": "curious_coder~linkedin-jobs-scraper", "label": "LinkedIn Jobs", "enabled": true, "input_mode": "linkedin_search", "count": 25}]"""),
+        ("apify_actors_json", Odradek.Core.Collector.ApifyActors.DefaultsJson()), // LinkedIn + Indeed
         // Vazio = prompt padrão (editável em Busca)
         ("linkedin_filter_prompt", ""), ("ai_usage_json", ""), ("apify_quota_snapshot_json", ""),
         ("smtp_host", ""), ("smtp_port", "587"), ("smtp_user", ""), ("smtp_from", ""), ("smtp_use_tls", "1"),
@@ -52,6 +52,7 @@ public static class Defaults
         new("full_name", "name,full_name,fullname,nome completo,your name,candidate name", "text", "candidate_name", "", 10),
         new("email", "email,e-mail,mail,correo", "text", "candidate_email", "", 20),
         new("phone", "phone,telephone,tel,telefone,celular,mobile,whatsapp", "text", "candidate_phone", "", 30),
+        new("phone_country_code", "phone country code,country code,calling code,dial code,country calling code,código do país,codigo do pais,código de discagem,ddi,prefixo", "text", "candidate_phone_country_code", "", 31),
         new("linkedin", "linkedin,linkedin url,profile url", "text", "candidate_linkedin", "", 40),
         new("city", "city,cidade,cidade atual,current city,localidade", "text", "candidate_city", "", 50),
         new("street_address", "street address,address line,endereço,endereco,rua,logradouro,street name,nome da rua,address 1,address line 1", "text", "candidate_street", "", 50),

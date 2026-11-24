@@ -29,7 +29,8 @@
 
   <ItemGroup>
     <!-- ícone do app (o mesmo do app Python) -->
-    <AvaloniaResource Include="Assets\odradek-icon.png" />
+    <!-- odradek-icon.png (1024 px) é só a matriz: o app usa as versões já reduzidas (64/128/256), que ficam nítidas em tamanho pequeno -->
+    <AvaloniaResource Include="Assets\odradek-64.png;Assets\odradek-128.png;Assets\odradek-256.png" />
   </ItemGroup>
 
 </Project>

@@ -210,12 +210,17 @@ public class JobSourcesTests
 {
     private const string UsageOk = """{"data":{"totalUsageCreditsUsdAfterVolumeDiscount":1.5,"usageCycle":{"startAt":"2026-11-01T00:00:00.000Z","endAt":"2026-11-30T23:59:59.999Z"}}}""";
 
+    private const string LinkedInOnly = """[{"id":"curious_coder~linkedin-jobs-scraper","label":"LinkedIn Jobs","enabled":true,"input_mode":"linkedin_search","count":25}]""";
+
     private static (TempDb T, RouteHandler Http, JobSources Sources) Setup(Action<RouteHandler>? routes = null, Dictionary<string, string>? settings = null, string token = "TOKEN-1")
     {
         var t = new TempDb();
         var http = new RouteHandler();
         routes?.Invoke(http);
-        new SettingsStore(t.Db).SetMany(settings ?? []);
+        // Os testes antigos tratam do LinkedIn; o padrão do app também traz o Indeed, que tem testes próprios.
+        var all = new Dictionary<string, string> { ["apify_actors_json"] = LinkedInOnly };
+        foreach (var (key, value) in settings ?? []) all[key] = value;
+        new SettingsStore(t.Db).SetMany(all);
         var sources = new JobSources(t.Db, new ApifyClient(new HttpClient(http)), name => name == "apify_token" ? token : name.StartsWith("adzuna") ? "adz-" + name : "",
             apifyOptions: new ApifyClient.Options(TimeSpan.FromMilliseconds(1), TimeSpan.FromSeconds(30)));
         return (t, http, sources);
@@ -365,4 +370,131 @@ public class JobSourcesTests
         Assert.Contains("limite de créditos atingido antes da execução", error.Message);
         Assert.DoesNotContain(http.Requests, r => r.Method == "POST");
     }
+
+    private static string Items(int count, string prefix = "Dev") =>
+        "[" + string.Join(",", Enumerable.Range(1, count).Select(i =>
+            $$"""{"id":"{{prefix}}{{i}}","title":"{{prefix}} {{i}}","companyName":"Acme","location":"Brazil","link":"https://li/{{prefix}}{{i}}","postedAt":"3 hours ago"}""")) + "]";
+
+    private static string LinkedInActor(int count) =>
+        $$"""[{"id":"curious_coder~linkedin-jobs-scraper","label":"LinkedIn Jobs","enabled":true,"input_mode":"linkedin_search","count":{{count}}}]""";
+
+    [Fact]
+    public async Task A_search_never_returns_more_jobs_than_its_limit_and_later_runs_stop_when_the_balance_is_spent()
+    {
+        var (t, http, sources) = Setup(h => h
+            .On("GET", "users/me/usage/monthly", UsageOk)
+            .On("POST", "actors/curious_coder~linkedin-jobs-scraper/runs", """{"data":{"id":"run1","status":"READY","defaultDatasetId":"ds1"}}""")
+            .On("GET", "actor-runs/run1", """{"data":{"status":"SUCCEEDED","defaultDatasetId":"ds1"}}""")
+            .On("GET", "datasets/ds1/items?clean=1", Items(40)), // o actor ignorou o count e devolveu 40
+            new() { ["linkedin_main_filter_json"] = MainFilter("Backend Engineer"), ["apify_actors_json"] = LinkedInActor(10) });
+        using var _ = t;
+        var jobs = await Collect(sources.Apify);
+        Assert.Equal(10, jobs.Count);
+        var posts = http.Requests.Where(r => r.Method == "POST").ToList();
+        Assert.Single(posts); // a janela de 7 dias nem começou: o saldo de 10 já tinha acabado
+        Assert.Contains("/runs?maxItems=10", posts[0].Url);
+        var logs = t.Db.Open().Query<string>("SELECT message FROM event_logs ORDER BY id").ToList();
+        Assert.Contains(logs, m => m.Contains("limite de 10 vaga(s) por busca atingido"));
+        Assert.DoesNotContain(logs, m => m.StartsWith("Cobertura incompleta"));
+    }
+
+    [Fact]
+    public async Task A_partial_first_run_leaves_only_the_missing_balance_for_the_next_one()
+    {
+        var (t, http, sources) = Setup(h => h
+            .On("GET", "users/me/usage/monthly", UsageOk)
+            .On("POST", "actors/curious_coder~linkedin-jobs-scraper/runs", """{"data":{"id":"run1","status":"READY","defaultDatasetId":"ds1"}}""")
+            .On("GET", "actor-runs/run1", """{"data":{"status":"SUCCEEDED","defaultDatasetId":"ds1"}}""")
+            .On("GET", "datasets/ds1/items?clean=1", Items(4)),
+            new() { ["linkedin_main_filter_json"] = MainFilter("Backend Engineer"), ["apify_actors_json"] = LinkedInActor(6) });
+        using var _ = t;
+        var jobs = await Collect(sources.Apify);
+        var counts = http.Requests.Where(r => r.Method == "POST").Select(r => JsonNode.Parse(r.Body!)!["count"]!.GetValue<int>()).ToList();
+        Assert.Equal([6, 2], counts); // 24h pediu 6 e trouxe 4; a janela de 7 dias pede só as 2 que faltam
+        Assert.Equal(6, jobs.Count); // 4 + 2 (o segundo lote veio maior que o pedido e foi cortado)
+    }
+
+    [Fact]
+    public async Task Indeed_runs_one_search_per_keyword_and_place_with_an_integer_limit_and_the_country_code()
+    {
+        var indeedItems = """
+            [{"positionName":"Backend Developer","company":"Acme","location":"São Paulo, SP","url":"https://www.indeed.com/rc/clk?jk=abc","id":"abc","isExpired":false,"postedAt":"Today","description":"Build APIs"},
+             {"positionName":"Vaga velha","company":"Z","location":"Recife","url":"https://www.indeed.com/rc/clk?jk=old","id":"old","isExpired":true,"postedAt":"30 days ago"},
+             {"error":"FOUND_NO_RESULTS","errorDescription":"Scraper didn't find any jobs"}]
+            """;
+        var (t, http, sources) = Setup(h => h
+            .On("GET", "users/me/usage/monthly", UsageOk)
+            .On("POST", "actors/misceres~indeed-scraper/runs", """{"data":{"id":"run1","status":"READY","defaultDatasetId":"ds1"}}""")
+            .On("GET", "actor-runs/run1", """{"data":{"status":"SUCCEEDED","defaultDatasetId":"ds1"}}""")
+            .On("GET", "datasets/ds1/items?clean=1", indeedItems),
+            new() { ["apify_actors_json"] = ApifyActors.DefaultsJson(), ["linkedin_main_filter_json"] = MainFilter("Backend Developer"), ["locations"] = "brazil", ["candidate_country"] = "Brazil" });
+        using var _ = t;
+        var jobs = await Collect(sources.Apify);
+        var posts = http.Requests.Where(r => r.Method == "POST" && r.Url.Contains("misceres~indeed-scraper")).ToList();
+        Assert.Equal(2, posts.Count); // 1 cargo do filtro × 2 locais (brazil, remote)
+        var input = JsonNode.Parse(posts[0].Body!)!.AsObject();
+        Assert.Equal(("backend developer", "brazil", "BR"), (input["position"]!.GetValue<string>().ToLowerInvariant(), input["location"]!.GetValue<string>(), input["country"]!.GetValue<string>()));
+        Assert.Equal(System.Text.Json.JsonValueKind.Number, input["maxItemsPerSearch"]!.GetValueKind()); // texto "12" seria recusado pelo schema do actor
+        Assert.Contains("/runs?maxItems=" + input["maxItemsPerSearch"], posts[0].Url);
+        Assert.Equal(13, input["maxItemsPerSearch"]!.GetValue<int>()); // "Vagas por busca" do painel (25) repartido entre as 2 buscas do cargo: 13 + 13, o saldo do actor corta em 25
+        var indeed = jobs.Where(j => j.Source.StartsWith("Apify:Indeed")).ToList();
+        Assert.Equal(2, indeed.Count); // a mesma vaga válida nas 2 buscas; a expirada e o item de erro ficam de fora
+        Assert.Equal(("Backend Developer", "Acme", "https://www.indeed.com/rc/clk?jk=abc"), (indeed[0].Title, indeed[0].Company, indeed[0].Url));
+    }
+
+    [Fact]
+    public async Task Indeed_follows_the_panel_limit_and_the_main_secondary_share_instead_of_a_fixed_count()
+    {
+        string Secondary() => LinkedInFilters.ValidateForm(new JsonObject { ["name"] = "Suporte", ["keywords"] = new JsonArray("IT Support"), ["experience_levels"] = new JsonArray(2) }.ToJsonString(), "secondary");
+        var (t, http, sources) = Setup(h => h
+            .On("GET", "users/me/usage/monthly", UsageOk)
+            .On("POST", "actors/misceres~indeed-scraper/runs", """{"data":{"id":"run1","status":"READY","defaultDatasetId":"ds1"}}""")
+            .On("GET", "actor-runs/run1", """{"data":{"status":"SUCCEEDED","defaultDatasetId":"ds1"}}""")
+            .On("GET", "datasets/ds1/items?clean=1", "[]"),
+            new() { ["apify_actors_json"] = new JsonArray(ApifyActors.IndeedActor()).ToJsonString(), ["apify_job_count"] = "20", ["linkedin_main_share"] = "70",
+                    ["linkedin_main_filter_json"] = MainFilter("Backend Developer"), ["linkedin_secondary_filter_json"] = Secondary(), ["locations"] = "brazil", ["candidate_country"] = "Brazil" });
+        using var _ = t;
+        await Collect(sources.Apify);
+        var byPosition = http.Requests.Where(r => r.Method == "POST" && r.Url.Contains("misceres~indeed-scraper")).Select(r => JsonNode.Parse(r.Body!)!.AsObject())
+            .GroupBy(i => i["position"]!.GetValue<string>().ToLowerInvariant()).ToDictionary(g => g.Key, g => g.Select(i => i["maxItemsPerSearch"]!.GetValue<int>()).ToList());
+        Assert.Equal([7, 7], byPosition["backend developer"]); // Principal: 70% de 20 = 14, em 2 locais
+        Assert.Equal([3, 3], byPosition["it support"]);        // Secundário: 30% = 6, em 2 locais
+    }
+
+    [Fact]
+    public void The_default_actors_are_linkedin_then_indeed_and_only_the_old_default_list_gets_upgraded()
+    {
+        var ids = ApifyActors.Load(new Dictionary<string, string>()).Select(a => a["id"]!.GetValue<string>()).ToList();
+        Assert.Equal(["curious_coder~linkedin-jobs-scraper", "misceres~indeed-scraper"], ids);
+        Assert.True(ApifyActors.IsLegacyDefault("""[{"id": "curious_coder~linkedin-jobs-scraper", "label": "LinkedIn Jobs", "enabled": true, "input_mode": "linkedin_search", "count": 25}]"""));
+        Assert.True(ApifyActors.IsLegacyDefault("""[{"id":"curious_coder~linkedin-jobs-scraper","label":"LinkedIn Jobs","enabled":true,"input_mode":"linkedin_search","count":25},{"id":"misceres~indeed-scraper","label":"Indeed","enabled":true,"input_mode":"custom","count":25,"input_template":{"position":"{{keyword}}"}}]"""));
+        Assert.False(ApifyActors.IsLegacyDefault("""[{"id":"curious_coder~linkedin-jobs-scraper","label":"LinkedIn Jobs","enabled":true,"input_mode":"linkedin_search","count":40}]""")); // count escolhido por você
+        Assert.False(ApifyActors.IsLegacyDefault(ApifyActors.DefaultsJson()));
+        Assert.DoesNotContain("\"count\"", ApifyActors.DefaultsJson()); // o padrão não fixa quantidade: segue o painel
+        Assert.False(ApifyActors.IsLegacyDefault("""[{"id":"curious_coder~linkedin-jobs-scraper"},{"id":"x~y"}]"""));
+        Assert.False(ApifyActors.IsLegacyDefault("não é json"));
+
+        using var t = new TempDb();
+        var settings = new SettingsStore(t.Db);
+        Assert.Contains("misceres~indeed-scraper", settings.Get("apify_actors_json")); // banco novo já nasce com o Indeed
+        void Reopen(string saved)
+        {
+            using (var c = t.Db.Open())
+            {
+                c.Execute("UPDATE settings SET value=@saved WHERE key='apify_actors_json'", new { saved });
+                c.Execute("DELETE FROM settings WHERE key='indeed_actor_v2_migrated'");
+            }
+            t.Db.Initialize();
+        }
+        Reopen("""[{"id": "curious_coder~linkedin-jobs-scraper", "label": "LinkedIn Jobs", "enabled": true, "input_mode": "linkedin_search", "count": 25}]""");
+        Assert.Contains("misceres~indeed-scraper", settings.Get("apify_actors_json")); // instalação antiga ganha o Indeed
+        const string Custom = """[{"id":"curious_coder~linkedin-jobs-scraper","count":50}]""";
+        Reopen(Custom);
+        Assert.Equal(Custom, settings.Get("apify_actors_json")); // lista editada à mão não é mexida
+    }
+
+    [Theory]
+    [InlineData("Brazil", "BR")] [InlineData("brasil", "BR")] [InlineData("United States", "US")] [InlineData("UK", "GB")]
+    [InlineData("remote", "")] [InlineData("Belo Horizonte", "")] [InlineData("", "")]
+    public void Country_codes_come_from_the_country_name_only(string name, string code) => Assert.Equal(code, Geo.CountryCode(name));
 }

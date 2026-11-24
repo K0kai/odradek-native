@@ -211,6 +211,31 @@ public static class LinkedInSearch
         return planned;
     }
 
+    /// <summary>
+    /// Ajusta a quantidade das buscas dos actors custom ao painel: o total do actor é o seu count ("Vagas por busca"), repartido entre Principal e
+    /// Secundário pela mesma fatia do LinkedIn e depois entre as execuções de cada filtro (no mínimo 1 vaga). O planejador acima mantém a regra
+    /// antiga (~2x, mínimo 5 por execução); esta etapa é a que vale na coleta.
+    /// </summary>
+    public static List<PlannedRun> FitCustomRunsToLimit(IReadOnlyList<PlannedRun> planned, IReadOnlyList<JsonObject> actors, IReadOnlyList<JsonObject> activeFilters, int mainShare)
+    {
+        var fitted = new List<PlannedRun>();
+        foreach (var run in planned)
+        {
+            var id = S(run.Actor["id"]);
+            if (S(run.Actor["input_mode"]) == "linkedin_search" || run.Actor["_ctx"] is null || actors.FirstOrDefault(a => S(a["id"]) == id) is not { } baseActor)
+            {
+                fitted.Add(run);
+                continue;
+            }
+            var total = Math.Max(1, ApifyClient.RunLimit(baseActor));
+            var index = run.Filter is null ? -1 : activeFilters.ToList().FindIndex(f => ReferenceEquals(f, run.Filter));
+            var budget = index >= 0 && activeFilters.Count > 0 ? SplitApifyCount(total, activeFilters.Count, mainShare)[index] : total;
+            var peers = Math.Max(1, planned.Count(p => S(p.Actor["id"]) == id && ReferenceEquals(p.Filter, run.Filter)));
+            fitted.Add(run with { Actor = Spread(run.Actor, ("count", Math.Max(1, (budget + peers - 1) / peers))) });
+        }
+        return fitted;
+    }
+
     /// <summary>Intercala as execuções de cada actor (uma de cada por vez), mantendo a ordem interna de cada um.</summary>
     public static List<T> Interleave<T>(IReadOnlyList<List<T>> groups)
     {

@@ -1,4 +1,6 @@
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.VisualTree;
 using Avalonia.Media.Imaging;
 
 namespace Odradek.App;
@@ -23,6 +25,13 @@ public partial class MainWindow
                         StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == key); await Task.Delay(1200);
                         JobsList.SelectedIndex = _jobs.Count > 0 ? 0 : -1; await Task.Delay(500);
                         Save(Path.Combine(folder, $"0-Jobs-{key}.png"));
+                        // o detalhe é longo: mais duas capturas, rolando até o meio e o fim
+                        if (DetailTitle.FindAncestorOfType<ScrollViewer>() is { } scroll && scroll.Extent.Height > scroll.Viewport.Height)
+                            for (var part = 1; part <= 2; part++)
+                            {
+                                scroll.Offset = new Vector(0, Math.Min(scroll.Extent.Height - scroll.Viewport.Height, scroll.Viewport.Height * 0.9 * part)); await Task.Delay(400);
+                                Save(Path.Combine(folder, $"0-Jobs-{key}-rolagem{part}.png"));
+                            }
                     }
                     StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == "worth"); await Task.Delay(800);
                 }

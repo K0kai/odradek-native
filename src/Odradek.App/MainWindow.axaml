@@ -5,13 +5,14 @@
         x:Class="Odradek.App.MainWindow"
         Title="Odradek"
         Width="1280" Height="860" MinWidth="900" MinHeight="600"
-        WindowStartupLocation="CenterScreen">
-  <Grid ColumnDefinitions="248,*">
+        WindowStartupLocation="CenterScreen"
+        WindowDecorations="BorderOnly">
+  <Grid ColumnDefinitions="248,*" RowDefinitions="32,*">
     <!-- Barra lateral -->
-    <Border x:Name="Sidebar" Grid.Column="0" Background="{DynamicResource SidebarBg}" Padding="14,18,14,14">
+    <Border x:Name="Sidebar" Grid.Column="0" Grid.RowSpan="2" Background="{DynamicResource SidebarBg}" Padding="14,18,14,14">
       <Grid RowDefinitions="Auto,*,Auto,Auto">
         <StackPanel Orientation="Horizontal" Spacing="10" Margin="6,0,0,18">
-          <Border Background="#F4F5F7" CornerRadius="8" Padding="3"><Image Source="avares://Odradek/Assets/odradek-icon.png" Width="26" Height="26" /></Border>
+          <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="10" Padding="3"><Image Source="avares://Odradek/Assets/odradek-128.png" Width="32" Height="32" RenderOptions.BitmapInterpolationMode="HighQuality" /></Border>
           <StackPanel VerticalAlignment="Center">
             <TextBlock Text="Odradek" FontSize="18" FontWeight="SemiBold" />
             <TextBlock Text="coleta · triagem · candidaturas" Classes="muted" FontSize="11" />
@@ -49,15 +50,22 @@
             <Button x:Name="CollectorButton" Classes="icon primary" Content="Iniciar coleta" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"  Tag="&#xE768;"/>
           </StackPanel>
         </Border>
-        <Grid Grid.Row="3" ColumnDefinitions="Auto,*" Margin="4,10,0,0">
-          <TextBlock Text="Tema" Classes="muted" VerticalAlignment="Center" Margin="0,0,10,0" />
-          <ComboBox x:Name="ThemeBox" Grid.Column="1" HorizontalAlignment="Stretch" />
-        </Grid>
+        <StackPanel Grid.Row="3" Spacing="10" Margin="0,10,0,0">
+          <!-- Atualização: uma linha discreta; só aparece no app instalado (com atualização automática ligada) -->
+          <Grid x:Name="UpdateBox" ColumnDefinitions="*,Auto" Margin="4,0,0,0" IsVisible="False">
+            <TextBlock x:Name="UpdateText" Classes="muted" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            <Button x:Name="UpdateButton" Grid.Column="1" Classes="quiet" Content="Buscar atualização" />
+          </Grid>
+          <Grid ColumnDefinitions="Auto,*" Margin="4,0,0,0">
+            <TextBlock Text="Tema" Classes="muted" VerticalAlignment="Center" Margin="0,0,10,0" />
+            <ComboBox x:Name="ThemeBox" Grid.Column="1" HorizontalAlignment="Stretch" />
+          </Grid>
+        </StackPanel>
       </Grid>
     </Border>
 
     <!-- Conteúdo -->
-    <Grid x:Name="ContentHost" Grid.Column="1" Background="Transparent" Margin="0" RowDefinitions="Auto,Auto,Auto,*,Auto">
+    <Grid x:Name="ContentHost" Grid.Column="1" Grid.Row="1" Background="Transparent" Margin="0" RowDefinitions="Auto,Auto,Auto,*,Auto">
       <StackPanel Grid.Row="0" Spacing="4" Margin="28,20,28,0">
         <TextBlock x:Name="StartupText" IsVisible="False" />
         <Border Classes="notice" Margin="0,0,0,12" IsVisible="{Binding #NoticeText.IsVisible}">
@@ -70,19 +78,50 @@
           <TextBlock x:Name="JobsSubtitle" Classes="muted" IsVisible="False" Margin="0,2,0,0" />
         </StackPanel>
         <StackPanel Grid.Column="1" x:Name="JobsControls" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-          <ComboBox x:Name="StatusBox" MinWidth="180" />
-          <ComboBox x:Name="SortBox" MinWidth="150" />
-          <Button x:Name="PrevButton" Classes="page" Content="‹" />
-          <TextBlock x:Name="PageText" VerticalAlignment="Center" MinWidth="48" TextAlignment="Center" Classes="muted" />
-          <Button x:Name="NextButton" Classes="page" Content="›" />
+          <Border Classes="field">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Classes="glyph muted" Text="&#xE8FD;" FontSize="14" />
+              <ComboBox x:Name="StatusBox" Classes="bare" MinWidth="150" />
+            </StackPanel>
+          </Border>
+          <Border Classes="field">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Classes="glyph muted" Text="&#xE8CB;" FontSize="14" />
+              <ComboBox x:Name="SortBox" Classes="bare" MinWidth="120" />
+            </StackPanel>
+          </Border>
+          <Border Classes="field pager">
+            <StackPanel Orientation="Horizontal">
+              <Button x:Name="PrevButton" Classes="page" Content="&#xE76B;" Tag="glyph" />
+              <TextBlock x:Name="PageText" VerticalAlignment="Center" MinWidth="44" TextAlignment="Center" Classes="muted" />
+              <Button x:Name="NextButton" Classes="page" Content="&#xE76C;" Tag="glyph" />
+            </StackPanel>
+          </Border>
         </StackPanel>
       </Grid>
       <StackPanel Grid.Row="2" x:Name="FilterHost" Spacing="0" Margin="28,0,28,4">
         <WrapPanel x:Name="FilterBar">
-          <ComboBox x:Name="MinBox" MinWidth="130" Margin="0,0,8,8" />
-          <TextBox x:Name="SearchBox" PlaceholderText="Buscar (só em Não selecionadas)" MinWidth="220" Margin="0,0,8,8" />
-          <TextBox x:Name="DateFromBox" PlaceholderText="De AAAA-MM-DD" MinWidth="140" Margin="0,0,8,8" />
-          <TextBox x:Name="DateToBox" PlaceholderText="Até AAAA-MM-DD" MinWidth="140" Margin="0,0,8,8" />
+          <Border x:Name="SearchField" Classes="field" Width="300" Margin="0,0,8,8">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <TextBlock Classes="glyph muted" Text="&#xE721;" FontSize="14" Margin="0,0,8,0" />
+              <TextBox x:Name="SearchBox" Grid.Column="1" Classes="bare" PlaceholderText="Buscar título, empresa ou local" />
+              <Button x:Name="SearchClearButton" Grid.Column="2" Classes="tiny" Content="&#xE894;" IsVisible="False" />
+            </Grid>
+          </Border>
+          <Border Classes="field" Margin="0,0,8,8">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Classes="glyph muted" Text="&#xE734;" FontSize="14" />
+              <ComboBox x:Name="MinBox" Classes="bare" MinWidth="120" />
+            </StackPanel>
+          </Border>
+          <Border Classes="field" Margin="0,0,8,8">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <CalendarDatePicker x:Name="DateFromBox" Classes="bare" Watermark="De" SelectedDateFormat="Custom" CustomDateFormatString="dd/MM/yyyy" Width="128" />
+              <TextBlock Classes="glyph muted" Text="&#xE76C;" FontSize="11" />
+              <CalendarDatePicker x:Name="DateToBox" Classes="bare" Watermark="Até" SelectedDateFormat="Custom" CustomDateFormatString="dd/MM/yyyy" Width="128" />
+            </StackPanel>
+          </Border>
+          <Button x:Name="ClearFiltersButton" Classes="quiet icon" Tag="&#xE894;" Content="Limpar filtros" IsVisible="False" Margin="0,0,8,8" VerticalAlignment="Top" Height="36" />
           <Button x:Name="ReviewedButton" Content="Marcar esta página como conferida" IsVisible="False" Margin="0,0,8,8"  Classes="icon" Tag="&#xE73E;"/>
         </WrapPanel>
         <Expander x:Name="BulkExpander" Header="Ignorar vagas em revisão por critérios" IsVisible="False" HorizontalAlignment="Stretch">
@@ -248,6 +287,9 @@
                     <TextBlock Classes="muted" TextTrimming="CharacterEllipsis">
                       <Run Text="{Binding Company}" /><Run Text=" · " /><Run Text="{Binding Location}" />
                     </TextBlock>
+                    <Border Classes="badge" HorizontalAlignment="Left" Padding="6,1" Margin="0,2,0,0" Background="{DynamicResource NeutralSoft}">
+                      <TextBlock Text="{Binding Source, Converter={x:Static local:Palette.SourceLabel}}" FontSize="11" Foreground="{DynamicResource Muted}" />
+                    </Border>
                   </StackPanel>
                   <Border Grid.Column="1" Classes="badge" MinWidth="36" Margin="10,0,0,0"
                           IsVisible="{Binding MatchScore, Converter={x:Static local:Palette.HasScore}}"
@@ -289,7 +331,10 @@
                   </StackPanel>
                 </StackPanel>
               </Border>
+              <StackPanel x:Name="DetailSections" Spacing="14" />
+              <TextBlock x:Name="DescriptionHeading" Text="Descrição da vaga" Classes="h2" FontSize="16" Margin="0,6,0,0" IsVisible="False" />
               <SelectableTextBlock x:Name="DetailBody" TextWrapping="Wrap" LineHeight="21" />
+              <StackPanel x:Name="DetailLetter" Spacing="6" Margin="0,6,0,0" />
               <StackPanel Spacing="6" IsVisible="{Binding #JobButtons.IsVisible}">
                 <TextBlock Text="Anotações" Classes="h2" />
                 <TextBox x:Name="NotesBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" />
@@ -305,6 +350,17 @@
         <TextBlock x:Name="ServerText" Classes="muted" />
         <TextBlock x:Name="DbText" Classes="muted" />
         <TextBlock x:Name="DataText" Classes="muted" MaxWidth="420" TextTrimming="CharacterEllipsis" />
+      </StackPanel>
+    </Grid>
+
+    <!-- Barra de título própria (a do Windows foi removida: WindowDecorations="BorderOnly"). Arrastar move a janela; duplo clique maximiza. -->
+    <Border x:Name="SidebarDrag" Grid.Column="0" Height="18" VerticalAlignment="Top" Background="Transparent" />
+    <Grid x:Name="TitleBar" Grid.Column="1" Grid.Row="0" ColumnDefinitions="*,Auto" Background="Transparent">
+      <Border x:Name="TitleDrag" Background="Transparent" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal">
+        <Button x:Name="MinButton" Classes="caption" Content="&#xE921;" ToolTip.Tip="Minimizar" />
+        <Button x:Name="MaxButton" Classes="caption" Content="&#xE922;" ToolTip.Tip="Maximizar" />
+        <Button x:Name="CloseButton" Classes="caption close" Content="&#xE8BB;" ToolTip.Tip="Fechar (o Odradek continua na bandeja)" />
       </StackPanel>
     </Grid>
   </Grid>

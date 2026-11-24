@@ -7,10 +7,30 @@
   A pasta publicada precisa do .NET 10 Desktop Runtime e do ASP.NET Core 10 Runtime instalados no Windows (versão "x64").
   Não há instalador: o app é uma pasta. Copie-a para onde quiser e crie o atalho para Odradek.exe.
   Dados do usuário: %LOCALAPPDATA%\Odradek (o mesmo jobs.db do app Python; ODRADEK_DATA_DIR muda a pasta).
+
+  Atualização automática: além de dist\, o build publica a versão no FEED (pasta local ou de rede): Odradek-<versão>-win-x64.zip e latest.json.
+  Os apps instalados por install.ps1 consultam essa pasta e se atualizam sozinhos.
+  .\build.ps1 -Feed D:\feed        # outra pasta-feed (padrão: $env:ODRADEK_UPDATE_FEED, senão <repositório>\releases)
+  .\build.ps1 -NoFeed              # não publica no feed
+  .\build.ps1 -Version 1.2.3       # versão explícita (padrão: aaaa.MMdd.HHmm da hora do build, sempre crescente)
 #>
-param([switch]$SkipTests)
+param(
+    [switch]$SkipTests,
+    [string]$Version,
+    [string]$Feed,
+    [switch]$NoFeed
+)
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
+
+if (-not $Version) {
+    $now = Get-Date
+    $Version = "{0}.{1}.{2}" -f $now.Year, ($now.Month * 100 + $now.Day), ($now.Hour * 100 + $now.Minute)
+}
+$parsed = $null
+if (-not [version]::TryParse($Version, [ref]$parsed)) { throw "Versão inválida: '$Version' (use o formato 1.2.3 ou 1.2.3.4)." }
+if (-not $Feed) { $Feed = if ($env:ODRADEK_UPDATE_FEED) { $env:ODRADEK_UPDATE_FEED } else { Join-Path $PSScriptRoot "releases" } }
+$Feed = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Feed)
 
 if (-not $SkipTests) {
     dotnet test Odradek.sln --configuration Release
@@ -19,7 +39,7 @@ if (-not $SkipTests) {
 
 $out = Join-Path $PSScriptRoot "dist\Odradek"
 if (Test-Path $out) { Remove-Item $out -Recurse -Force }
-dotnet publish src\Odradek.App\Odradek.App.csproj --configuration Release --runtime win-x64 --self-contained false --output $out
+dotnet publish src\Odradek.App\Odradek.App.csproj --configuration Release --runtime win-x64 --self-contained false --output $out "-p:Version=$Version"
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish falhou" }
 
 # Os símbolos de depuração só pesam: ficam de fora do pacote.
@@ -29,6 +49,26 @@ if (Test-Path $zip) { Remove-Item $zip -Force }
 Compress-Archive -Path (Join-Path $out "*") -DestinationPath $zip
 
 $size = [math]::Round((Get-ChildItem $out -Recurse | Measure-Object Length -Sum).Sum / 1MB, 1)
+
+if (-not $NoFeed) {
+    New-Item -ItemType Directory -Force -Path $Feed | Out-Null
+    $feedZipName = "Odradek-$Version-win-x64.zip"
+    Copy-Item $zip (Join-Path $Feed $feedZipName) -Force
+    $manifest = [ordered]@{
+        version      = $Version
+        file         = $feedZipName
+        sha256       = (Get-FileHash (Join-Path $Feed $feedZipName) -Algorithm SHA256).Hash.ToLowerInvariant()
+        published_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    }
+    # O manifesto só passa a apontar para o zip depois de ele estar inteiro no feed, e é trocado de uma vez (sem leitura pela metade).
+    $tmp = Join-Path $Feed "latest.json.tmp"
+    [System.IO.File]::WriteAllText($tmp, ($manifest | ConvertTo-Json), (New-Object System.Text.UTF8Encoding($false)))
+    Move-Item $tmp (Join-Path $Feed "latest.json") -Force
+    # Só os 3 zips mais recentes ficam (um app que baixa agora ainda acha o arquivo que o manifesto anterior citava).
+    Get-ChildItem $Feed -Filter "Odradek-*-win-x64.zip" | Sort-Object LastWriteTime -Descending | Select-Object -Skip 3 | Remove-Item -Force
+}
+
 Write-Host ""
-Write-Host "Pronto: $out\Odradek.exe ($size MB)"
+Write-Host "Pronto: $out\Odradek.exe ($size MB), versão $Version"
 Write-Host "Zip:    $zip"
+if (-not $NoFeed) { Write-Host "Feed:   $Feed (latest.json -> $Version)" }

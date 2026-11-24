@@ -35,5 +35,7 @@ internal static class Palette
     /// <summary>"2026-11-24T03:51:10+00:00" → "24/11 00:51:10" (horário de Brasília).</summary>
     public static readonly FuncValueConverter<string?, string?> LogTime = new(Format.LogTime);
 
+    public static readonly FuncValueConverter<string?, string?> SourceLabel = new(Format.SourceName);
+
     public static readonly FuncValueConverter<int?, bool> HasScore = new(score => score is not null);
 }

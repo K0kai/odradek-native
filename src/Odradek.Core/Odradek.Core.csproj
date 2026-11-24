@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Backup\schema_postgres.sql" LogicalName="schema_postgres.sql" />
+    <EmbeddedResource Include="Update\apply-update.ps1" LogicalName="apply-update.ps1" />
   </ItemGroup>
 
 </Project>

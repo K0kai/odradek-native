@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input.Platform;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Odradek.Core;
@@ -13,16 +14,27 @@ namespace Odradek.App;
 /// <summary>Pedaços de tela repetidos: rótulo + controle, cartão com borda, botão.</summary>
 public static class Ui
 {
-    public static StackPanel Labeled(string label, Control control, string? hint = null)
+    public static StackPanel Labeled(string label, Control control, string? hint = null) =>
+        Labeled(new TextBlock { Text = label, Classes = { "muted" } }, control, hint);
+
+    /// <summary>Como <see cref="Labeled(string, Control, string?)"/>, com um cabeçalho livre (rótulo + selo, por exemplo).</summary>
+    public static StackPanel Labeled(Control header, Control control, string? hint = null)
     {
         var panel = new StackPanel { Spacing = 2 };
-        panel.Children.Add(new TextBlock { Text = label, Classes = { "muted" } });
+        panel.Children.Add(header);
         panel.Children.Add(control);
         if (!string.IsNullOrEmpty(hint)) panel.Children.Add(new TextBlock { Text = hint, Classes = { "muted" }, FontSize = 11, Opacity = 0.8, TextWrapping = TextWrapping.Wrap });
         return panel;
     }
 
     public static Border Card(Control child) => new() { Child = child, Classes = { "card" } };
+
+    /// <summary>Selo colorido (fundo e texto pelas cores do tema, que acompanham a troca claro/escuro).</summary>
+    public static void Paint(Border badge, TextBlock text, string backgroundKey, string foregroundKey)
+    {
+        badge.Bind(Border.BackgroundProperty, badge.GetResourceObservable(backgroundKey));
+        text.Bind(TextBlock.ForegroundProperty, text.GetResourceObservable(foregroundKey));
+    }
 
     public static Button Button(string text, Action onClick)
     {
@@ -73,6 +85,8 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
     {
         var selected = Math.Max(0, host.SelectedIndex);
         _tabs.Clear();
+        _secretViews.Clear();
+        _providerRead = null;
         foreach (var tab in SettingsLayout.Tabs)
         {
             var state = new TabState { Tab = tab, Item = new TabItem { Header = tab.Label } };
@@ -147,6 +161,7 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
                 var combo = new ComboBox { ItemsSource = options.Select(o => o.Label).ToList(), SelectedIndex = options.FindIndex(o => o.Value == raw), MinWidth = 260 };
                 var entry = new Entry(field, () => combo.SelectedIndex >= 0 ? options[combo.SelectedIndex].Value : raw, s => combo.SelectedIndex = options.FindIndex(o => o.Value == s));
                 Attach(combo, entry);
+                if (field.Key == "ai_provider") _providerRead = entry.Read; // a chave da IA mostra o estado do provedor escolhido
                 return (Ui.Labeled(field.Label, combo), entry);
             }
             case FieldKind.Sources:
@@ -170,11 +185,43 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
             }
             case FieldKind.Secret:
             {
-                var configured = SettingsLayout.Display(field, values) == "configurada";
-                var box = new TextBox { PasswordChar = '•', PlaceholderText = configured ? "Configurada — digite para trocar" : "Não configurada", MinWidth = 320 };
+                var box = new TextBox { PasswordChar = '•', MinWidth = 320 };
                 var entry = new Entry(field, () => box.Text ?? "", _ => box.Text = "");
                 Attach(box, entry);
-                return (Ui.Labeled(field.Label, box, "Só de escrita: o valor fica no Cofre de Credenciais do Windows e nunca volta para a tela."), entry);
+
+                // Selo ao lado do rótulo (como o "Configurada ✓" do painel web): verde com a chave no cofre, azul com uma nova digitada
+                // e ainda não salva, cinza sem chave. A chave da IA segue o provedor escolhido agora na tela, não só o salvo.
+                var badgeText = new TextBlock { FontSize = 11, FontWeight = FontWeight.SemiBold };
+                var badge = new Border { Classes = { "badge" }, Child = badgeText };
+                void Update()
+                {
+                    var provider = _providerRead?.Invoke() ?? (values.TryGetValue("ai_provider", out var p) ? p : null);
+                    var (stored, origin) = SecretStore.Lookup(SettingsLayout.SecretName(field, provider));
+                    if (entry.Read().Length > 0)
+                    {
+                        badgeText.Text = "●  Nova chave: salve para aplicar";
+                        Ui.Paint(badge, badgeText, "AccentSoft", "Accent");
+                        box.PlaceholderText = "";
+                    }
+                    else if (stored.Length > 0)
+                    {
+                        badgeText.Text = origin == SecretStore.Origin.Environment ? "✓  Configurada (variável de ambiente)" : "✓  Configurada";
+                        Ui.Paint(badge, badgeText, "SuccessSoft", "Success");
+                        box.PlaceholderText = "Deixe vazio para manter a atual";
+                    }
+                    else
+                    {
+                        badgeText.Text = "Não configurada";
+                        Ui.Paint(badge, badgeText, "NeutralSoft", "Muted");
+                        box.PlaceholderText = "Cole a chave aqui";
+                    }
+                }
+                _secretViews[entry] = Update;
+                Update();
+                var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                header.Children.Add(new TextBlock { Text = field.Label, Classes = { "muted" }, VerticalAlignment = VerticalAlignment.Center });
+                header.Children.Add(badge);
+                return (Ui.Labeled(header, box, "Só de escrita: o valor fica no Cofre de Credenciais do Windows e nunca volta para a tela."), entry);
             }
             default:
                 if (SettingsLayout.Sliders.TryGetValue(field.Key, out var range))
@@ -193,6 +240,30 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
                     panel.Children.Add(slider); panel.Children.Add(caption);
                     return (Ui.Labeled(field.Label, panel), entry);
                 }
+                if (SettingsLayout.PromptDefaults.TryGetValue(field.Key, out var promptDefault))
+                {
+                    // Vazio = padrão: a caixa mostra o texto padrão (editável). Texto igual ao padrão não é guardado, então o app segue o padrão quando ele melhora.
+                    string Shown(string s) => s.Trim().Length == 0 ? promptDefault : s;
+                    var prompt = new TextBox { Text = Shown(raw), MinWidth = 320, TextWrapping = TextWrapping.Wrap, AcceptsReturn = true, MinHeight = 220, MaxHeight = 420 };
+                    var promptEntry = new Entry(field, () => prompt.Text ?? "", s => prompt.Text = Shown(s));
+                    Attach(prompt, promptEntry);
+                    var status = new TextBlock { Classes = { "muted" }, FontSize = 11, VerticalAlignment = VerticalAlignment.Center };
+                    var restore = new Button { Content = "Restaurar o padrão", Classes = { "quiet" } };
+                    void Refresh()
+                    {
+                        var isDefault = (prompt.Text ?? "").Trim() == promptDefault.Trim();
+                        status.Text = isDefault ? "Texto padrão (acompanha as melhorias do app)" : "Personalizado";
+                        restore.IsVisible = !isDefault;
+                    }
+                    prompt.TextChanged += (_, _) => Refresh();
+                    restore.Click += (_, _) => prompt.Text = promptDefault;
+                    Refresh();
+                    var bar = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
+                    bar.Children.Add(status); bar.Children.Add(restore);
+                    var box = new StackPanel { Spacing = 4 };
+                    box.Children.Add(prompt); box.Children.Add(bar);
+                    return (Ui.Labeled(field.Label, box), promptEntry);
+                }
                 var text = new TextBox { Text = raw, MinWidth = 320, TextWrapping = TextWrapping.Wrap };
                 if (SettingsLayout.MultiLine.Contains(field.Key)) { text.AcceptsReturn = true; text.MinHeight = 110; text.MaxHeight = 260; }
                 var textEntry = new Entry(field, () => text.Text ?? "", s => text.Text = s);
@@ -202,30 +273,50 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
     }
 
     private readonly Dictionary<Entry, Action> _refreshers = [];
+    private readonly Dictionary<Entry, Action> _secretViews = []; // atualiza o selo de cada chave (depois de digitar, de trocar o provedor e de salvar)
+    private Func<string>? _providerRead;
     private readonly Dictionary<string, SelectableTextBlock> _filterTexts = [];
+    private readonly Dictionary<string, Button> _filterButtons = [];
+    private readonly HashSet<string> _generating = []; // filtros sendo gerados agora; sobrevive à reconstrução das abas (sair e voltar da tela)
 
-    /// <summary>"Gerar com IA": salva as edições não salvas da aba (menos segredos) e substitui só o filtro deste campo.</summary>
+    /// <summary>
+    /// "Gerar com IA": salva as edições não salvas da aba (menos segredos) e substitui só o filtro deste campo. A geração roda fora da tela:
+    /// sair de Configurações não a interrompe, e ao voltar o botão novo já aparece "Gerando…" e recebe o resultado quando ela termina.
+    /// </summary>
     private Control BuildFilterAction(TabState state, SettingField field, IReadOnlyDictionary<string, string> values)
     {
         var slot = field.Key == LinkedInFilters.MainKey ? "main" : "secondary";
         var label = values.TryGetValue(field.Key, out var current) && current.Trim().Length > 0 ? "Gerar de novo com IA" : "Gerar com IA";
         var button = Ui.Button(label, () => { });
         button.HorizontalAlignment = HorizontalAlignment.Left;
+        _filterButtons[field.Key] = button;
+        if (_generating.Contains(field.Key)) { button.IsEnabled = false; button.Content = "Gerando…"; }
         button.Click += async (_, _) =>
         {
+            if (!_generating.Add(field.Key)) return; // já tem uma geração deste filtro em andamento
             var changed = state.Entries.Where(e => e.Dirty && e.Field.Kind != FieldKind.Secret).ToList();
             var form = changed.ToDictionary(e => e.Field.Key, e => e.Read());
+            var idleLabel = label;
             button.IsEnabled = false; button.Content = "Gerando…";
+            var done = false;
             try
             {
                 var filter = await Task.Run(() => Program.Engines.Filters.GenerateAndSaveAsync(form, slot));
                 foreach (var entry in changed) entry.Baseline = entry.Read();
-                _filterTexts[field.Key].Text = SettingsLayout.Display(field, new Dictionary<string, string> { [field.Key] = PyJson.Serialize(filter) });
+                // As abas podem ter sido reconstruídas enquanto a IA trabalhava: o resultado vai para o texto que está na tela agora.
+                if (_filterTexts.TryGetValue(field.Key, out var shown))
+                    shown.Text = SettingsLayout.Display(field, new Dictionary<string, string> { [field.Key] = PyJson.Serialize(filter) });
+                done = true;
                 notify($"Filtro {(slot == "main" ? "principal" : "secundário")} gerado e salvo.", false);
             }
             catch (ActionException ex) { notify(ex.Message, true); }
             catch (Exception ex) { notify($"Não foi possível gerar o filtro: {ex.Message}", true); }
-            finally { button.IsEnabled = true; button.Content = "Gerar de novo com IA"; Refresh(state); }
+            finally
+            {
+                _generating.Remove(field.Key);
+                if (_filterButtons.TryGetValue(field.Key, out var visible)) { visible.IsEnabled = true; visible.Content = done ? "Gerar de novo com IA" : idleLabel; }
+                Refresh(state);
+            }
         };
         return button;
     }
@@ -234,7 +325,11 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
 
     private void Refresh(TabState state)
     {
-        foreach (var entry in state.Entries) _refreshers[entry] = () => Refresh(state);
+        foreach (var entry in state.Entries)
+        {
+            _refreshers[entry] = () => Refresh(state);
+            if (_secretViews.TryGetValue(entry, out var updateBadge)) updateBadge();
+        }
         var dirty = state.Entries.Any(e => e.Dirty);
         state.State.Text = dirty ? "Alterações não salvas" : "Sem alterações";
         state.Save.IsEnabled = dirty;
@@ -289,6 +384,30 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
         panel.Children.Add(status);
         panel.Children.Add(buttons);
         panel.Children.Add(token);
+
+        // O Qpid (assistente do desktop) usa as rotas /api/qpid/* com um token próprio, guardado no Cofre do Windows: aqui só se copia para colar lá.
+        var qpid = new StackPanel { Spacing = 6, Margin = new Thickness(0, 12, 0, 0) };
+        qpid.Children.Add(new TextBlock { Text = "Token do Qpid", FontWeight = FontWeight.SemiBold });
+        qpid.Children.Add(new TextBlock
+        {
+            Text = "No Qpid, abra Integrações › Odradek, cole este valor e salve. O Qpid se conecta em http://127.0.0.1:8765 com o Odradek aberto.",
+            Classes = { "muted" }, TextWrapping = TextWrapping.Wrap,
+        });
+        var copyQpid = Ui.Button("Copiar token do Qpid", () => { });
+        copyQpid.HorizontalAlignment = HorizontalAlignment.Left;
+        copyQpid.Click += async (_, _) =>
+        {
+            try
+            {
+                var value = await Task.Run(() => Program.QpidApiToken);
+                if (TopLevel.GetTopLevel(copyQpid)?.Clipboard is not { } clipboard) { notify("Não foi possível acessar a área de transferência.", true); return; }
+                await clipboard.SetTextAsync(value);
+                notify("Token do Qpid copiado. Cole em Integrações › Odradek no Qpid.", false);
+            }
+            catch (Exception ex) { notify($"Não foi possível obter o token do Qpid: {ex.Message}", true); }
+        };
+        qpid.Children.Add(copyQpid);
+        panel.Children.Add(qpid);
         return panel;
     }
 }

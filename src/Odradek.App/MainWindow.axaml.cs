@@ -42,7 +42,7 @@ public partial class MainWindow : Window
     private string _jobsTitle = "Vale a pena olhar";
     // Os status das vagas mais as duas abas de "Não selecionadas" (consulta de triagem).
     private static readonly (string Key, string Label)[] Views =
-        [.. Defaults.Statuses, ("triage:discarded", "Descartadas pela IA"), ("triage:pending", "Aguardando triagem")];
+        [.. Defaults.Statuses, ("triage:discarded", "Descartadas pela IA"), ("triage:pending", "Aguardando triagem"), (PanelQueries.AllStatuses, "Todas as vagas")];
     private string _dateFrom = "", _dateTo = ""; // lidos das caixas na thread da tela; a consulta roda em outra
     private static readonly int[] MinOptions = [0, 50, 60, 70, 80, 90];
     private readonly ObservableCollection<LogEntry> _logs = [];
@@ -92,6 +92,12 @@ public partial class MainWindow : Window
     {
         BulkExpander.IsVisible = _status == "worth";
         ReviewedButton.IsVisible = _status == "triage:discarded";
+        // A busca por texto só existe nas abas de triagem (o filtro das outras listas não a usa): nas demais o campo fica apagado.
+        var searchable = _status.StartsWith("triage:", StringComparison.Ordinal);
+        SearchField.Opacity = searchable ? 1 : 0.45;
+        SearchBox.IsEnabled = searchable;
+        ToolTip.SetTip(SearchField, searchable ? null : "A busca por texto vale nas abas de Não selecionadas.");
+        UpdateFilterChrome();
     }
 
     /// <summary>Lê a lista de vagas fora da tela e troca a lista. Várias mudanças seguidas viram uma leitura só.</summary>
@@ -305,9 +311,7 @@ public partial class MainWindow : Window
         MinBox.ItemsSource = MinOptions.Select(n => n == 0 ? "Qualquer nota" : $"Nota ≥ {n}").ToList();
         MinBox.SelectedIndex = 0;
         MinBox.SelectionChanged += (_, _) => { if (MinBox.SelectedIndex < 0) return; _minMatch = MinOptions[MinBox.SelectedIndex]; _pageNumber = 1; _ = ReloadJobsAsync(); };
-        DateFromBox.LostFocus += (_, _) => { _dateFrom = DateFromBox.Text?.Trim() ?? ""; _pageNumber = 1; _ = ReloadJobsAsync(); };
-        DateToBox.LostFocus += (_, _) => { _dateTo = DateToBox.Text?.Trim() ?? ""; _pageNumber = 1; _ = ReloadJobsAsync(); };
-        SearchBox.LostFocus += (_, _) => { _query = SearchBox.Text?.Trim() ?? ""; _pageNumber = 1; _ = ReloadJobsAsync(); };
+        WireFilterFields();
         LogsList.ItemsSource = _logs;
         _logs.CollectionChanged += (_, _) => LogsEmpty.IsVisible = _logs.Count == 0;
         LogsEmpty.IsVisible = false; // vira "Nenhum registro ainda." depois da primeira leitura

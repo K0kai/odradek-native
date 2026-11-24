@@ -113,7 +113,9 @@ public sealed class ApifyClient(HttpClient http)
         var label = Text.Truthy(actor["label"]) ? Text.PyStrRaw(actor["label"]) : actorId;
         var runInput = ApifyActors.BuildRunInput(actor, cfg, filter, urls, mainFilter);
         log("info", $"Iniciando actor {label} ({actorId}); quantidade solicitada: {(runInput["count"] is { } c ? Text.PyStrRaw(c) : "definida pelo template")}.");
-        var started = await FetchJsonAsync($"{ApifyActors.Api}/actors/{LinkedInSearch.QuotePlus(actorId)}/runs", runInput.ToJsonString(), token, 45).ConfigureAwait(false);
+        // O limite da busca vale de verdade: maxItems faz o actor (pago por resultado) parar de cobrar no teto e, no fim, o excedente é cortado aqui.
+        var limit = RunLimit(actor);
+        var started = await FetchJsonAsync($"{ApifyActors.Api}/actors/{LinkedInSearch.QuotePlus(actorId)}/runs?maxItems={limit}", runInput.ToJsonString(), token, 45).ConfigureAwait(false);
         var run = Data(started);
         var runId = Text.PyStr(run["id"]);
         var datasetId = Text.PyStr(run["defaultDatasetId"]);
@@ -134,7 +136,16 @@ public sealed class ApifyClient(HttpClient http)
         if (datasetId.Length == 0) throw CollectorException.Runtime($"Apify ({label}) não produziu dataset.");
         var items = await FetchJsonAsync($"{ApifyActors.Api}/datasets/{LinkedInSearch.QuotePlus(datasetId)}/items?clean=1", bearer: token, timeoutSeconds: 45).ConfigureAwait(false);
         var normalized = ApifyItems.Normalize((items as JsonArray)?.ToList() ?? [], label, LinkedInSearch.MaxAgeDays(cfg), LinkedInSearch.PreferredCountries(cfg), log);
+        if (normalized.Count > limit)
+        {
+            log("info", $"Actor {label}: devolveu {normalized.Count} vaga(s); mantidas as {limit} primeiras (limite da busca).");
+            normalized = normalized.Take(limit).ToList();
+        }
         log("success", $"Actor {label}: {normalized.Count} vaga(s) úteis.");
         return normalized;
     }
+
+    /// <summary>Quantidade pedida para a execução (<c>count</c> do actor, de 1 a 100; 25 se faltar).</summary>
+    public static int RunLimit(JsonObject actor) =>
+        Text.Truthy(actor["count"]) && ApifyActors.PyInt(actor["count"]) is { } n ? (int)Math.Max(1, Math.Min(100, n)) : 25;
 }

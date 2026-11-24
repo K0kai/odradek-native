@@ -131,6 +131,8 @@ public class QueueEngineTests
         gate.Release(5);
         await WaitFor(() => Volatile.Read(ref done) == 5);
         Assert.Equal(2, peak);
+        // `done` sobe dentro do handler; o motor só grava "succeeded" depois que ele retorna: espera a gravação do último item.
+        await WaitFor(() => t.Scalar<int>("SELECT COUNT(*) FROM queue_jobs WHERE status='succeeded'") == 5);
         Assert.Equal(5, t.Scalar<int>("SELECT COUNT(*) FROM queue_jobs WHERE status='succeeded'"));
     }
 

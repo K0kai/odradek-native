@@ -107,7 +107,7 @@ public class ExtensionApiTests
         });
         var token = IssueToken(api);
         var (_, profile) = await api.Json("GET", "/api/autofill-profile", token);
-        Assert.Equal("{\"profile\":{\"firstName\":\"Ana\",\"lastName\":\"Maria Souza\",\"fullName\":\"Ana  Maria  Souza\",\"email\":\"ana@example.test\",\"phone\":\"\",\"city\":\"Recife\",\"state\":\"\",\"country\":\"\",\"zip\":\"50000-000\",\"linkedin\":\"\"}}",
+        Assert.Equal("{\"profile\":{\"firstName\":\"Ana\",\"lastName\":\"Maria Souza\",\"fullName\":\"Ana  Maria  Souza\",\"email\":\"ana@example.test\",\"phone\":\"\",\"phoneCountryCode\":\"\",\"phoneNational\":\"\",\"city\":\"Recife\",\"state\":\"\",\"country\":\"\",\"zip\":\"50000-000\",\"linkedin\":\"\"}}",
             profile!.ToJsonString());
 
         using (var c = api.Temp.Db.Open())

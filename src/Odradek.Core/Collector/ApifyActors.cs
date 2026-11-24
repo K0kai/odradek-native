@@ -16,9 +16,49 @@ public static class ApifyActors
     [
         new JsonObject
         {
-            ["id"] = "curious_coder~linkedin-jobs-scraper", ["label"] = "LinkedIn Jobs", ["enabled"] = true, ["input_mode"] = "linkedin_search", ["count"] = 25,
+            ["id"] = "curious_coder~linkedin-jobs-scraper", ["label"] = "LinkedIn Jobs", ["enabled"] = true, ["input_mode"] = "linkedin_search",
         },
+        IndeedActor(), // sem "count": a quantidade acompanha "Vagas por busca" do painel (apify_job_count)
     ];
+
+    /// <summary>
+    /// Indeed (<c>misceres/indeed-scraper</c>): uma execução por cargo dos filtros × local. <c>maxItemsPerSearch</c> é inteiro no schema do actor
+    /// (por isso <c>{{count_number}}</c>) e <c>country</c> é o código de 2 letras do local da busca.
+    /// </summary>
+    public static JsonObject IndeedActor() => new()
+    {
+        ["id"] = "misceres~indeed-scraper", ["label"] = "Indeed", ["enabled"] = true, ["input_mode"] = "custom",
+        ["input_template"] = new JsonObject
+        {
+            ["position"] = "{{keyword}}", ["location"] = "{{location}}", ["country"] = "{{country_code}}", ["maxItemsPerSearch"] = "{{count_number}}",
+            ["saveOnlyUniqueItems"] = true, ["parseCompanyDetails"] = false,
+        },
+    };
+
+    /// <summary>O texto padrão de <c>apify_actors_json</c> (o que o painel mostra e o banco recebe na primeira vez).</summary>
+    public static string DefaultsJson() => new JsonArray(Defaults().Select(a => (JsonNode?)a).ToArray()).ToJsonString(new JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+
+    /// <summary>
+    /// As listas que o app gravou nas versões anteriores (só o LinkedIn com count 25; depois LinkedIn + Indeed com count 25 fixo). Só elas são
+    /// trocadas pela atual; qualquer lista editada, ou com outro count, fica como está.
+    /// </summary>
+    public static bool IsLegacyDefault(string? raw)
+    {
+        try
+        {
+            if (JsonNode.Parse(raw ?? "") is not JsonArray list || list.Count is < 1 or > 2) return false;
+            var expected = new[] { ("curious_coder~linkedin-jobs-scraper", "linkedin_search"), ("misceres~indeed-scraper", "custom") };
+            for (var i = 0; i < list.Count; i++)
+            {
+                if (list[i] is not JsonObject item) return false;
+                var count = item["count"];
+                if (S(item["id"]) != expected[i].Item1 || S(item["input_mode"]) != expected[i].Item2 || PyInt(count) != 25) return false;
+                if (i == 0 && item.Count > 5) return false;
+            }
+            return true;
+        }
+        catch (JsonException) { return false; }
+    }
 
     /// <summary><c>owner/name</c> vira <c>owner~name</c>, o formato da API.</summary>
     public static string NormalizeId(string? actorId)
@@ -47,7 +87,7 @@ public static class ApifyActors
     public static List<JsonObject> Load(IReadOnlyDictionary<string, string> cfg)
     {
         var raw = (cfg.GetValueOrDefault("apify_actors_json") ?? "").Trim();
-        if (raw.Length == 0) return Defaults();
+        if (raw.Length == 0) raw = DefaultsJson(); // passa pela mesma leitura: o count que falta vira "Vagas por busca" do painel
         JsonNode? data;
         try { data = JsonNode.Parse(raw); }
         catch (JsonException ex) { throw new ActionException($"JSON de actors Apify inválido: {ex.Message}"); }
@@ -81,6 +121,9 @@ public static class ApifyActors
     {
         switch (value)
         {
+            // Actors com campo inteiro no schema recusam "25" como texto: {{count_number}} sozinho no valor vira número.
+            case JsonValue v when v.TryGetValue<string>(out var whole) && whole == "{{count_number}}" && int.TryParse(context.GetValueOrDefault("count_number"), NumberStyles.None, CultureInfo.InvariantCulture, out var number):
+                return JsonValue.Create(number);
             case JsonValue v when v.TryGetValue<string>(out var text):
                 foreach (var (key, replacement) in context) text = text.Replace("{{" + key + "}}", replacement, StringComparison.Ordinal);
                 return text;
@@ -114,12 +157,15 @@ public static class ApifyActors
             throw new ActionException($"Actor {S(actor["label"])} em modo custom precisa de input_template (objeto JSON).");
         var context = new Dictionary<string, string>
         {
-            ["count"] = count.ToString(CultureInfo.InvariantCulture), ["keywords"] = string.Join(", ", keywords), ["locations"] = string.Join(", ", locations),
+            ["count"] = count.ToString(CultureInfo.InvariantCulture), ["count_number"] = count.ToString(CultureInfo.InvariantCulture), ["keywords"] = string.Join(", ", keywords), ["locations"] = string.Join(", ", locations),
             ["keyword"] = keywords[0], ["location"] = locations[0], ["keyword0"] = keywords[0], ["keyword1"] = keywords.Count > 1 ? keywords[1] : keywords[0],
             ["location0"] = locations[0], ["location1"] = locations.Count > 1 ? locations[1] : locations[0],
             ["max_age_days"] = LinkedInSearch.MaxAgeDays(cfg).ToString(CultureInfo.InvariantCulture),
         };
         if (actor["_ctx"] is JsonObject extra) foreach (var (key, value) in extra) context[key] = S(value); // consulta específica planejada para esta execução
+        // Código ISO do país da busca: o do local ("Brazil"), senão o do país do candidato, senão EUA (padrão dos actors de emprego).
+        context["country_code"] = Geo.CountryCode(context["location"]) is { Length: > 0 } byLocation ? byLocation
+            : Geo.CountryCode(Candidate.JobAssessment.InferCandidateCountry(cfg)) is { Length: > 0 } byProfile ? byProfile : "US";
         var built = Substitute(template, context);
         if (built is JsonArray array) return new JsonObject { ["items"] = array };
         if (built is JsonObject obj) return obj;

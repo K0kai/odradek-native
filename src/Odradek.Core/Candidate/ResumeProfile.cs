@@ -245,6 +245,20 @@ public static partial class ResumeProfile
         return UnionMonths(Arr(profile["roles"]).OfType<JsonObject>().Where(r => wanted.Contains(S(r["id"]))).Select(r => Interval(r, day)).Where(i => i is not null).Select(i => i!.Value));
     }
 
+    /// <summary>Meses de formação com período conhecido (união dos cursos; um curso em andamento conta até hoje).</summary>
+    public static int EducationMonths(JsonObject profile, DateOnly? today = null)
+    {
+        var day = today ?? DateOnly.FromDateTime(DateTime.Now);
+        return UnionMonths(Arr(profile["education"]).OfType<JsonObject>().Select(e => Interval(e, day)).Where(i => i is not null).Select(i => i!.Value));
+    }
+
+    /// <summary>Há papel sem datas (ou com datas ilegíveis): a experiência medida pode estar subestimada.</summary>
+    public static bool HasUndatedRoles(JsonObject profile, DateOnly? today = null)
+    {
+        var day = today ?? DateOnly.FromDateTime(DateTime.Now);
+        return Arr(profile["roles"]).OfType<JsonObject>().Any(r => Interval(r, day) is null);
+    }
+
     private static string IndexToYm(int index) => $"{index / 12:0000}-{index % 12 + 1:00}";
 
     private static string Compact(string? value) => Core.Text.NormalizeText(value).Replace(" ", "");
@@ -404,7 +418,13 @@ public static partial class ResumeProfile
             {
                 if (item is JsonObject obj && Str(obj["text"]).Length > 0 && Grounded(obj["quote"]))
                 {
-                    named[key].Add(new JsonObject { ["id"] = $"{prefix}{named[key].Count + 1}", ["text"] = Str(obj["text"], 400), ["quote"] = Str(obj["quote"], 400) });
+                    var fact = new JsonObject { ["id"] = $"{prefix}{named[key].Count + 1}", ["text"] = Str(obj["text"], 400), ["quote"] = Str(obj["quote"], 400) };
+                    if (key == "education" && CleanDate(obj["start"], false) is { Length: > 0 } eduStart && CleanDate(obj["end"], true) is { Length: > 0 } eduEnd)
+                    {
+                        fact["start"] = eduStart; // só quando o período é conhecido: o perfil de quem não tem datas continua igual
+                        fact["end"] = eduEnd;
+                    }
+                    named[key].Add(fact);
                     kept++;
                 }
                 else Drop(key);
@@ -601,6 +621,8 @@ public static partial class ResumeProfile
                     var headline = Core.Text.Truthy(item["headline"]) ? S(item["headline"]) : S(item["text"]);
                     lines.Add($"[{S(item["id"])}] {(Core.Text.Truthy(item["title"]) ? S(item["title"]) : "Project")} ({span}; {stack}) — {Core.Text.Take(headline, 200)}");
                 }
+                else if (key == "education" && Core.Text.Truthy(item["start"]) && Core.Text.Truthy(item["end"]))
+                    lines.Add($"[{S(item["id"])}] {Core.Text.Take(S(item["text"]), 200)} ({S(item["start"])} → {S(item["end"])})");
                 else lines.Add($"[{S(item["id"])}] {Core.Text.Take(S(item["text"]), 200)}");
             }
         }

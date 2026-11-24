@@ -74,6 +74,9 @@ public sealed class BackupService
 
     public bool Configured => _url().Trim().Length > 0;
 
+    /// <summary>Há uma cópia em andamento agora (a atualização automática não reinicia o app nesse momento).</summary>
+    public bool IsRunning => _running.CurrentCount == 0;
+
     /// <summary>O último resultado gravado (ou <c>null</c>).</summary>
     public BackupResult? Last()
     {

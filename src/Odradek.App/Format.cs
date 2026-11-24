@@ -92,6 +92,16 @@ public static class Format
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Nome curto da fonte para o cartão: "Apify:LinkedIn Jobs: Desenvolvedor Full Stack (24h, lote 1)" → "LinkedIn Jobs"; "Remote OK" fica como está.
+    /// </summary>
+    public static string SourceName(string? source)
+    {
+        var text = (source ?? "").Trim();
+        if (text.StartsWith("Apify:", StringComparison.OrdinalIgnoreCase)) text = text[6..].Split(':')[0].Trim();
+        return text.Length > 0 ? text : "Apify";
+    }
+
     /// <summary>Abre só endereços http(s) no navegador padrão; qualquer outra coisa é ignorada.</summary>
     public static bool OpenInBrowser(string? url)
     {

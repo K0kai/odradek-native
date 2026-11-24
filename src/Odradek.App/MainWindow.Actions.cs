@@ -60,6 +60,7 @@ public partial class MainWindow
         if (job is null)
         {
             DetailTitle.Text = "Selecione uma vaga"; DetailMeta.Text = ""; DetailStatus.IsVisible = false; DetailBody.Text = ""; NotesBox.Text = "";
+            DetailSections.Children.Clear(); DetailLetter.Children.Clear(); DescriptionHeading.IsVisible = false;
             NotesBox.IsEnabled = NotesSaveButton.IsEnabled = false;
             return;
         }
@@ -78,13 +79,20 @@ public partial class MainWindow
             "applied" => ("SuccessSoft", "Success"), "saved" => ("AccentSoft", "Accent"), "worth" => ("WarningSoft", "Warning"), _ => ("NeutralSoft", "Muted"),
         };
         DetailStatus.Background = Palette.Brush(statusBg); DetailStatusText.Foreground = Palette.Brush(statusFg);
-        DetailMeta.Text = $"{job.Company} · {job.Location} · {job.Source} · coletada {Format.Date(job.FirstSeenAt)}"
+        DetailMeta.Text = $"{job.Company} · {job.Location} · {Format.SourceName(job.Source)} · coletada {Format.Date(job.FirstSeenAt)}"
             + (job.MatchScore is { } m ? $" · nota {m}" : "")
             + (job.ContactEmails.Count > 0 ? nl + "Contato: " + string.Join(", ", job.ContactEmails) : "");
-        var text = job.Description;
-        if (job.Assessment is { } a) text = Format.Assessment(a) + nl + nl + text;
-        if (job.HasCoverLetter) text += nl + nl + "— Carta —" + nl + job.CoverLetter;
-        DetailBody.Text = text;
+        // A auditoria da nota vira cartões (veredito em selo, explicação e citações); a descrição e a carta ficam sob títulos próprios.
+        DetailSections.Children.Clear();
+        if (job.Assessment is { } a) DetailSections.Children.Add(AssessmentView.Build(a));
+        DescriptionHeading.IsVisible = job.Description.Trim().Length > 0;
+        DetailBody.Text = job.Description;
+        DetailLetter.Children.Clear();
+        if (job.HasCoverLetter)
+        {
+            DetailLetter.Children.Add(new TextBlock { Text = "Carta de apresentação", Classes = { "h2" }, FontSize = 16 });
+            DetailLetter.Children.Add(new SelectableTextBlock { Text = job.CoverLetter, TextWrapping = Avalonia.Media.TextWrapping.Wrap, LineHeight = 21 });
+        }
         if (!sameJob) NotesBox.Text = job.Notes; // não apaga o que está sendo digitado quando a lista recarrega por outro motivo
 
         if (job.Status != "applied" && job.HasCoverLetter && job.ContactEmails.Count > 0)
@@ -364,6 +372,15 @@ public partial class MainWindow
             noteJob = _detailJob?.Id ?? 0;
             NotesBox.Text = "anotação do teste de fumaça ç 😀"; Click(NotesSaveButton);
         }, () => $"vaga {(noteJob > 0 ? "escolhida" : "NENHUMA")}, notas gravadas={Q<string>("SELECT notes FROM jobs WHERE id=@noteJob", new { noteJob }) == "anotação do teste de fumaça ç 😀"}, aviso='{NoticeText.Text}'");
+
+        string F() => $"lista={JobsList.ItemCount}, título='{JobsTitle.Text}', limpar visível={ClearFiltersButton.IsVisible}, busca ativa={SearchBox.IsEnabled}, página={PageText.Text}";
+        await Step("filtro-nota", async () => { StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == "ignored"); await Task.Delay(900); MinBox.SelectedIndex = 3; }, () => "nota ≥ 70 → " + F());
+        await Step("filtro-data", async () => { DateFromBox.SelectedDate = new DateTime(2026, 10, 1); }, () => $"de 01/10/2026 (_dateFrom={_dateFrom}) → " + F());
+        await Step("filtro-data-futura", async () => { DateFromBox.SelectedDate = new DateTime(2030, 1, 1); }, () => "de 2030 → " + F());
+        await Step("filtro-limpar", async () => { Click(ClearFiltersButton); }, () => $"limpo (nota={MinBox.SelectedIndex}, de={DateFromBox.SelectedDate}) → " + F());
+        await Step("filtro-busca", async () => { StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == "triage:discarded"); await Task.Delay(900); SearchBox.Text = "zzzz-nada"; await Task.Delay(600); }, () => "busca 'zzzz-nada' → " + F());
+        await Step("filtro-busca-limpar", async () => { Click(SearchClearButton); }, () => $"busca limpa (texto='{SearchBox.Text}') → " + F());
+        StatusBox.SelectedIndex = Array.FindIndex(Views, v => v.Key == "worth"); await Task.Delay(500);
 
         await Step("lote", async () =>
         {

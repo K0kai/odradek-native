@@ -38,7 +38,7 @@ internal static class Toast
             MaxWidth = 380,
             Opacity = 0,
             Transitions = new Transitions { new DoubleTransition { Property = Visual.OpacityProperty, Duration = TimeSpan.FromMilliseconds(180) } },
-            Background = new SolidColorBrush(Color.Parse(dark ? "#2B2B2B" : "#F7F7F7")),
+            Background = new SolidColorBrush(Color.Parse(dark ? "#141417" : "#F7F7F7")),
             Content = new Border
             {
                 Padding = new Thickness(16, 12),
