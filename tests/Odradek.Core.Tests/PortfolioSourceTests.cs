@@ -105,9 +105,36 @@ public class PortfolioSourceTests
         using var big = new HttpClient(new StaticHandler(new string('x', PortfolioSource.MaxBodyBytes + 10)));
         Assert.Equal("Resposta do portfólio maior que 2 MB.", (await Assert.ThrowsAsync<PortfolioException>(() => PortfolioSource.FetchAsync(big, "https://example.test/p"))).Message);
         using var notJson = new HttpClient(new StaticHandler("<html>"));
-        Assert.Equal("O portfólio não retornou JSON válido.", (await Assert.ThrowsAsync<PortfolioException>(() => PortfolioSource.FetchAsync(notJson, "https://example.test/p"))).Message);
+        Assert.Equal("O portfólio não retornou JSON válido. Use o endereço do endpoint, como https://example.test/ai/profile.json.",
+            (await Assert.ThrowsAsync<PortfolioException>(() => PortfolioSource.FetchAsync(notJson, "https://example.test/p"))).Message);
         using var ok = new HttpClient(new StaticHandler(Cases["payload"]!.ToJsonString()));
         Assert.Null(JsonCompare.Diff(Cases["valid"], await PortfolioSource.FetchAsync(ok, "https://example.test/p")));
+        using var bom = new HttpClient(new StaticHandler("﻿" + Cases["payload"]!.ToJsonString()));
+        Assert.Null(JsonCompare.Diff(Cases["valid"], await PortfolioSource.FetchAsync(bom, "https://example.test/p")));
+    }
+
+    [Fact]
+    public async Task Fetch_falls_back_to_the_profile_endpoint_when_given_the_page_address()
+    {
+        var requested = new List<string>();
+        using var http = new HttpClient(new RoutingHandler(requested, ("/ai/profile.json", Cases["payload"]!.ToJsonString())));
+        // o endereço da página (HTML) leva ao endpoint padrão na raiz do mesmo site
+        Assert.Null(JsonCompare.Diff(Cases["valid"], await PortfolioSource.FetchAsync(http, "https://example.test/pt?x=1#topo")));
+        Assert.Equal(["https://example.test/pt?x=1", "https://example.test/ai/profile.json"], requested);
+        // endereço já correto: uma única requisição
+        requested.Clear();
+        await PortfolioSource.FetchAsync(http, "https://example.test/ai/profile.json");
+        Assert.Single(requested);
+    }
+
+    private sealed class RoutingHandler(List<string> requested, params (string Path, string Body)[] routes) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            requested.Add(request.RequestUri!.GetLeftPart(UriPartial.Query));
+            var route = routes.FirstOrDefault(r => r.Path == request.RequestUri.AbsolutePath);
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(route.Path is null ? "<html>página</html>" : route.Body) });
+        }
     }
 
     private sealed class FailingHandler : HttpMessageHandler

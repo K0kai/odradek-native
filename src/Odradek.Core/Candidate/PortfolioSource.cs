@@ -66,6 +66,24 @@ public static partial class PortfolioSource
         url = (url ?? "").Trim();
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https") || string.IsNullOrEmpty(uri.Host))
             throw new PortfolioException("URL do portfólio inválida: use http(s)://...");
+        var data = await FetchJsonAsync(http, uri, timeoutSeconds, ct);
+        // Quem cola o endereço da página (ex.: https://site/pt) recebe HTML: tenta o endpoint padrão na raiz do mesmo site.
+        if (data is null && !uri.AbsolutePath.Equals(ProfilePath, StringComparison.OrdinalIgnoreCase))
+        {
+            var fallback = new UriBuilder(uri) { Path = ProfilePath, Query = "", Fragment = "" }.Uri;
+            data = await FetchJsonAsync(http, fallback, timeoutSeconds, ct);
+        }
+        if (data is null)
+            throw new PortfolioException($"O portfólio não retornou JSON válido. Use o endereço do endpoint, como {new Uri(uri, ProfilePath)}.");
+        return ValidatePayload(data);
+    }
+
+    /// <summary>Caminho padrão do endpoint de perfil do portfólio.</summary>
+    public const string ProfilePath = "/ai/profile.json";
+
+    /// <summary>Baixa e interpreta a URL; <c>null</c> quando o corpo não é JSON (HTML, texto, bytes inválidos).</summary>
+    private static async Task<JsonNode?> FetchJsonAsync(HttpClient http, Uri uri, int timeoutSeconds, CancellationToken ct)
+    {
         byte[] body;
         try
         {
@@ -92,13 +110,8 @@ public static partial class PortfolioSource
             throw new PortfolioException($"Não foi possível buscar o portfólio: {ex.Message}", ex);
         }
         if (body.Length > MaxBodyBytes) throw new PortfolioException("Resposta do portfólio maior que 2 MB.");
-        JsonNode? data;
-        try { data = JsonNode.Parse(new UTF8Encoding(false, true).GetString(body)); }
-        catch (Exception ex) when (ex is JsonException or DecoderFallbackException)
-        {
-            throw new PortfolioException("O portfólio não retornou JSON válido.", ex);
-        }
-        return ValidatePayload(data);
+        try { return JsonNode.Parse(new UTF8Encoding(false, true).GetString(body).TrimStart('﻿')); } // BOM não é JSON válido
+        catch (Exception ex) when (ex is JsonException or DecoderFallbackException) { return null; }
     }
 
     // ------------------------------------------------------------ montagem do perfil

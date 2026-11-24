@@ -49,7 +49,7 @@ public static class SettingsLayout
         [
             new("Contato", "Telefone sem o código do país (ex.: 11 99999-0000); o código (ex.: 55) vai à parte, para os sites que têm um campo para cada. Com + na frente o telefone já traz o próprio código.",
                 [new("candidate_name", "Nome"), new("candidate_email", "E-mail"),
-                 new("candidate_phone_country_code", "Código do país (DDI)"), new("candidate_phone", "Telefone"),
+                 new("candidate_phone_country_code", "Código do país (DDI; o + é opcional)"), new("candidate_phone", "Telefone"),
                  new("candidate_linkedin", "LinkedIn"), new("candidate_current_company", "Empresa atual"), new("candidate_cpf", "CPF")]),
             new("Endereço", "A cidade e o país definem a elegibilidade geográfica e onde o LinkedIn é pesquisado.",
                 [new("candidate_city", "Cidade"), new("candidate_state", "Estado"), new("candidate_country", "País"),
