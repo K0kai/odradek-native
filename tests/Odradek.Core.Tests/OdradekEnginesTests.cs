@@ -41,7 +41,10 @@ public class OdradekEnginesTests
             var queueId = new QueueActions(t.Db).Enqueue("worth_reverify", [new("scheduled_date", "2026-11-23")], "daily:2026-11-23");
             var row = await Eventually(() => t.Db.Open().QuerySingle<(string Status, string? Result)>("SELECT status, result FROM queue_jobs WHERE id=@queueId", new { queueId }), r => r.Status == "succeeded");
             Assert.True(row.Status == "succeeded", $"status {row.Status}, resultado {row.Result}" + Dump(t));
-            Assert.True(row.Result == "Verificação diária: 1 checadas, 1 inativas removidas, 0 ativas, 0 inconclusivas mantidas.", $"resultado: {row.Result}" + Dump(t));
+            // Ao iniciar, o próprio motor também enfileira a verificação diária de hoje (recuperação do dia perdido). Os dois itens miram a mesma vaga:
+            // quem rodar primeiro a fecha (1 checada) e o outro acha 0. Por isso a conferência é sobre o conjunto, não sobre este item.
+            var results = t.Db.Open().Query<string>("SELECT result FROM queue_jobs WHERE kind='worth_reverify' AND status='succeeded'").ToList();
+            Assert.True(results.Contains("Verificação diária: 1 checadas, 1 inativas removidas, 0 ativas, 0 inconclusivas mantidas."), $"resultado: {row.Result}" + Dump(t));
             var closedStatus = t.Scalar<string>("SELECT status FROM jobs WHERE id=@closed", new { closed });
             Assert.True(closedStatus == "ignored", $"vaga ficou {closedStatus}" + Dump(t));
 
