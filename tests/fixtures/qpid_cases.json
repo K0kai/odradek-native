@@ -1,0 +1,2478 @@
+{
+ "now": "2026-11-23T12:00:00+00:00",
+ "seed": [
+  [
+   "INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+   [
+    "candidate_name",
+    "João da Silva Souza"
+   ]
+  ],
+  [
+   "INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+   [
+    "candidate_email",
+    "joao@example.test"
+   ]
+  ],
+  [
+   "INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+   [
+    "candidate_phone",
+    "+55 11 99999-0000"
+   ]
+  ],
+  [
+   "INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+   [
+    "candidate_city",
+    "São Paulo"
+   ]
+  ],
+  [
+   "INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+   [
+    "candidate_linkedin",
+    "https://linkedin.com/in/joao"
+   ]
+  ],
+  [
+   "INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+   [
+    "expected_salary",
+    "R$ 12.000"
+   ]
+  ],
+  [
+   "INSERT INTO jobs(id,source,title,company,location,description,url,first_seen_at,status,fingerprint) VALUES(?,?,?,?,?,?,?,?,?,?)",
+   [
+    1,
+    "t",
+    "Dev Python",
+    "Acme",
+    "Brasil",
+    "descrição",
+    "https://acme.test/1",
+    "2026-11-01T00:00:00+00:00",
+    "worth",
+    "fp1"
+   ]
+  ],
+  [
+   "INSERT INTO jobs(id,source,title,company,location,description,url,first_seen_at,status,fingerprint) VALUES(?,?,?,?,?,?,?,?,?,?)",
+   [
+    2,
+    "t",
+    "Dev Go",
+    "Beta",
+    "Brasil",
+    "descrição",
+    "https://beta.test/2",
+    "2026-11-01T00:00:00+00:00",
+    "saved",
+    "fp2"
+   ]
+  ],
+  [
+   "INSERT INTO jobs(id,source,title,company,location,description,url,first_seen_at,status,fingerprint) VALUES(?,?,?,?,?,?,?,?,?,?)",
+   [
+    3,
+    "t",
+    "Dev Rust",
+    "Gama",
+    "Brasil",
+    "descrição",
+    "https://gama.test/3",
+    "2026-11-01T00:00:00+00:00",
+    "applied",
+    "fp3"
+   ]
+  ],
+  [
+   "INSERT INTO jobs(id,source,title,company,location,description,url,first_seen_at,status,fingerprint) VALUES(?,?,?,?,?,?,?,?,?,?)",
+   [
+    4,
+    "t",
+    "Dev C#",
+    "Delta",
+    "Brasil",
+    "descrição",
+    "https://delta.test/4",
+    "2026-11-01T00:00:00+00:00",
+    "worth",
+    "fp4"
+   ]
+  ],
+  [
+   "INSERT INTO jobs(id,source,title,company,location,description,url,first_seen_at,status,fingerprint) VALUES(?,?,?,?,?,?,?,?,?,?)",
+   [
+    5,
+    "t",
+    "Dev Java",
+    "Épsilon",
+    "Brasil",
+    "descrição",
+    "https://eps.test/5",
+    "2026-11-01T00:00:00+00:00",
+    "worth",
+    "fp5"
+   ]
+  ],
+  [
+   "INSERT INTO jobs(id,source,title,company,location,description,url,first_seen_at,status,fingerprint) VALUES(?,?,?,?,?,?,?,?,?,?)",
+   [
+    6,
+    "t",
+    "Dev Ruby",
+    "Zeta",
+    "Brasil",
+    "descrição",
+    "https://zeta.test/6",
+    "2026-11-01T00:00:00+00:00",
+    "ignored",
+    "fp6"
+   ]
+  ],
+  [
+   "INSERT INTO ai_decisions(job_id,decided_at,match_score,should_apply,letter_required,reason,assessment_json) VALUES(?,?,?,?,?,?,?)",
+   [
+    1,
+    "2026-11-23T12:00:00+00:00",
+    88,
+    1,
+    0,
+    "ok",
+    "{\"requirements\": [{\"text\": \"Python experience\", \"status\": \"met\", \"resume_quote\": \"Desenvolvedor Python\"}, {\"text\": \"Go\", \"status\": \"missing\", \"resume_quote\": \"Go\"}], \"responsibilities\": [{\"text\": \"APIs\", \"status\": \"partial\", \"resume_quote\": \"Acme\"}]}"
+   ]
+  ],
+  [
+   "INSERT INTO ai_decisions(job_id,decided_at,match_score,should_apply,letter_required,reason) VALUES(?,?,?,?,?,?)",
+   [
+    2,
+    "2026-11-23T12:00:00+00:00",
+    61,
+    1,
+    0,
+    "ok"
+   ]
+  ],
+  [
+   "INSERT INTO cover_letters(job_id,language,provider,model,body,created_at,updated_at) VALUES(?,?,?,?,?,?,?)",
+   [
+    1,
+    "pt",
+    "gemini",
+    "m",
+    "Prezados,\ncarta de teste çãõ.",
+    "2026-11-23T12:00:00+00:00",
+    "2026-11-23T12:00:00+00:00"
+   ]
+  ],
+  [
+   "INSERT INTO resumes(id,language,original_filename,stored_path,file_sha256,extracted_text,analysis_json,analysis_summary,analyzed_at,provider,model,created_at,updated_at,profile_json,profile_version) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+   [
+    1,
+    "pt",
+    "cv.pdf",
+    "x",
+    "60f04d691c9bd8c650e4ce156dd23205a90d7161e754e40487f064fea3070868",
+    "JOÃO SILVA\nDesenvolvedor Python\n\nEXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel\n\nDesenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI\n\nFORMAÇÃO\nAnálise e Desenvolvimento de Sistemas\n",
+    "{}",
+    "resumo",
+    "2026-11-23T12:00:00+00:00",
+    "gemini",
+    "m",
+    "2026-11-23T12:00:00+00:00",
+    "2026-11-23T12:00:00+00:00",
+    "{\"version\": \"2\", \"headline\": \"Dev com base administrativa\", \"professional_profile\": \"\", \"seniority\": \"\", \"location_notes\": \"\", \"work_authorization_notes\": \"\", \"roles\": [{\"id\": \"R1\", \"title\": \"Assistente Administrativo\", \"employer\": \"Acme Ltda\", \"start\": \"2019-01\", \"end\": \"2021-12\", \"quote\": \"Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)\", \"responsibilities\": [{\"id\": \"R1.1\", \"text\": \"suporte interno\", \"quote\": \"Suporte a usuários internos e planilhas Excel\"}], \"skills_used\": [\"excel\"]}, {\"id\": \"R2\", \"title\": \"Desenvolvedor Backend\", \"employer\": \"Beta SA\", \"start\": \"2022-01\", \"end\": \"present\", \"quote\": \"Desenvolvedor Backend — Beta SA (2022 - atual)\", \"responsibilities\": [{\"id\": \"R2.1\", \"text\": \"APIs\", \"quote\": \"APIs em Python e FastAPI\"}], \"skills_used\": [\"python\", \"fastapi\"]}], \"skills\": [{\"id\": \"S1\", \"name\": \"Python\", \"canonical\": \"python\", \"category\": \"language\", \"quotes\": [\"APIs em Python e FastAPI\"]}], \"transferable_skills\": [{\"id\": \"T1\", \"capability\": \"suporte a usuários\", \"from_role_ids\": [\"R1\"], \"quotes\": [\"Suporte a usuários internos\"]}], \"education\": [], \"certifications\": [], \"projects\": [], \"achievements\": [], \"languages\": [], \"derived\": {\"total_months\": 95, \"skills\": {\"S1\": {\"canonical\": \"python\", \"months\": 59, \"last_used\": \"2026-11\", \"role_ids\": [\"R2\"], \"project_months\": 0, \"project_ids\": [], \"project_last_used\": \"\"}}, \"role_months\": {\"R1\": 36, \"R2\": 59}, \"current_role_ids\": [\"R2\"]}, \"coverage\": {\"kept\": 4, \"dropped\": {\"responsibilities\": 1, \"skills\": 1, \"transferable_skills\": 1}, \"ungrounded\": 3}}",
+    "2"
+   ]
+  ],
+  [
+   "INSERT INTO resume_files(resume_id,content) VALUES(?,?)",
+   [
+    1,
+    {
+     "hex": "255044462d312e340a25207265666572656e6369612073696e7465746963610a"
+    }
+   ]
+  ],
+  [
+   "DELETE FROM form_field_rules",
+   []
+  ],
+  [
+   "INSERT INTO form_field_rules(id,key,aliases,mode,value_from,value,sort_order) VALUES(?,?,?,?,?,?,?)",
+   [
+    1,
+    "full_name",
+    "nome, name; nome completo",
+    "text",
+    "candidate_name",
+    "",
+    10
+   ]
+  ],
+  [
+   "INSERT INTO form_field_rules(id,key,aliases,mode,value_from,value,sort_order) VALUES(?,?,?,?,?,?,?)",
+   [
+    2,
+    "salary",
+    "pretensão salarial",
+    "text",
+    "expected_salary",
+    "",
+    20
+   ]
+  ],
+  [
+   "INSERT INTO form_field_rules(id,key,aliases,mode,value_from,value,sort_order) VALUES(?,?,?,?,?,?,?)",
+   [
+    3,
+    "cover_letter",
+    "carta\nmensagem",
+    "cover_letter",
+    "",
+    "",
+    30
+   ]
+  ],
+  [
+   "INSERT INTO form_field_rules(id,key,aliases,mode,value_from,value,sort_order) VALUES(?,?,?,?,?,?,?)",
+   [
+    4,
+    "hobby",
+    "hobby",
+    "text",
+    "",
+    "xadrez",
+    40
+   ]
+  ],
+  [
+   "INSERT INTO form_field_rules(id,key,aliases,mode,value_from,value,sort_order) VALUES(?,?,?,?,?,?,?)",
+   [
+    5,
+    "skipme",
+    "x",
+    "skip",
+    "",
+    "z",
+    50
+   ]
+  ],
+  [
+   "INSERT INTO form_field_rules(id,key,aliases,mode,value_from,value,sort_order) VALUES(?,?,?,?,?,?,?)",
+   [
+    6,
+    "empty",
+    "vazio",
+    "text",
+    "candidate_state",
+    "",
+    60
+   ]
+  ],
+  [
+   "INSERT INTO form_field_rules(id,key,aliases,mode,value_from,value,sort_order) VALUES(?,?,?,?,?,?,?)",
+   [
+    7,
+    "availability",
+    "disponibilidade",
+    "text",
+    "",
+    "imediata",
+    70
+   ]
+  ],
+  [
+   "INSERT INTO form_field_rules(id,key,aliases,mode,value_from,value,sort_order) VALUES(?,?,?,?,?,?,?)",
+   [
+    8,
+    "contract_type",
+    "contratação",
+    "select",
+    "",
+    "CLT",
+    80
+   ]
+  ]
+ ],
+ "cases": [
+  {
+   "method": "GET",
+   "url": "/api/qpid/capabilities",
+   "body": null,
+   "status": 200,
+   "response": {
+    "version": 2,
+    "application_contract": 2,
+    "features": [
+     "profile-facts-v1",
+     "application-reservation-v1",
+     "application-result-v1",
+     "collector-apply-limit-v1"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications?limit=30",
+   "body": null,
+   "status": 200,
+   "response": {
+    "items": [
+     {
+      "id": 5,
+      "title": "Dev Java",
+      "company": "Épsilon",
+      "status": "worth",
+      "match_score": null
+     },
+     {
+      "id": 4,
+      "title": "Dev C#",
+      "company": "Delta",
+      "status": "worth",
+      "match_score": null
+     },
+     {
+      "id": 2,
+      "title": "Dev Go",
+      "company": "Beta",
+      "status": "saved",
+      "match_score": 61
+     },
+     {
+      "id": 1,
+      "title": "Dev Python",
+      "company": "Acme",
+      "status": "worth",
+      "match_score": 88
+     }
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications?limit=1",
+   "body": null,
+   "status": 200,
+   "response": {
+    "items": [
+     {
+      "id": 5,
+      "title": "Dev Java",
+      "company": "Épsilon",
+      "status": "worth",
+      "match_score": null
+     }
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/1?language=pt",
+   "body": null,
+   "status": 200,
+   "response": {
+    "contract_version": 2,
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "job": {
+     "id": 1,
+     "title": "Dev Python",
+     "company": "Acme",
+     "url": "https://acme.test/1",
+     "status": "worth"
+    },
+    "rules": [
+     {
+      "id": "form-rule:1:full_name",
+      "aliases": [
+       "nome",
+       "name",
+       "nome completo"
+      ],
+      "value": "João da Silva Souza",
+      "source": "candidate_name",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "version": "1c08dcd5d90475996a034826f54c71a0eca0b93013607304abc05d5c9bb996bc"
+     },
+     {
+      "id": "form-rule:2:salary",
+      "aliases": [
+       "pretensão salarial"
+      ],
+      "value": "R$ 12.000",
+      "source": "expected_salary",
+      "kind": "preference",
+      "language": "pt",
+      "scope": "profile",
+      "version": "7d741e3dc6143d1506c3d77e3b536521d60170eb4daefc1d2544cbdfb0492d44"
+     },
+     {
+      "id": "form-rule:3:cover_letter",
+      "aliases": [
+       "carta",
+       "mensagem"
+      ],
+      "value": "Prezados,\ncarta de teste çãõ.",
+      "source": "form-rule",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "job",
+      "version": "e84fc280821f5acc96b910ac818ec1c447a5816ec55ea80e98eeae91f5a638ea"
+     },
+     {
+      "id": "form-rule:4:hobby",
+      "aliases": [
+       "hobby"
+      ],
+      "value": "xadrez",
+      "source": "form-rule",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "version": "32fb66f59d6c0605e963d454ebcbc021a7f5a5ea34211715b5475be28b7cf0d8"
+     },
+     {
+      "id": "form-rule:7:availability",
+      "aliases": [
+       "disponibilidade"
+      ],
+      "value": "imediata",
+      "source": "form-rule",
+      "kind": "preference",
+      "language": "pt",
+      "scope": "profile",
+      "version": "1bf7a2b3d66380a5e61ce0b7a802082cb53e6acbc786c3213d89960e8940e1cb"
+     },
+     {
+      "id": "form-rule:8:contract_type",
+      "aliases": [
+       "contratação"
+      ],
+      "value": "CLT",
+      "source": "form-rule",
+      "kind": "preference",
+      "language": "pt",
+      "scope": "profile",
+      "version": "461154a8faef710f0d426a3622771a4d6f3fd723127ebf09378c84d7f4b9eaaa"
+     },
+     {
+      "id": "candidate:first_name",
+      "aliases": [
+       "first name",
+       "primeiro nome"
+      ],
+      "value": "João",
+      "source": "candidate_name",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "version": "cc66c8c1ea7ca2bcb03530a202eaddb0e8cbe0bc5377745c171b05d6312cc698"
+     },
+     {
+      "id": "candidate:last_name",
+      "aliases": [
+       "last name",
+       "sobrenome"
+      ],
+      "value": "da Silva Souza",
+      "source": "candidate_name",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "version": "ac1c97a33c4902cb0ba9022cf1322b63bb2c6cab4eb52736b66bbe6073856646"
+     },
+     {
+      "id": "resume:pt:excerpt:0",
+      "aliases": [
+       "Cabeçalho — JOÃO SILVA"
+      ],
+      "value": "JOÃO SILVA\nDesenvolvedor Python",
+      "source": "uploaded-resume",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "sourceOnly": true,
+      "section": "header",
+      "sourceLanguage": "pt",
+      "matched_requirements": [
+       "Python experience"
+      ],
+      "version": "14761ba2bbd0cd96c3df4bc4581efe53eb243dae07f7bc5b2429c111414fb8ae"
+     },
+     {
+      "id": "resume:pt:excerpt:1",
+      "aliases": [
+       "EXPERIÊNCIA PROFISSIONAL — Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)"
+      ],
+      "value": "EXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel",
+      "source": "uploaded-resume",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "sourceOnly": true,
+      "section": "experience",
+      "sourceLanguage": "pt",
+      "matched_requirements": [
+       "APIs"
+      ],
+      "version": "2f749b9791d58cf1051aa7617a8680f15c0296652578dd22179118202e4b96f5"
+     },
+     {
+      "id": "resume:pt:excerpt:2",
+      "aliases": [
+       "EXPERIÊNCIA PROFISSIONAL — Desenvolvedor Backend — Beta SA (2022 - atual)"
+      ],
+      "value": "Desenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI",
+      "source": "uploaded-resume",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "sourceOnly": true,
+      "section": "experience",
+      "sourceLanguage": "pt",
+      "version": "5934bc81e973f162114639fa0f925be14aa0f9a1c1745a26ddc3338a809fbbd7"
+     },
+     {
+      "id": "resume:pt:excerpt:3",
+      "aliases": [
+       "FORMAÇÃO — Análise e Desenvolvimento de Sistemas"
+      ],
+      "value": "FORMAÇÃO\nAnálise e Desenvolvimento de Sistemas",
+      "source": "uploaded-resume",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "sourceOnly": true,
+      "section": "education",
+      "sourceLanguage": "pt",
+      "version": "c4598cdae88f25e0361e5e8cff4ee53afed0ec969670bf6e4088c95dcf9cfed5"
+     }
+    ],
+    "profile": {
+     "schema": 1,
+     "version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+     "facts": [
+      {
+       "id": "form-rule:1:full_name",
+       "aliases": [
+        "nome",
+        "name",
+        "nome completo"
+       ],
+       "value": "João da Silva Souza",
+       "source": "candidate_name",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "version": "1c08dcd5d90475996a034826f54c71a0eca0b93013607304abc05d5c9bb996bc"
+      },
+      {
+       "id": "form-rule:2:salary",
+       "aliases": [
+        "pretensão salarial"
+       ],
+       "value": "R$ 12.000",
+       "source": "expected_salary",
+       "kind": "preference",
+       "language": "pt",
+       "scope": "profile",
+       "version": "7d741e3dc6143d1506c3d77e3b536521d60170eb4daefc1d2544cbdfb0492d44"
+      },
+      {
+       "id": "form-rule:3:cover_letter",
+       "aliases": [
+        "carta",
+        "mensagem"
+       ],
+       "value": "Prezados,\ncarta de teste çãõ.",
+       "source": "form-rule",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "job",
+       "version": "e84fc280821f5acc96b910ac818ec1c447a5816ec55ea80e98eeae91f5a638ea"
+      },
+      {
+       "id": "form-rule:4:hobby",
+       "aliases": [
+        "hobby"
+       ],
+       "value": "xadrez",
+       "source": "form-rule",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "version": "32fb66f59d6c0605e963d454ebcbc021a7f5a5ea34211715b5475be28b7cf0d8"
+      },
+      {
+       "id": "form-rule:7:availability",
+       "aliases": [
+        "disponibilidade"
+       ],
+       "value": "imediata",
+       "source": "form-rule",
+       "kind": "preference",
+       "language": "pt",
+       "scope": "profile",
+       "version": "1bf7a2b3d66380a5e61ce0b7a802082cb53e6acbc786c3213d89960e8940e1cb"
+      },
+      {
+       "id": "form-rule:8:contract_type",
+       "aliases": [
+        "contratação"
+       ],
+       "value": "CLT",
+       "source": "form-rule",
+       "kind": "preference",
+       "language": "pt",
+       "scope": "profile",
+       "version": "461154a8faef710f0d426a3622771a4d6f3fd723127ebf09378c84d7f4b9eaaa"
+      },
+      {
+       "id": "candidate:first_name",
+       "aliases": [
+        "first name",
+        "primeiro nome"
+       ],
+       "value": "João",
+       "source": "candidate_name",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "version": "cc66c8c1ea7ca2bcb03530a202eaddb0e8cbe0bc5377745c171b05d6312cc698"
+      },
+      {
+       "id": "candidate:last_name",
+       "aliases": [
+        "last name",
+        "sobrenome"
+       ],
+       "value": "da Silva Souza",
+       "source": "candidate_name",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "version": "ac1c97a33c4902cb0ba9022cf1322b63bb2c6cab4eb52736b66bbe6073856646"
+      },
+      {
+       "id": "resume:pt:excerpt:0",
+       "aliases": [
+        "Cabeçalho — JOÃO SILVA"
+       ],
+       "value": "JOÃO SILVA\nDesenvolvedor Python",
+       "source": "uploaded-resume",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "sourceOnly": true,
+       "section": "header",
+       "sourceLanguage": "pt",
+       "matched_requirements": [
+        "Python experience"
+       ],
+       "version": "14761ba2bbd0cd96c3df4bc4581efe53eb243dae07f7bc5b2429c111414fb8ae"
+      },
+      {
+       "id": "resume:pt:excerpt:1",
+       "aliases": [
+        "EXPERIÊNCIA PROFISSIONAL — Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)"
+       ],
+       "value": "EXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel",
+       "source": "uploaded-resume",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "sourceOnly": true,
+       "section": "experience",
+       "sourceLanguage": "pt",
+       "matched_requirements": [
+        "APIs"
+       ],
+       "version": "2f749b9791d58cf1051aa7617a8680f15c0296652578dd22179118202e4b96f5"
+      },
+      {
+       "id": "resume:pt:excerpt:2",
+       "aliases": [
+        "EXPERIÊNCIA PROFISSIONAL — Desenvolvedor Backend — Beta SA (2022 - atual)"
+       ],
+       "value": "Desenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI",
+       "source": "uploaded-resume",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "sourceOnly": true,
+       "section": "experience",
+       "sourceLanguage": "pt",
+       "version": "5934bc81e973f162114639fa0f925be14aa0f9a1c1745a26ddc3338a809fbbd7"
+      },
+      {
+       "id": "resume:pt:excerpt:3",
+       "aliases": [
+        "FORMAÇÃO — Análise e Desenvolvimento de Sistemas"
+       ],
+       "value": "FORMAÇÃO\nAnálise e Desenvolvimento de Sistemas",
+       "source": "uploaded-resume",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "sourceOnly": true,
+       "section": "education",
+       "sourceLanguage": "pt",
+       "version": "c4598cdae88f25e0361e5e8cff4ee53afed0ec969670bf6e4088c95dcf9cfed5"
+      }
+     ]
+    },
+    "resume": true,
+    "resume_meta": {
+     "id": 1,
+     "language": "pt",
+     "version": "526c256691147c9075b38d83c132983533cc893d4487ed2b645c1672f06d4631"
+    },
+    "language": "pt"
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/1?language=en",
+   "body": null,
+   "status": 200,
+   "response": {
+    "contract_version": 2,
+    "context_version": "19e5dd84238ff8b4c8d544713ccd4e0a978ddb3bfb87ed01fc01cfa519d01ca2",
+    "job": {
+     "id": 1,
+     "title": "Dev Python",
+     "company": "Acme",
+     "url": "https://acme.test/1",
+     "status": "worth"
+    },
+    "rules": [
+     {
+      "id": "form-rule:1:full_name",
+      "aliases": [
+       "nome",
+       "name",
+       "nome completo"
+      ],
+      "value": "João da Silva Souza",
+      "source": "candidate_name",
+      "kind": "fact",
+      "language": "en",
+      "scope": "profile",
+      "version": "e013c79badec7b452bea5950772f5daba644bf16e6704e268a9a0132ca96b71c"
+     },
+     {
+      "id": "form-rule:2:salary",
+      "aliases": [
+       "pretensão salarial"
+      ],
+      "value": "R$ 12.000",
+      "source": "expected_salary",
+      "kind": "preference",
+      "language": "en",
+      "scope": "profile",
+      "version": "7be78f25c910e5121757a93b64db97add414645cadb5cb12a6a5a321b3168991"
+     },
+     {
+      "id": "form-rule:3:cover_letter",
+      "aliases": [
+       "carta",
+       "mensagem"
+      ],
+      "value": "Prezados,\ncarta de teste çãõ.",
+      "source": "form-rule",
+      "kind": "fact",
+      "language": "en",
+      "scope": "job",
+      "version": "b9d962c35a3a5d048ae9b72c69ac476ee2ba0f4a2b9f7c557f426fc05de66711"
+     },
+     {
+      "id": "form-rule:4:hobby",
+      "aliases": [
+       "hobby"
+      ],
+      "value": "xadrez",
+      "source": "form-rule",
+      "kind": "fact",
+      "language": "en",
+      "scope": "profile",
+      "version": "490661e0f98da76fb911ae0217995c19f034970c47a355fdab121482b962a870"
+     },
+     {
+      "id": "form-rule:7:availability",
+      "aliases": [
+       "disponibilidade"
+      ],
+      "value": "imediata",
+      "source": "form-rule",
+      "kind": "preference",
+      "language": "en",
+      "scope": "profile",
+      "version": "f1a081c5fa166e644b609a64008f4164cdd1e00bcb43617a6a6d692988c5e184"
+     },
+     {
+      "id": "form-rule:8:contract_type",
+      "aliases": [
+       "contratação"
+      ],
+      "value": "CLT",
+      "source": "form-rule",
+      "kind": "preference",
+      "language": "en",
+      "scope": "profile",
+      "version": "c38326be03f651b1901c368bf1bc86427f2e60fd59cb6f906fd1eb83581f3f9c"
+     },
+     {
+      "id": "candidate:first_name",
+      "aliases": [
+       "first name",
+       "primeiro nome"
+      ],
+      "value": "João",
+      "source": "candidate_name",
+      "kind": "fact",
+      "language": "en",
+      "scope": "profile",
+      "version": "18ab1e0928ea941b252ab5f5e5904a7ce9ba016c49daed31598dee1256a652b4"
+     },
+     {
+      "id": "candidate:last_name",
+      "aliases": [
+       "last name",
+       "sobrenome"
+      ],
+      "value": "da Silva Souza",
+      "source": "candidate_name",
+      "kind": "fact",
+      "language": "en",
+      "scope": "profile",
+      "version": "4a80d8d46f2b7a0a65463abe7738242408739ee2dcbf2301e43e144d90c6d364"
+     }
+    ],
+    "profile": {
+     "schema": 1,
+     "version": "b98068730f3bd8be192237057a9fa137777c5dae5dd8f8c591d09729671c946f",
+     "facts": [
+      {
+       "id": "form-rule:1:full_name",
+       "aliases": [
+        "nome",
+        "name",
+        "nome completo"
+       ],
+       "value": "João da Silva Souza",
+       "source": "candidate_name",
+       "kind": "fact",
+       "language": "en",
+       "scope": "profile",
+       "version": "e013c79badec7b452bea5950772f5daba644bf16e6704e268a9a0132ca96b71c"
+      },
+      {
+       "id": "form-rule:2:salary",
+       "aliases": [
+        "pretensão salarial"
+       ],
+       "value": "R$ 12.000",
+       "source": "expected_salary",
+       "kind": "preference",
+       "language": "en",
+       "scope": "profile",
+       "version": "7be78f25c910e5121757a93b64db97add414645cadb5cb12a6a5a321b3168991"
+      },
+      {
+       "id": "form-rule:3:cover_letter",
+       "aliases": [
+        "carta",
+        "mensagem"
+       ],
+       "value": "Prezados,\ncarta de teste çãõ.",
+       "source": "form-rule",
+       "kind": "fact",
+       "language": "en",
+       "scope": "job",
+       "version": "b9d962c35a3a5d048ae9b72c69ac476ee2ba0f4a2b9f7c557f426fc05de66711"
+      },
+      {
+       "id": "form-rule:4:hobby",
+       "aliases": [
+        "hobby"
+       ],
+       "value": "xadrez",
+       "source": "form-rule",
+       "kind": "fact",
+       "language": "en",
+       "scope": "profile",
+       "version": "490661e0f98da76fb911ae0217995c19f034970c47a355fdab121482b962a870"
+      },
+      {
+       "id": "form-rule:7:availability",
+       "aliases": [
+        "disponibilidade"
+       ],
+       "value": "imediata",
+       "source": "form-rule",
+       "kind": "preference",
+       "language": "en",
+       "scope": "profile",
+       "version": "f1a081c5fa166e644b609a64008f4164cdd1e00bcb43617a6a6d692988c5e184"
+      },
+      {
+       "id": "form-rule:8:contract_type",
+       "aliases": [
+        "contratação"
+       ],
+       "value": "CLT",
+       "source": "form-rule",
+       "kind": "preference",
+       "language": "en",
+       "scope": "profile",
+       "version": "c38326be03f651b1901c368bf1bc86427f2e60fd59cb6f906fd1eb83581f3f9c"
+      },
+      {
+       "id": "candidate:first_name",
+       "aliases": [
+        "first name",
+        "primeiro nome"
+       ],
+       "value": "João",
+       "source": "candidate_name",
+       "kind": "fact",
+       "language": "en",
+       "scope": "profile",
+       "version": "18ab1e0928ea941b252ab5f5e5904a7ce9ba016c49daed31598dee1256a652b4"
+      },
+      {
+       "id": "candidate:last_name",
+       "aliases": [
+        "last name",
+        "sobrenome"
+       ],
+       "value": "da Silva Souza",
+       "source": "candidate_name",
+       "kind": "fact",
+       "language": "en",
+       "scope": "profile",
+       "version": "4a80d8d46f2b7a0a65463abe7738242408739ee2dcbf2301e43e144d90c6d364"
+      }
+     ]
+    },
+    "resume": false,
+    "resume_meta": null,
+    "language": "en"
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/2?language=pt",
+   "body": null,
+   "status": 200,
+   "response": {
+    "contract_version": 2,
+    "context_version": "dac9e1dfb2c34eecbc3c70caf183fcdac40379b856abb5199587c6cd22b498a2",
+    "job": {
+     "id": 2,
+     "title": "Dev Go",
+     "company": "Beta",
+     "url": "https://beta.test/2",
+     "status": "saved"
+    },
+    "rules": [
+     {
+      "id": "form-rule:1:full_name",
+      "aliases": [
+       "nome",
+       "name",
+       "nome completo"
+      ],
+      "value": "João da Silva Souza",
+      "source": "candidate_name",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "version": "1c08dcd5d90475996a034826f54c71a0eca0b93013607304abc05d5c9bb996bc"
+     },
+     {
+      "id": "form-rule:2:salary",
+      "aliases": [
+       "pretensão salarial"
+      ],
+      "value": "R$ 12.000",
+      "source": "expected_salary",
+      "kind": "preference",
+      "language": "pt",
+      "scope": "profile",
+      "version": "7d741e3dc6143d1506c3d77e3b536521d60170eb4daefc1d2544cbdfb0492d44"
+     },
+     {
+      "id": "form-rule:4:hobby",
+      "aliases": [
+       "hobby"
+      ],
+      "value": "xadrez",
+      "source": "form-rule",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "version": "32fb66f59d6c0605e963d454ebcbc021a7f5a5ea34211715b5475be28b7cf0d8"
+     },
+     {
+      "id": "form-rule:7:availability",
+      "aliases": [
+       "disponibilidade"
+      ],
+      "value": "imediata",
+      "source": "form-rule",
+      "kind": "preference",
+      "language": "pt",
+      "scope": "profile",
+      "version": "1bf7a2b3d66380a5e61ce0b7a802082cb53e6acbc786c3213d89960e8940e1cb"
+     },
+     {
+      "id": "form-rule:8:contract_type",
+      "aliases": [
+       "contratação"
+      ],
+      "value": "CLT",
+      "source": "form-rule",
+      "kind": "preference",
+      "language": "pt",
+      "scope": "profile",
+      "version": "461154a8faef710f0d426a3622771a4d6f3fd723127ebf09378c84d7f4b9eaaa"
+     },
+     {
+      "id": "candidate:first_name",
+      "aliases": [
+       "first name",
+       "primeiro nome"
+      ],
+      "value": "João",
+      "source": "candidate_name",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "version": "cc66c8c1ea7ca2bcb03530a202eaddb0e8cbe0bc5377745c171b05d6312cc698"
+     },
+     {
+      "id": "candidate:last_name",
+      "aliases": [
+       "last name",
+       "sobrenome"
+      ],
+      "value": "da Silva Souza",
+      "source": "candidate_name",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "version": "ac1c97a33c4902cb0ba9022cf1322b63bb2c6cab4eb52736b66bbe6073856646"
+     },
+     {
+      "id": "resume:pt:excerpt:0",
+      "aliases": [
+       "Cabeçalho — JOÃO SILVA"
+      ],
+      "value": "JOÃO SILVA\nDesenvolvedor Python",
+      "source": "uploaded-resume",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "sourceOnly": true,
+      "section": "header",
+      "sourceLanguage": "pt",
+      "version": "506b772fb8bc8304f2622b544bf48bc0cf53b3522c4cb79fdb2e911c2974c50d"
+     },
+     {
+      "id": "resume:pt:excerpt:1",
+      "aliases": [
+       "EXPERIÊNCIA PROFISSIONAL — Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)"
+      ],
+      "value": "EXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel",
+      "source": "uploaded-resume",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "sourceOnly": true,
+      "section": "experience",
+      "sourceLanguage": "pt",
+      "version": "a66e0839c5a0a1171ea0d3875cff80437becbe972362820ab3f120111a0012d9"
+     },
+     {
+      "id": "resume:pt:excerpt:2",
+      "aliases": [
+       "EXPERIÊNCIA PROFISSIONAL — Desenvolvedor Backend — Beta SA (2022 - atual)"
+      ],
+      "value": "Desenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI",
+      "source": "uploaded-resume",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "sourceOnly": true,
+      "section": "experience",
+      "sourceLanguage": "pt",
+      "version": "5934bc81e973f162114639fa0f925be14aa0f9a1c1745a26ddc3338a809fbbd7"
+     },
+     {
+      "id": "resume:pt:excerpt:3",
+      "aliases": [
+       "FORMAÇÃO — Análise e Desenvolvimento de Sistemas"
+      ],
+      "value": "FORMAÇÃO\nAnálise e Desenvolvimento de Sistemas",
+      "source": "uploaded-resume",
+      "kind": "fact",
+      "language": "pt",
+      "scope": "profile",
+      "sourceOnly": true,
+      "section": "education",
+      "sourceLanguage": "pt",
+      "version": "c4598cdae88f25e0361e5e8cff4ee53afed0ec969670bf6e4088c95dcf9cfed5"
+     }
+    ],
+    "profile": {
+     "schema": 1,
+     "version": "aefbdeff09b1f6dc17f74a5e13b16d1a48743663cf4a0286454207a68c964bf8",
+     "facts": [
+      {
+       "id": "form-rule:1:full_name",
+       "aliases": [
+        "nome",
+        "name",
+        "nome completo"
+       ],
+       "value": "João da Silva Souza",
+       "source": "candidate_name",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "version": "1c08dcd5d90475996a034826f54c71a0eca0b93013607304abc05d5c9bb996bc"
+      },
+      {
+       "id": "form-rule:2:salary",
+       "aliases": [
+        "pretensão salarial"
+       ],
+       "value": "R$ 12.000",
+       "source": "expected_salary",
+       "kind": "preference",
+       "language": "pt",
+       "scope": "profile",
+       "version": "7d741e3dc6143d1506c3d77e3b536521d60170eb4daefc1d2544cbdfb0492d44"
+      },
+      {
+       "id": "form-rule:4:hobby",
+       "aliases": [
+        "hobby"
+       ],
+       "value": "xadrez",
+       "source": "form-rule",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "version": "32fb66f59d6c0605e963d454ebcbc021a7f5a5ea34211715b5475be28b7cf0d8"
+      },
+      {
+       "id": "form-rule:7:availability",
+       "aliases": [
+        "disponibilidade"
+       ],
+       "value": "imediata",
+       "source": "form-rule",
+       "kind": "preference",
+       "language": "pt",
+       "scope": "profile",
+       "version": "1bf7a2b3d66380a5e61ce0b7a802082cb53e6acbc786c3213d89960e8940e1cb"
+      },
+      {
+       "id": "form-rule:8:contract_type",
+       "aliases": [
+        "contratação"
+       ],
+       "value": "CLT",
+       "source": "form-rule",
+       "kind": "preference",
+       "language": "pt",
+       "scope": "profile",
+       "version": "461154a8faef710f0d426a3622771a4d6f3fd723127ebf09378c84d7f4b9eaaa"
+      },
+      {
+       "id": "candidate:first_name",
+       "aliases": [
+        "first name",
+        "primeiro nome"
+       ],
+       "value": "João",
+       "source": "candidate_name",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "version": "cc66c8c1ea7ca2bcb03530a202eaddb0e8cbe0bc5377745c171b05d6312cc698"
+      },
+      {
+       "id": "candidate:last_name",
+       "aliases": [
+        "last name",
+        "sobrenome"
+       ],
+       "value": "da Silva Souza",
+       "source": "candidate_name",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "version": "ac1c97a33c4902cb0ba9022cf1322b63bb2c6cab4eb52736b66bbe6073856646"
+      },
+      {
+       "id": "resume:pt:excerpt:0",
+       "aliases": [
+        "Cabeçalho — JOÃO SILVA"
+       ],
+       "value": "JOÃO SILVA\nDesenvolvedor Python",
+       "source": "uploaded-resume",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "sourceOnly": true,
+       "section": "header",
+       "sourceLanguage": "pt",
+       "version": "506b772fb8bc8304f2622b544bf48bc0cf53b3522c4cb79fdb2e911c2974c50d"
+      },
+      {
+       "id": "resume:pt:excerpt:1",
+       "aliases": [
+        "EXPERIÊNCIA PROFISSIONAL — Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)"
+       ],
+       "value": "EXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel",
+       "source": "uploaded-resume",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "sourceOnly": true,
+       "section": "experience",
+       "sourceLanguage": "pt",
+       "version": "a66e0839c5a0a1171ea0d3875cff80437becbe972362820ab3f120111a0012d9"
+      },
+      {
+       "id": "resume:pt:excerpt:2",
+       "aliases": [
+        "EXPERIÊNCIA PROFISSIONAL — Desenvolvedor Backend — Beta SA (2022 - atual)"
+       ],
+       "value": "Desenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI",
+       "source": "uploaded-resume",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "sourceOnly": true,
+       "section": "experience",
+       "sourceLanguage": "pt",
+       "version": "5934bc81e973f162114639fa0f925be14aa0f9a1c1745a26ddc3338a809fbbd7"
+      },
+      {
+       "id": "resume:pt:excerpt:3",
+       "aliases": [
+        "FORMAÇÃO — Análise e Desenvolvimento de Sistemas"
+       ],
+       "value": "FORMAÇÃO\nAnálise e Desenvolvimento de Sistemas",
+       "source": "uploaded-resume",
+       "kind": "fact",
+       "language": "pt",
+       "scope": "profile",
+       "sourceOnly": true,
+       "section": "education",
+       "sourceLanguage": "pt",
+       "version": "c4598cdae88f25e0361e5e8cff4ee53afed0ec969670bf6e4088c95dcf9cfed5"
+      }
+     ]
+    },
+    "resume": true,
+    "resume_meta": {
+     "id": 1,
+     "language": "pt",
+     "version": "526c256691147c9075b38d83c132983533cc893d4487ed2b645c1672f06d4631"
+    },
+    "language": "pt"
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/3?language=pt",
+   "body": null,
+   "status": 409,
+   "response": {
+    "error": "Vaga já marcada como enviada."
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/999?language=pt",
+   "body": null,
+   "status": 404,
+   "response": {
+    "error": "Vaga não encontrada"
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/1/resume?language=pt",
+   "body": null,
+   "status": 200,
+   "response": {
+    "pdf_sha256": "60f04d691c9bd8c650e4ce156dd23205a90d7161e754e40487f064fea3070868",
+    "media_type": "application/pdf",
+    "headers": {
+     "Content-Disposition": "attachment; filename=\"curriculo.pdf\"",
+     "Cache-Control": "no-store"
+    }
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/1/resume?language=en",
+   "body": null,
+   "status": 404,
+   "response": {
+    "error": "Currículo não cadastrado neste idioma."
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/999/resume?language=pt",
+   "body": null,
+   "status": 404,
+   "response": {
+    "error": "Vaga não encontrada"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "curto",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "pt"
+   },
+   "status": 400,
+   "response": {
+    "error": "Reserva inválida."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "es"
+   },
+   "status": 400,
+   "response": {
+    "error": "Reserva inválida."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "digest": "xyz",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "pt"
+   },
+   "status": 400,
+   "response": {
+    "error": "Reserva inválida."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "velha",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "pt"
+   },
+   "status": 409,
+   "response": {
+    "error": "O perfil mudou. Reabra a candidatura e revise novamente."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "velha",
+    "language": "pt"
+   },
+   "status": 409,
+   "response": {
+    "error": "O contexto ou currículo mudou. Reabra a candidatura e revise novamente."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "pt"
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "pt"
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "existing": true
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "pt"
+   },
+   "status": 409,
+   "response": {
+    "error": "Reserva já utilizada com outros dados."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "bbbbbbbbbbbbbbbbbbbb-2",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "pt"
+   },
+   "status": 409,
+   "response": {
+    "error": "Já existe uma tentativa pendente para esta vaga ou a reserva não pôde ser salva. Confira antes de tentar novamente."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/999/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "bbbbbbbbbbbbbbbbbbbb-2",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "pt"
+   },
+   "status": 404,
+   "response": {
+    "error": "Vaga não encontrada"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/3/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "bbbbbbbbbbbbbbbbbbbb-2",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "162217321ad4de47477e05d20bc85ec47ef4df87520775e819c9da5801618354",
+    "context_version": "3cda5189784aebdc7fe45c8e71618be734ea370242f392f84ca1e12a3f586eea",
+    "language": "pt"
+   },
+   "status": 409,
+   "response": {
+    "error": "Vaga já marcada como enviada."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "nope",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "timeout",
+    "url": "https://acme.test/apply/ok?x=1#frag",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 400,
+   "response": {
+    "error": "Resultado inválido."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "invalid",
+    "url": "https://acme.test/apply/ok?x=1#frag",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 400,
+   "response": {
+    "error": "Resultado inválido."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submitted",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "timeout",
+    "url": "https://acme.test/apply/ok?x=1#frag",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 400,
+   "response": {
+    "error": "Envio sem evidência observada."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "timeout",
+    "url": "http://acme.test/x",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 400,
+   "response": {
+    "error": "Endereço de resultado inválido."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "timeout",
+    "url": "https://user:pw@acme.test/x",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 400,
+   "response": {
+    "error": "Endereço de resultado inválido."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "timeout",
+    "url": "https://user@acme.test/x",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 400,
+   "response": {
+    "error": "Endereço de resultado inválido."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "timeout",
+    "url": "",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 400,
+   "response": {
+    "error": "Endereço de resultado inválido."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "bbbbbbbbbbbbbbbbbbbb-2",
+    "evidence": "timeout",
+    "url": "https://acme.test/apply/ok?x=1#frag",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 409,
+   "response": {
+    "error": "Não há reserva correspondente a este resultado."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "timeout",
+    "url": "https://acme.test/apply/ok?x=1#frag",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "source": "qpid-observed",
+    "state": "submission-unknown"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "timeout",
+    "url": "https://acme.test/apply/ok?x=1#frag",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "existing": true
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "page-changed",
+    "url": "https://acme.test/apply/ok?x=1#frag",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 409,
+   "response": {
+    "error": "Resultado já registrado com outros dados."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/1/result",
+   "body": {
+    "version": 1,
+    "state": "submission-unknown",
+    "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+    "evidence": "timeout",
+    "url": "https://ACME.test:8443/path/Dir?q=1",
+    "resume_hash": "não-hex",
+    "automatic": false
+   },
+   "status": 409,
+   "response": {
+    "error": "Resultado já registrado com outros dados."
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/1/results",
+   "body": null,
+   "status": 200,
+   "response": {
+    "items": [
+     {
+      "attempt_id": "aaaaaaaaaaaaaaaaaaaa-1",
+      "automatic": true,
+      "evidence": "timeout",
+      "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "source": "qpid-observed",
+      "state": "submission-unknown",
+      "url": "https://acme.test/apply/ok",
+      "version": 1
+     }
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/4/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "cccccccccccccccccccc-3",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "aefbdeff09b1f6dc17f74a5e13b16d1a48743663cf4a0286454207a68c964bf8",
+    "context_version": "dac9e1dfb2c34eecbc3c70caf183fcdac40379b856abb5199587c6cd22b498a2",
+    "language": "pt"
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "attempt_id": "cccccccccccccccccccc-3"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/4/result",
+   "body": {
+    "version": 1,
+    "state": "failed-before-click",
+    "attempt_id": "cccccccccccccccccccc-3",
+    "evidence": "validation",
+    "url": "https://acme.test/apply/ok?x=1#frag",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "source": "qpid-observed",
+    "state": "failed-before-click"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/4/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "dddddddddddddddddddd-4",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "aefbdeff09b1f6dc17f74a5e13b16d1a48743663cf4a0286454207a68c964bf8",
+    "context_version": "dac9e1dfb2c34eecbc3c70caf183fcdac40379b856abb5199587c6cd22b498a2",
+    "language": "pt"
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "attempt_id": "dddddddddddddddddddd-4"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/2/attempt",
+   "body": {
+    "version": 1,
+    "attempt_id": "bbbbbbbbbbbbbbbbbbbb-2",
+    "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "profile_version": "aefbdeff09b1f6dc17f74a5e13b16d1a48743663cf4a0286454207a68c964bf8",
+    "context_version": "dac9e1dfb2c34eecbc3c70caf183fcdac40379b856abb5199587c6cd22b498a2",
+    "language": "pt"
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "attempt_id": "bbbbbbbbbbbbbbbbbbbb-2"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/2/result",
+   "body": {
+    "version": 1,
+    "state": "submitted",
+    "attempt_id": "bbbbbbbbbbbbbbbbbbbb-2",
+    "evidence": "success-message-and-form-finished",
+    "url": "https://acme.test/apply/ok?x=1#frag",
+    "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "automatic": true
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "source": "qpid-observed",
+    "state": "submitted"
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/2/results",
+   "body": null,
+   "status": 200,
+   "response": {
+    "items": [
+     {
+      "attempt_id": "bbbbbbbbbbbbbbbbbbbb-2",
+      "automatic": true,
+      "evidence": "success-message-and-form-finished",
+      "resume_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "source": "qpid-observed",
+      "state": "submitted",
+      "url": "https://acme.test/apply/ok",
+      "version": 1
+     }
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications/2?language=pt",
+   "body": null,
+   "status": 409,
+   "response": {
+    "error": "Vaga já marcada como enviada."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/5/confirmed",
+   "body": {
+    "confirmed": "true"
+   },
+   "status": 400,
+   "response": {
+    "error": "Confirmação explícita obrigatória."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/999/confirmed",
+   "body": {
+    "confirmed": true
+   },
+   "status": 404,
+   "response": {
+    "error": "Vaga não encontrada"
+   }
+  },
+  {
+   "method": "POST",
+   "url": "/api/qpid/applications/5/confirmed",
+   "body": {
+    "confirmed": true
+   },
+   "status": 200,
+   "response": {
+    "ok": true,
+    "source": "user-declared",
+    "notice": "Envio confirmado pelo usuário no Qpid."
+   }
+  },
+  {
+   "method": "GET",
+   "url": "/api/qpid/applications?limit=30",
+   "body": null,
+   "status": 200,
+   "response": {
+    "items": [
+     {
+      "id": 4,
+      "title": "Dev C#",
+      "company": "Delta",
+      "status": "worth",
+      "match_score": null
+     },
+     {
+      "id": 1,
+      "title": "Dev Python",
+      "company": "Acme",
+      "status": "worth",
+      "match_score": 88
+     }
+    ]
+   }
+  }
+ ],
+ "final_jobs": [
+  {
+   "id": 1,
+   "status": "worth",
+   "applied_at": null
+  },
+  {
+   "id": 2,
+   "status": "applied",
+   "applied_at": "2026-11-23T12:00:00+00:00"
+  },
+  {
+   "id": 3,
+   "status": "applied",
+   "applied_at": null
+  },
+  {
+   "id": 4,
+   "status": "worth",
+   "applied_at": null
+  },
+  {
+   "id": 5,
+   "status": "applied",
+   "applied_at": "2026-11-23T12:00:00+00:00"
+  },
+  {
+   "id": 6,
+   "status": "ignored",
+   "applied_at": null
+  }
+ ],
+ "excerpts": [
+  {
+   "name": "resume",
+   "text": "JOÃO SILVA\nDesenvolvedor Python\n\nEXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel\n\nDesenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI\n\nFORMAÇÃO\nAnálise e Desenvolvimento de Sistemas\n",
+   "profile": {
+    "version": "2",
+    "headline": "Dev com base administrativa",
+    "professional_profile": "",
+    "seniority": "",
+    "location_notes": "",
+    "work_authorization_notes": "",
+    "roles": [
+     {
+      "id": "R1",
+      "title": "Assistente Administrativo",
+      "employer": "Acme Ltda",
+      "start": "2019-01",
+      "end": "2021-12",
+      "quote": "Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)",
+      "responsibilities": [
+       {
+        "id": "R1.1",
+        "text": "suporte interno",
+        "quote": "Suporte a usuários internos e planilhas Excel"
+       }
+      ],
+      "skills_used": [
+       "excel"
+      ]
+     },
+     {
+      "id": "R2",
+      "title": "Desenvolvedor Backend",
+      "employer": "Beta SA",
+      "start": "2022-01",
+      "end": "present",
+      "quote": "Desenvolvedor Backend — Beta SA (2022 - atual)",
+      "responsibilities": [
+       {
+        "id": "R2.1",
+        "text": "APIs",
+        "quote": "APIs em Python e FastAPI"
+       }
+      ],
+      "skills_used": [
+       "python",
+       "fastapi"
+      ]
+     }
+    ],
+    "skills": [
+     {
+      "id": "S1",
+      "name": "Python",
+      "canonical": "python",
+      "category": "language",
+      "quotes": [
+       "APIs em Python e FastAPI"
+      ]
+     }
+    ],
+    "transferable_skills": [
+     {
+      "id": "T1",
+      "capability": "suporte a usuários",
+      "from_role_ids": [
+       "R1"
+      ],
+      "quotes": [
+       "Suporte a usuários internos"
+      ]
+     }
+    ],
+    "education": [],
+    "certifications": [],
+    "projects": [],
+    "achievements": [],
+    "languages": [],
+    "derived": {
+     "total_months": 95,
+     "skills": {
+      "S1": {
+       "canonical": "python",
+       "months": 59,
+       "last_used": "2026-11",
+       "role_ids": [
+        "R2"
+       ],
+       "project_months": 0,
+       "project_ids": [],
+       "project_last_used": ""
+      }
+     },
+     "role_months": {
+      "R1": 36,
+      "R2": 59
+     },
+     "current_role_ids": [
+      "R2"
+     ]
+    },
+    "coverage": {
+     "kept": 4,
+     "dropped": {
+      "responsibilities": 1,
+      "skills": 1,
+      "transferable_skills": 1
+     },
+     "ungrounded": 3
+    }
+   },
+   "max_chars": 900,
+   "language": "pt",
+   "result": [
+    {
+     "section": "header",
+     "label": "Cabeçalho — JOÃO SILVA",
+     "text": "JOÃO SILVA\nDesenvolvedor Python"
+    },
+    {
+     "section": "experience",
+     "label": "EXPERIÊNCIA PROFISSIONAL — Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)",
+     "text": "EXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel"
+    },
+    {
+     "section": "experience",
+     "label": "EXPERIÊNCIA PROFISSIONAL — Desenvolvedor Backend — Beta SA (2022 - atual)",
+     "text": "Desenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI"
+    },
+    {
+     "section": "education",
+     "label": "FORMAÇÃO — Análise e Desenvolvimento de Sistemas",
+     "text": "FORMAÇÃO\nAnálise e Desenvolvimento de Sistemas"
+    }
+   ]
+  },
+  {
+   "name": "resume-120",
+   "text": "JOÃO SILVA\nDesenvolvedor Python\n\nEXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel\n\nDesenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI\n\nFORMAÇÃO\nAnálise e Desenvolvimento de Sistemas\n",
+   "profile": {
+    "version": "2",
+    "headline": "Dev com base administrativa",
+    "professional_profile": "",
+    "seniority": "",
+    "location_notes": "",
+    "work_authorization_notes": "",
+    "roles": [
+     {
+      "id": "R1",
+      "title": "Assistente Administrativo",
+      "employer": "Acme Ltda",
+      "start": "2019-01",
+      "end": "2021-12",
+      "quote": "Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)",
+      "responsibilities": [
+       {
+        "id": "R1.1",
+        "text": "suporte interno",
+        "quote": "Suporte a usuários internos e planilhas Excel"
+       }
+      ],
+      "skills_used": [
+       "excel"
+      ]
+     },
+     {
+      "id": "R2",
+      "title": "Desenvolvedor Backend",
+      "employer": "Beta SA",
+      "start": "2022-01",
+      "end": "present",
+      "quote": "Desenvolvedor Backend — Beta SA (2022 - atual)",
+      "responsibilities": [
+       {
+        "id": "R2.1",
+        "text": "APIs",
+        "quote": "APIs em Python e FastAPI"
+       }
+      ],
+      "skills_used": [
+       "python",
+       "fastapi"
+      ]
+     }
+    ],
+    "skills": [
+     {
+      "id": "S1",
+      "name": "Python",
+      "canonical": "python",
+      "category": "language",
+      "quotes": [
+       "APIs em Python e FastAPI"
+      ]
+     }
+    ],
+    "transferable_skills": [
+     {
+      "id": "T1",
+      "capability": "suporte a usuários",
+      "from_role_ids": [
+       "R1"
+      ],
+      "quotes": [
+       "Suporte a usuários internos"
+      ]
+     }
+    ],
+    "education": [],
+    "certifications": [],
+    "projects": [],
+    "achievements": [],
+    "languages": [],
+    "derived": {
+     "total_months": 95,
+     "skills": {
+      "S1": {
+       "canonical": "python",
+       "months": 59,
+       "last_used": "2026-11",
+       "role_ids": [
+        "R2"
+       ],
+       "project_months": 0,
+       "project_ids": [],
+       "project_last_used": ""
+      }
+     },
+     "role_months": {
+      "R1": 36,
+      "R2": 59
+     },
+     "current_role_ids": [
+      "R2"
+     ]
+    },
+    "coverage": {
+     "kept": 4,
+     "dropped": {
+      "responsibilities": 1,
+      "skills": 1,
+      "transferable_skills": 1
+     },
+     "ungrounded": 3
+    }
+   },
+   "max_chars": 120,
+   "language": "en",
+   "result": [
+    {
+     "section": "header",
+     "label": "Header — JOÃO SILVA",
+     "text": "JOÃO SILVA\nDesenvolvedor Python"
+    },
+    {
+     "section": "experience",
+     "label": "EXPERIÊNCIA PROFISSIONAL — Assistente Administrativo — Acme Ltda (01/2019 - 12/2021) (1/2)",
+     "text": "EXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)"
+    },
+    {
+     "section": "experience",
+     "label": "EXPERIÊNCIA PROFISSIONAL — Assistente Administrativo — Acme Ltda (01/2019 - 12/2021) (2/2)",
+     "text": "- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel"
+    },
+    {
+     "section": "experience",
+     "label": "EXPERIÊNCIA PROFISSIONAL — Desenvolvedor Backend — Beta SA (2022 - atual)",
+     "text": "Desenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI"
+    },
+    {
+     "section": "education",
+     "label": "FORMAÇÃO — Análise e Desenvolvimento de Sistemas",
+     "text": "FORMAÇÃO\nAnálise e Desenvolvimento de Sistemas"
+    }
+   ]
+  },
+  {
+   "name": "no-profile",
+   "text": "JOÃO SILVA\nDesenvolvedor Python\n\nEXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel\n\nDesenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI\n\nFORMAÇÃO\nAnálise e Desenvolvimento de Sistemas\n",
+   "profile": null,
+   "max_chars": 900,
+   "language": "pt",
+   "result": [
+    {
+     "section": "header",
+     "label": "Cabeçalho — JOÃO SILVA",
+     "text": "JOÃO SILVA\nDesenvolvedor Python"
+    },
+    {
+     "section": "experience",
+     "label": "EXPERIÊNCIA PROFISSIONAL — Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)",
+     "text": "EXPERIÊNCIA PROFISSIONAL\nAssistente Administrativo — Acme Ltda (01/2019 - 12/2021)\n- Organização de documentos e controle de contratos\n- Suporte a usuários internos e planilhas Excel\nDesenvolvedor Backend — Beta SA (2022 - atual)\n- APIs em Python e FastAPI"
+    },
+    {
+     "section": "education",
+     "label": "FORMAÇÃO — Análise e Desenvolvimento de Sistemas",
+     "text": "FORMAÇÃO\nAnálise e Desenvolvimento de Sistemas"
+    }
+   ]
+  },
+  {
+   "name": "flat",
+   "text": "palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra ",
+   "profile": null,
+   "max_chars": 900,
+   "language": "pt",
+   "result": [
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (1/4)",
+     "text": "palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (2/4)",
+     "text": "palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (3/4)",
+     "text": "palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (4/4)",
+     "text": "palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra"
+    }
+   ]
+  },
+  {
+   "name": "long-lines",
+   "text": "palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra \nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 ",
+   "profile": null,
+   "max_chars": 100,
+   "language": "pt",
+   "result": [
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (1/8)",
+     "text": "palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (2/8)",
+     "text": "palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (3/8)",
+     "text": "palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (4/8)",
+     "text": "palavra palavra palavra palavra"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (5/8)",
+     "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (6/8)",
+     "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (7/8)",
+     "text": "😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀"
+    },
+    {
+     "section": "header",
+     "label": "Cabeçalho — palavra palavra palavra palavra palavra palavra palavra palavra palavra palavra  (8/8)",
+     "text": "😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀 😀"
+    }
+   ]
+  },
+  {
+   "name": "empty",
+   "text": "",
+   "profile": null,
+   "max_chars": 900,
+   "language": "pt",
+   "result": []
+  },
+  {
+   "name": "heading-only",
+   "text": "EXPERIÊNCIA PROFISSIONAL\n",
+   "profile": {
+    "version": "2",
+    "headline": "Dev com base administrativa",
+    "professional_profile": "",
+    "seniority": "",
+    "location_notes": "",
+    "work_authorization_notes": "",
+    "roles": [
+     {
+      "id": "R1",
+      "title": "Assistente Administrativo",
+      "employer": "Acme Ltda",
+      "start": "2019-01",
+      "end": "2021-12",
+      "quote": "Assistente Administrativo — Acme Ltda (01/2019 - 12/2021)",
+      "responsibilities": [
+       {
+        "id": "R1.1",
+        "text": "suporte interno",
+        "quote": "Suporte a usuários internos e planilhas Excel"
+       }
+      ],
+      "skills_used": [
+       "excel"
+      ]
+     },
+     {
+      "id": "R2",
+      "title": "Desenvolvedor Backend",
+      "employer": "Beta SA",
+      "start": "2022-01",
+      "end": "present",
+      "quote": "Desenvolvedor Backend — Beta SA (2022 - atual)",
+      "responsibilities": [
+       {
+        "id": "R2.1",
+        "text": "APIs",
+        "quote": "APIs em Python e FastAPI"
+       }
+      ],
+      "skills_used": [
+       "python",
+       "fastapi"
+      ]
+     }
+    ],
+    "skills": [
+     {
+      "id": "S1",
+      "name": "Python",
+      "canonical": "python",
+      "category": "language",
+      "quotes": [
+       "APIs em Python e FastAPI"
+      ]
+     }
+    ],
+    "transferable_skills": [
+     {
+      "id": "T1",
+      "capability": "suporte a usuários",
+      "from_role_ids": [
+       "R1"
+      ],
+      "quotes": [
+       "Suporte a usuários internos"
+      ]
+     }
+    ],
+    "education": [],
+    "certifications": [],
+    "projects": [],
+    "achievements": [],
+    "languages": [],
+    "derived": {
+     "total_months": 95,
+     "skills": {
+      "S1": {
+       "canonical": "python",
+       "months": 59,
+       "last_used": "2026-11",
+       "role_ids": [
+        "R2"
+       ],
+       "project_months": 0,
+       "project_ids": [],
+       "project_last_used": ""
+      }
+     },
+     "role_months": {
+      "R1": 36,
+      "R2": 59
+     },
+     "current_role_ids": [
+      "R2"
+     ]
+    },
+    "coverage": {
+     "kept": 4,
+     "dropped": {
+      "responsibilities": 1,
+      "skills": 1,
+      "transferable_skills": 1
+     },
+     "ungrounded": 3
+    }
+   },
+   "max_chars": 900,
+   "language": "pt",
+   "result": [
+    {
+     "section": "experience",
+     "label": "EXPERIÊNCIA PROFISSIONAL",
+     "text": "EXPERIÊNCIA PROFISSIONAL"
+    }
+   ]
+  }
+ ],
+ "settings": {
+  "candidate_name": "João da Silva Souza",
+  "candidate_email": "joao@example.test",
+  "candidate_phone": "+55 11 99999-0000",
+  "candidate_city": "São Paulo",
+  "candidate_linkedin": "https://linkedin.com/in/joao",
+  "expected_salary": "R$ 12.000"
+ }
+}

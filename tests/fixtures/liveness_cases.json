@@ -1,0 +1,954 @@
+{
+ "classify": [
+  {
+   "status": 0,
+   "body": "",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "Candidatar-se",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "This job is no longer available",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "Vaga encerrada",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "Submit application",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "nothing here",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "inscrições encerradas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "Application deadline has passed",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "enviar candidatura",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "unknown"
+  },
+  {
+   "status": 0,
+   "body": "The position has been filled",
+   "verdict": "unknown"
+  },
+  {
+   "status": 200,
+   "body": "",
+   "verdict": "unknown"
+  },
+  {
+   "status": 200,
+   "body": "Apply now",
+   "verdict": "active"
+  },
+  {
+   "status": 200,
+   "body": "Candidatar-se",
+   "verdict": "active"
+  },
+  {
+   "status": 200,
+   "body": "This job is no longer available",
+   "verdict": "inactive"
+  },
+  {
+   "status": 200,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 200,
+   "body": "Vaga encerrada",
+   "verdict": "inactive"
+  },
+  {
+   "status": 200,
+   "body": "Submit application",
+   "verdict": "active"
+  },
+  {
+   "status": 200,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 200,
+   "body": "nothing here",
+   "verdict": "unknown"
+  },
+  {
+   "status": 200,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 200,
+   "body": "inscrições encerradas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 200,
+   "body": "Application deadline has passed",
+   "verdict": "inactive"
+  },
+  {
+   "status": 200,
+   "body": "enviar candidatura",
+   "verdict": "active"
+  },
+  {
+   "status": 200,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "active"
+  },
+  {
+   "status": 200,
+   "body": "The position has been filled",
+   "verdict": "inactive"
+  },
+  {
+   "status": 204,
+   "body": "",
+   "verdict": "unknown"
+  },
+  {
+   "status": 204,
+   "body": "Apply now",
+   "verdict": "active"
+  },
+  {
+   "status": 204,
+   "body": "Candidatar-se",
+   "verdict": "active"
+  },
+  {
+   "status": 204,
+   "body": "This job is no longer available",
+   "verdict": "inactive"
+  },
+  {
+   "status": 204,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 204,
+   "body": "Vaga encerrada",
+   "verdict": "inactive"
+  },
+  {
+   "status": 204,
+   "body": "Submit application",
+   "verdict": "active"
+  },
+  {
+   "status": 204,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 204,
+   "body": "nothing here",
+   "verdict": "unknown"
+  },
+  {
+   "status": 204,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 204,
+   "body": "inscrições encerradas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 204,
+   "body": "Application deadline has passed",
+   "verdict": "inactive"
+  },
+  {
+   "status": 204,
+   "body": "enviar candidatura",
+   "verdict": "active"
+  },
+  {
+   "status": 204,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "active"
+  },
+  {
+   "status": 204,
+   "body": "The position has been filled",
+   "verdict": "inactive"
+  },
+  {
+   "status": 301,
+   "body": "",
+   "verdict": "unknown"
+  },
+  {
+   "status": 301,
+   "body": "Apply now",
+   "verdict": "active"
+  },
+  {
+   "status": 301,
+   "body": "Candidatar-se",
+   "verdict": "active"
+  },
+  {
+   "status": 301,
+   "body": "This job is no longer available",
+   "verdict": "inactive"
+  },
+  {
+   "status": 301,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 301,
+   "body": "Vaga encerrada",
+   "verdict": "inactive"
+  },
+  {
+   "status": 301,
+   "body": "Submit application",
+   "verdict": "active"
+  },
+  {
+   "status": 301,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 301,
+   "body": "nothing here",
+   "verdict": "unknown"
+  },
+  {
+   "status": 301,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 301,
+   "body": "inscrições encerradas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 301,
+   "body": "Application deadline has passed",
+   "verdict": "inactive"
+  },
+  {
+   "status": 301,
+   "body": "enviar candidatura",
+   "verdict": "active"
+  },
+  {
+   "status": 301,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "active"
+  },
+  {
+   "status": 301,
+   "body": "The position has been filled",
+   "verdict": "inactive"
+  },
+  {
+   "status": 401,
+   "body": "",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "Candidatar-se",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "This job is no longer available",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "Vaga encerrada",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "Submit application",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "nothing here",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "inscrições encerradas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "Application deadline has passed",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "enviar candidatura",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "unknown"
+  },
+  {
+   "status": 401,
+   "body": "The position has been filled",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "Candidatar-se",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "This job is no longer available",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "Vaga encerrada",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "Submit application",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "nothing here",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "inscrições encerradas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "Application deadline has passed",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "enviar candidatura",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "unknown"
+  },
+  {
+   "status": 403,
+   "body": "The position has been filled",
+   "verdict": "unknown"
+  },
+  {
+   "status": 404,
+   "body": "",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "Candidatar-se",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "This job is no longer available",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "Vaga encerrada",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "Submit application",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "nothing here",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "inscrições encerradas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "Application deadline has passed",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "enviar candidatura",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "inactive"
+  },
+  {
+   "status": 404,
+   "body": "The position has been filled",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "Candidatar-se",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "This job is no longer available",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "Vaga encerrada",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "Submit application",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "nothing here",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "inscrições encerradas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "Application deadline has passed",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "enviar candidatura",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "inactive"
+  },
+  {
+   "status": 410,
+   "body": "The position has been filled",
+   "verdict": "inactive"
+  },
+  {
+   "status": 418,
+   "body": "",
+   "verdict": "unknown"
+  },
+  {
+   "status": 418,
+   "body": "Apply now",
+   "verdict": "active"
+  },
+  {
+   "status": 418,
+   "body": "Candidatar-se",
+   "verdict": "active"
+  },
+  {
+   "status": 418,
+   "body": "This job is no longer available",
+   "verdict": "inactive"
+  },
+  {
+   "status": 418,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 418,
+   "body": "Vaga encerrada",
+   "verdict": "inactive"
+  },
+  {
+   "status": 418,
+   "body": "Submit application",
+   "verdict": "active"
+  },
+  {
+   "status": 418,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 418,
+   "body": "nothing here",
+   "verdict": "unknown"
+  },
+  {
+   "status": 418,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 418,
+   "body": "inscrições encerradas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 418,
+   "body": "Application deadline has passed",
+   "verdict": "inactive"
+  },
+  {
+   "status": 418,
+   "body": "enviar candidatura",
+   "verdict": "active"
+  },
+  {
+   "status": 418,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "active"
+  },
+  {
+   "status": 418,
+   "body": "The position has been filled",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "Candidatar-se",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "This job is no longer available",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "Vaga encerrada",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "Submit application",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "nothing here",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "inscrições encerradas",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "Application deadline has passed",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "enviar candidatura",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "inactive"
+  },
+  {
+   "status": 451,
+   "body": "The position has been filled",
+   "verdict": "inactive"
+  },
+  {
+   "status": 500,
+   "body": "",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "Candidatar-se",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "This job is no longer available",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "Vaga encerrada",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "Submit application",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "nothing here",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "inscrições encerradas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "Application deadline has passed",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "enviar candidatura",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "unknown"
+  },
+  {
+   "status": 500,
+   "body": "The position has been filled",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "Candidatar-se",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "This job is no longer available",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "Esta vaga não está mais aceitando candidaturas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "Vaga encerrada",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "Submit application",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "<div class='closed-job__flavor'>x</div> apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "nothing here",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "We are not currently accepting applications. Apply now",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "inscrições encerradas",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "Application deadline has passed",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "enviar candidatura",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "FINALIZAR CANDIDATURA",
+   "verdict": "unknown"
+  },
+  {
+   "status": 503,
+   "body": "The position has been filled",
+   "verdict": "unknown"
+  }
+ ],
+ "ids": [
+  {
+   "url": "https://www.linkedin.com/jobs/view/3912345678/",
+   "id": "3912345678"
+  },
+  {
+   "url": "https://br.linkedin.com/jobs/view/senior-dev-at-acme-3912345678?trk=x",
+   "id": "3912345678"
+  },
+  {
+   "url": "https://www.linkedin.com/jobs/view/software-engineer-3912345678",
+   "id": "3912345678"
+  },
+  {
+   "url": "https://www.linkedin.com/jobs/collections/recommended/?currentJobId=4001",
+   "id": "4001"
+  },
+  {
+   "url": "https://www.linkedin.com/jobs/search/?jobId=77&x=1",
+   "id": "77"
+  },
+  {
+   "url": "https://www.linkedin.com/jobs/search/?trkJobId=abc",
+   "id": null
+  },
+  {
+   "url": "https://www.linkedin.com/jobs/search/?trkJobId=12&currentJobId=zz",
+   "id": "12"
+  },
+  {
+   "url": "https://example.com/job/1",
+   "id": null
+  },
+  {
+   "url": "",
+   "id": null
+  },
+  {
+   "url": "  https://www.linkedin.com/jobs/view/55  ",
+   "id": "55"
+  },
+  {
+   "url": "https://www.linkedin.com/in/someone",
+   "id": null
+  },
+  {
+   "url": "https://www.linkedin.com/jobs/view/a-b-c-9-8",
+   "id": "9"
+  }
+ ]
+}

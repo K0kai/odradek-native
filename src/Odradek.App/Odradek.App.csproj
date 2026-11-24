@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Odradek</AssemblyName>
+    <RootNamespace>Odradek.App</RootNamespace>
+    <ApplicationIcon>..\..\..\assets\public\favicon.ico</ApplicationIcon>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.2.0" />
+    <PackageReference Include="Avalonia.HarfBuzz" Version="12.2.0" />
+    <PackageReference Include="Avalonia.Skia" Version="12.2.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.2.0" />
+    <PackageReference Include="Avalonia.Win32" Version="12.2.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Odradek.Core\Odradek.Core.csproj" />
+    <ProjectReference Include="..\Odradek.LocalApi\Odradek.LocalApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- ícone do app: o mesmo do app Python (assets/public) -->
+    <AvaloniaResource Include="..\..\..\assets\public\odradek-icon.png" Link="Assets\odradek-icon.png" />
+  </ItemGroup>
+
+</Project>

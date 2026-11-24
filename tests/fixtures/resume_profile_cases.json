@@ -1,0 +1,1321 @@
+{
+ "today": "2026-11-23",
+ "resume_pt": "Ana Exemplo\nDesenvolvedora de software\nBelo Horizonte, MG\n\nResumo\nProfissional com experiência em automação de processos e desenvolvimento de APIs.\n\nExperiência Profissional\nAnalista de Sistemas — Empresa Alfa (01/2021 – atual)\n- Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos.\n- Suporte a usuários internos e controle de documentos em planilhas.\n- Automação de rotinas financeiras com Python e PostgreSQL.\nAssistente Administrativo — Comércio Beta (03/2018 – 12/2020)\n- Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas.\n- Relatórios em planilhas para a diretoria.\n\nFormação Acadêmica\nBacharelado em Sistemas de Informação — Universidade Gama (2017 – 2021)\n\nHabilidades\nC#, .NET, Python, PostgreSQL, Node.js, Git, Docker\n\nIdiomas\nInglês avançado; Português nativo\n\nProjetos\nPainel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.\n",
+ "resume_en": "Ana Example\nSoftware developer\n\nExperience\nSystems Analyst — Alpha Company (01/2021 – present)\n- Built REST APIs in C# and .NET to integrate internal systems.\n- Automated financial routines with Python and PostgreSQL.\nOperations Intern — Delta Corp (06/2016 – 02/2018)\n- Prepared weekly reports and supported the logistics team.\n\nSkills\nC#, Python, SQL, Kubernetes\n\nLanguages\nEnglish advanced\n",
+ "raw_pt": {
+  "headline": "Desenvolvedora de software com foco em automação",
+  "professional_profile": "Atua com   sistemas internos.\n\nTambém tem experiência administrativa.",
+  "seniority": "pleno",
+  "location_notes": "Belo Horizonte, MG",
+  "work_authorization_notes": "",
+  "roles": [
+   {
+    "title": "Analista de Sistemas",
+    "employer": "Empresa Alfa",
+    "start": "2021-01",
+    "end": "atual",
+    "quote": "Analista de Sistemas — Empresa Alfa (01/2021 – atual)",
+    "responsibilities": [
+     {
+      "text": "APIs REST em C# e .NET",
+      "quote": "Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos"
+     },
+     {
+      "text": "Suporte a usuários",
+      "quote": "Suporte a usuários internos e controle de documentos em planilhas"
+     },
+     {
+      "text": "Inventada",
+      "quote": "Liderou uma equipe de quarenta pessoas em três países"
+     },
+     {
+      "text": "Automação financeira",
+      "quote": "Automacao de rotinas financeiras com Python e Postgres"
+     }
+    ],
+    "skills_used": [
+     "C#",
+     ".NET",
+     "Python",
+     "PostgreSQL"
+    ]
+   },
+   {
+    "title": "Assistente Administrativo",
+    "employer": "Comércio Beta",
+    "start": "2018",
+    "end": "2020-12",
+    "quote": "Assistente Administrativo — Comércio Beta (03/2018 – 12/2020)",
+    "responsibilities": [
+     {
+      "text": "Atendimento",
+      "quote": "Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas"
+     }
+    ],
+    "skills_used": []
+   },
+   {
+    "title": "Gerente Fantasma",
+    "employer": "Empresa Inexistente",
+    "start": "2010-01",
+    "end": "2012-01",
+    "quote": "Gerente Fantasma — Empresa Inexistente",
+    "responsibilities": [],
+    "skills_used": []
+   }
+  ],
+  "skills": [
+   {
+    "name": "C#",
+    "canonical": "c#",
+    "category": "language",
+    "quotes": [
+     "C#, .NET, Python"
+    ]
+   },
+   {
+    "name": "Node.js",
+    "canonical": "node.js",
+    "category": "framework",
+    "quotes": []
+   },
+   {
+    "name": "Rust",
+    "canonical": "rust",
+    "category": "language",
+    "quotes": [
+     "Rust avançado"
+    ]
+   },
+   {
+    "name": "PostgreSQL",
+    "canonical": "postgresql",
+    "category": "db",
+    "quotes": [
+     "PostgreSQL"
+    ]
+   },
+   {
+    "name": "Postgres",
+    "canonical": "postgresql",
+    "category": "db",
+    "quotes": [
+     "PostgreSQL"
+    ]
+   },
+   {
+    "name": "Docker",
+    "category": "estranha",
+    "quotes": [
+     "Git, Docker"
+    ]
+   }
+  ],
+  "transferable_skills": [
+   {
+    "capability": "Suporte a usuários",
+    "from_roles": [
+     "Analista de Sistemas",
+     "Cargo que não existe"
+    ],
+    "quotes": [
+     "Suporte a usuários internos"
+    ]
+   },
+   {
+    "capability": "Sem citação",
+    "from_roles": [],
+    "quotes": [
+     "texto que não está no currículo de forma alguma"
+    ]
+   }
+  ],
+  "education": [
+   {
+    "text": "Bacharelado em Sistemas de Informação",
+    "quote": "Bacharelado em Sistemas de Informação — Universidade Gama"
+   },
+   {
+    "text": "Mestrado",
+    "quote": "Mestrado em Física"
+   }
+  ],
+  "certifications": [],
+  "projects": [
+   {
+    "text": "Painel de vagas com C# e Avalonia",
+    "quote": "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia"
+   }
+  ],
+  "achievements": [],
+  "languages": [
+   {
+    "language": "Inglês",
+    "level": "avançado",
+    "quote": "Inglês avançado"
+   },
+   {
+    "language": "Alemão",
+    "level": "fluente",
+    "quote": "Alemão fluente"
+   }
+  ]
+ },
+ "raw_en": {
+  "headline": "Software developer",
+  "professional_profile": "Builds integrations.",
+  "seniority": "mid",
+  "location_notes": "",
+  "work_authorization_notes": "",
+  "roles": [
+   {
+    "title": "Systems Analyst",
+    "employer": "Alpha Company",
+    "start": "2021-01",
+    "end": "present",
+    "quote": "Systems Analyst — Alpha Company (01/2021 – present)",
+    "responsibilities": [
+     {
+      "text": "REST APIs in C# and .NET",
+      "quote": "Built REST APIs in C# and .NET to integrate internal systems"
+     }
+    ],
+    "skills_used": [
+     "C#",
+     "Kubernetes"
+    ]
+   },
+   {
+    "title": "Operations Intern",
+    "employer": "Delta Corp",
+    "start": "2016-06",
+    "end": "2018-02",
+    "quote": "Operations Intern — Delta Corp (06/2016 – 02/2018)",
+    "responsibilities": [
+     {
+      "text": "Weekly reports",
+      "quote": "Prepared weekly reports and supported the logistics team"
+     }
+    ],
+    "skills_used": []
+   }
+  ],
+  "skills": [
+   {
+    "name": "C#",
+    "canonical": "c#",
+    "category": "language",
+    "quotes": [
+     "C#, Python, SQL"
+    ]
+   },
+   {
+    "name": "SQL",
+    "canonical": "sql",
+    "category": "db",
+    "quotes": [
+     "SQL"
+    ]
+   },
+   {
+    "name": "Kubernetes",
+    "canonical": "kubernetes",
+    "category": "tool",
+    "quotes": [
+     "Kubernetes"
+    ]
+   }
+  ],
+  "transferable_skills": [],
+  "education": [],
+  "certifications": [],
+  "achievements": [],
+  "projects": [],
+  "languages": [
+   {
+    "language": "English",
+    "level": "advanced",
+    "quote": "English advanced"
+   }
+  ]
+ },
+ "profile_pt": {
+  "version": "2",
+  "headline": "Desenvolvedora de software com foco em automação",
+  "professional_profile": "Atua com sistemas internos. Também tem experiência administrativa.",
+  "seniority": "pleno",
+  "location_notes": "Belo Horizonte, MG",
+  "work_authorization_notes": "",
+  "roles": [
+   {
+    "id": "R1",
+    "title": "Analista de Sistemas",
+    "employer": "Empresa Alfa",
+    "start": "2021-01",
+    "end": "present",
+    "quote": "Analista de Sistemas — Empresa Alfa (01/2021 – atual)",
+    "responsibilities": [
+     {
+      "id": "R1.1",
+      "text": "APIs REST em C# e .NET",
+      "quote": "Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos"
+     },
+     {
+      "id": "R1.2",
+      "text": "Suporte a usuários",
+      "quote": "Suporte a usuários internos e controle de documentos em planilhas"
+     }
+    ],
+    "skills_used": [
+     "C#",
+     ".NET",
+     "Python",
+     "PostgreSQL"
+    ]
+   },
+   {
+    "id": "R2",
+    "title": "Assistente Administrativo",
+    "employer": "Comércio Beta",
+    "start": "2018-01",
+    "end": "2020-12",
+    "quote": "Assistente Administrativo — Comércio Beta (03/2018 – 12/2020)",
+    "responsibilities": [
+     {
+      "id": "R2.1",
+      "text": "Atendimento",
+      "quote": "Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas"
+     }
+    ],
+    "skills_used": []
+   }
+  ],
+  "skills": [
+   {
+    "id": "S1",
+    "name": "C#",
+    "canonical": "c#",
+    "category": "language",
+    "quotes": [
+     "C#, .NET, Python"
+    ]
+   },
+   {
+    "id": "S2",
+    "name": "Node.js",
+    "canonical": "node js",
+    "category": "framework",
+    "quotes": []
+   },
+   {
+    "id": "S3",
+    "name": "PostgreSQL",
+    "canonical": "postgresql",
+    "category": "db",
+    "quotes": [
+     "PostgreSQL"
+    ]
+   },
+   {
+    "id": "S4",
+    "name": "Docker",
+    "canonical": "docker",
+    "category": "other",
+    "quotes": [
+     "Git, Docker"
+    ]
+   }
+  ],
+  "transferable_skills": [
+   {
+    "id": "T1",
+    "capability": "Suporte a usuários",
+    "from_role_ids": [
+     "R1"
+    ],
+    "quotes": [
+     "Suporte a usuários internos"
+    ]
+   }
+  ],
+  "education": [
+   {
+    "id": "E1",
+    "text": "Bacharelado em Sistemas de Informação",
+    "quote": "Bacharelado em Sistemas de Informação — Universidade Gama"
+   }
+  ],
+  "certifications": [],
+  "projects": [
+   {
+    "id": "P1",
+    "text": "Painel de vagas com C# e Avalonia",
+    "quote": "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia"
+   }
+  ],
+  "achievements": [],
+  "languages": [
+   {
+    "id": "L1",
+    "language": "Inglês",
+    "level": "avançado",
+    "quote": "Inglês avançado"
+   }
+  ],
+  "derived": {
+   "total_months": 107,
+   "skills": {
+    "S1": {
+     "canonical": "c#",
+     "months": 71,
+     "last_used": "2026-11",
+     "role_ids": [
+      "R1"
+     ],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S2": {
+     "canonical": "node js",
+     "months": 0,
+     "last_used": "",
+     "role_ids": [],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S3": {
+     "canonical": "postgresql",
+     "months": 71,
+     "last_used": "2026-11",
+     "role_ids": [
+      "R1"
+     ],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S4": {
+     "canonical": "docker",
+     "months": 0,
+     "last_used": "",
+     "role_ids": [],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    }
+   },
+   "role_months": {
+    "R1": 71,
+    "R2": 36
+   },
+   "current_role_ids": [
+    "R1"
+   ]
+  },
+  "coverage": {
+   "kept": 10,
+   "dropped": {
+    "responsibilities": 2,
+    "roles": 1,
+    "skills": 1,
+    "transferable_skills": 1,
+    "education": 1,
+    "languages": 1
+   },
+   "ungrounded": 7
+  }
+ },
+ "profile_en": {
+  "version": "2",
+  "headline": "Software developer",
+  "professional_profile": "Builds integrations.",
+  "seniority": "mid",
+  "location_notes": "",
+  "work_authorization_notes": "",
+  "roles": [
+   {
+    "id": "R1",
+    "title": "Systems Analyst",
+    "employer": "Alpha Company",
+    "start": "2021-01",
+    "end": "present",
+    "quote": "Systems Analyst — Alpha Company (01/2021 – present)",
+    "responsibilities": [
+     {
+      "id": "R1.1",
+      "text": "REST APIs in C# and .NET",
+      "quote": "Built REST APIs in C# and .NET to integrate internal systems"
+     }
+    ],
+    "skills_used": [
+     "C#",
+     "Kubernetes"
+    ]
+   },
+   {
+    "id": "R2",
+    "title": "Operations Intern",
+    "employer": "Delta Corp",
+    "start": "2016-06",
+    "end": "2018-02",
+    "quote": "Operations Intern — Delta Corp (06/2016 – 02/2018)",
+    "responsibilities": [
+     {
+      "id": "R2.1",
+      "text": "Weekly reports",
+      "quote": "Prepared weekly reports and supported the logistics team"
+     }
+    ],
+    "skills_used": []
+   }
+  ],
+  "skills": [
+   {
+    "id": "S1",
+    "name": "C#",
+    "canonical": "c#",
+    "category": "language",
+    "quotes": [
+     "C#, Python, SQL"
+    ]
+   },
+   {
+    "id": "S2",
+    "name": "SQL",
+    "canonical": "sql",
+    "category": "db",
+    "quotes": [
+     "SQL"
+    ]
+   },
+   {
+    "id": "S3",
+    "name": "Kubernetes",
+    "canonical": "kubernetes",
+    "category": "tool",
+    "quotes": [
+     "Kubernetes"
+    ]
+   }
+  ],
+  "transferable_skills": [],
+  "education": [],
+  "certifications": [],
+  "projects": [],
+  "achievements": [],
+  "languages": [
+   {
+    "id": "L1",
+    "language": "English",
+    "level": "advanced",
+    "quote": "English advanced"
+   }
+  ],
+  "derived": {
+   "total_months": 92,
+   "skills": {
+    "S1": {
+     "canonical": "c#",
+     "months": 71,
+     "last_used": "2026-11",
+     "role_ids": [
+      "R1"
+     ],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S2": {
+     "canonical": "sql",
+     "months": 0,
+     "last_used": "",
+     "role_ids": [],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S3": {
+     "canonical": "kubernetes",
+     "months": 71,
+     "last_used": "2026-11",
+     "role_ids": [
+      "R1"
+     ],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    }
+   },
+   "role_months": {
+    "R1": 71,
+    "R2": 21
+   },
+   "current_role_ids": [
+    "R1"
+   ]
+  },
+  "coverage": {
+   "kept": 6,
+   "dropped": {},
+   "ungrounded": 0
+  }
+ },
+ "portfolio": {
+  "version": "2",
+  "headline": "",
+  "professional_profile": "",
+  "seniority": "",
+  "location_notes": "",
+  "work_authorization_notes": "",
+  "roles": [],
+  "skills": [
+   {
+    "id": "S1",
+    "name": "Avalonia",
+    "canonical": "avalonia",
+    "category": "framework",
+    "quotes": [
+     "Avalonia"
+    ]
+   }
+  ],
+  "transferable_skills": [],
+  "education": [],
+  "certifications": [],
+  "achievements": [],
+  "languages": [],
+  "projects": [
+   {
+    "id": "P1",
+    "title": "Painel de vagas",
+    "slug": "painel",
+    "headline": "Triagem de vagas",
+    "text": "Painel de vagas desktop",
+    "quote": "Painel de vagas",
+    "start": "2025-03",
+    "end": "2025-09",
+    "stack": [
+     "C#",
+     "Avalonia"
+    ],
+    "source": "portfolio",
+    "url": "https://example.test/p"
+   }
+  ]
+ },
+ "merged": {
+  "version": "2",
+  "headline": "Desenvolvedora de software com foco em automação",
+  "professional_profile": "Atua com sistemas internos. Também tem experiência administrativa.",
+  "seniority": "pleno",
+  "location_notes": "Belo Horizonte, MG",
+  "work_authorization_notes": "",
+  "roles": [
+   {
+    "id": "R1",
+    "title": "Analista de Sistemas",
+    "employer": "Empresa Alfa",
+    "start": "2021-01",
+    "end": "present",
+    "quote": "Analista de Sistemas — Empresa Alfa (01/2021 – atual)",
+    "responsibilities": [
+     {
+      "id": "R1.1",
+      "text": "APIs REST em C# e .NET",
+      "quote": "Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos"
+     },
+     {
+      "id": "R1.2",
+      "text": "Suporte a usuários",
+      "quote": "Suporte a usuários internos e controle de documentos em planilhas"
+     }
+    ],
+    "skills_used": [
+     "C#",
+     ".NET",
+     "Python",
+     "PostgreSQL"
+    ]
+   },
+   {
+    "id": "R2",
+    "title": "Assistente Administrativo",
+    "employer": "Comércio Beta",
+    "start": "2018-01",
+    "end": "2020-12",
+    "quote": "Assistente Administrativo — Comércio Beta (03/2018 – 12/2020)",
+    "responsibilities": [
+     {
+      "id": "R2.1",
+      "text": "Atendimento",
+      "quote": "Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas"
+     }
+    ],
+    "skills_used": []
+   },
+   {
+    "id": "R3",
+    "title": "Systems Analyst",
+    "employer": "Alpha Company",
+    "start": "2021-01",
+    "end": "present",
+    "quote": "Systems Analyst — Alpha Company (01/2021 – present)",
+    "responsibilities": [
+     {
+      "id": "R3.1",
+      "text": "REST APIs in C# and .NET",
+      "quote": "Built REST APIs in C# and .NET to integrate internal systems"
+     }
+    ],
+    "skills_used": [
+     "C#",
+     "Kubernetes"
+    ]
+   },
+   {
+    "id": "R4",
+    "title": "Operations Intern",
+    "employer": "Delta Corp",
+    "start": "2016-06",
+    "end": "2018-02",
+    "quote": "Operations Intern — Delta Corp (06/2016 – 02/2018)",
+    "responsibilities": [
+     {
+      "id": "R4.1",
+      "text": "Weekly reports",
+      "quote": "Prepared weekly reports and supported the logistics team"
+     }
+    ],
+    "skills_used": []
+   }
+  ],
+  "skills": [
+   {
+    "id": "S1",
+    "name": "C#",
+    "canonical": "c#",
+    "category": "language",
+    "quotes": [
+     "C#, .NET, Python"
+    ]
+   },
+   {
+    "id": "S2",
+    "name": "Node.js",
+    "canonical": "node js",
+    "category": "framework",
+    "quotes": []
+   },
+   {
+    "id": "S3",
+    "name": "PostgreSQL",
+    "canonical": "postgresql",
+    "category": "db",
+    "quotes": [
+     "PostgreSQL"
+    ]
+   },
+   {
+    "id": "S4",
+    "name": "Docker",
+    "canonical": "docker",
+    "category": "other",
+    "quotes": [
+     "Git, Docker"
+    ]
+   },
+   {
+    "id": "S5",
+    "name": "SQL",
+    "canonical": "sql",
+    "category": "db",
+    "quotes": [
+     "SQL"
+    ]
+   },
+   {
+    "id": "S6",
+    "name": "Kubernetes",
+    "canonical": "kubernetes",
+    "category": "tool",
+    "quotes": [
+     "Kubernetes"
+    ]
+   },
+   {
+    "id": "S7",
+    "name": "Avalonia",
+    "canonical": "avalonia",
+    "category": "framework",
+    "quotes": [
+     "Avalonia"
+    ]
+   }
+  ],
+  "transferable_skills": [
+   {
+    "id": "T1",
+    "capability": "Suporte a usuários",
+    "from_role_ids": [],
+    "quotes": [
+     "Suporte a usuários internos"
+    ]
+   }
+  ],
+  "education": [
+   {
+    "id": "E1",
+    "text": "Bacharelado em Sistemas de Informação",
+    "quote": "Bacharelado em Sistemas de Informação — Universidade Gama"
+   }
+  ],
+  "certifications": [],
+  "projects": [
+   {
+    "id": "P1",
+    "text": "Painel de vagas com C# e Avalonia",
+    "quote": "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia",
+    "title": "Painel de vagas",
+    "slug": "painel",
+    "headline": "Triagem de vagas",
+    "start": "2025-03",
+    "end": "2025-09",
+    "stack": [
+     "C#",
+     "Avalonia"
+    ],
+    "source": "portfolio",
+    "url": "https://example.test/p"
+   }
+  ],
+  "achievements": [],
+  "languages": [
+   {
+    "id": "L1",
+    "language": "Inglês",
+    "level": "avançado",
+    "quote": "Inglês avançado"
+   },
+   {
+    "id": "L2",
+    "language": "English",
+    "level": "advanced",
+    "quote": "English advanced"
+   }
+  ],
+  "derived": {
+   "total_months": 126,
+   "skills": {
+    "S1": {
+     "canonical": "c#",
+     "months": 71,
+     "last_used": "2026-11",
+     "role_ids": [
+      "R1",
+      "R3"
+     ],
+     "project_months": 7,
+     "project_ids": [
+      "P1"
+     ],
+     "project_last_used": "2025-09"
+    },
+    "S2": {
+     "canonical": "node js",
+     "months": 0,
+     "last_used": "",
+     "role_ids": [],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S3": {
+     "canonical": "postgresql",
+     "months": 71,
+     "last_used": "2026-11",
+     "role_ids": [
+      "R1"
+     ],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S4": {
+     "canonical": "docker",
+     "months": 0,
+     "last_used": "",
+     "role_ids": [],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S5": {
+     "canonical": "sql",
+     "months": 0,
+     "last_used": "",
+     "role_ids": [],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S6": {
+     "canonical": "kubernetes",
+     "months": 71,
+     "last_used": "2026-11",
+     "role_ids": [
+      "R3"
+     ],
+     "project_months": 0,
+     "project_ids": [],
+     "project_last_used": ""
+    },
+    "S7": {
+     "canonical": "avalonia",
+     "months": 0,
+     "last_used": "",
+     "role_ids": [],
+     "project_months": 7,
+     "project_ids": [
+      "P1"
+     ],
+     "project_last_used": "2025-09"
+    }
+   },
+   "role_months": {
+    "R1": 71,
+    "R2": 36,
+    "R3": 71,
+    "R4": 21
+   },
+   "current_role_ids": [
+    "R1",
+    "R3"
+   ]
+  },
+  "coverage": {
+   "kept": 16,
+   "dropped": {},
+   "ungrounded": 7
+  }
+ },
+ "compact_pt": "TOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 8y11m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11\n[S3] PostgreSQL: 5y11m, last 2026-11\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas com C# e Avalonia",
+ "compact_merged": "TOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas",
+ "compact_short": "TOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimen",
+ "evidence_index": {
+  "R1": {
+   "kind": "role",
+   "text": "Analista de Sistemas Empresa Alfa",
+   "quotes": [
+    "Analista de Sistemas — Empresa Alfa (01/2021 – atual)"
+   ]
+  },
+  "R1.1": {
+   "kind": "responsibility",
+   "text": "APIs REST em C# e .NET",
+   "quotes": [
+    "Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos"
+   ]
+  },
+  "R1.2": {
+   "kind": "responsibility",
+   "text": "Suporte a usuários",
+   "quotes": [
+    "Suporte a usuários internos e controle de documentos em planilhas"
+   ]
+  },
+  "R2": {
+   "kind": "role",
+   "text": "Assistente Administrativo Comércio Beta",
+   "quotes": [
+    "Assistente Administrativo — Comércio Beta (03/2018 – 12/2020)"
+   ]
+  },
+  "R2.1": {
+   "kind": "responsibility",
+   "text": "Atendimento",
+   "quotes": [
+    "Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas"
+   ]
+  },
+  "R3": {
+   "kind": "role",
+   "text": "Systems Analyst Alpha Company",
+   "quotes": [
+    "Systems Analyst — Alpha Company (01/2021 – present)"
+   ]
+  },
+  "R3.1": {
+   "kind": "responsibility",
+   "text": "REST APIs in C# and .NET",
+   "quotes": [
+    "Built REST APIs in C# and .NET to integrate internal systems"
+   ]
+  },
+  "R4": {
+   "kind": "role",
+   "text": "Operations Intern Delta Corp",
+   "quotes": [
+    "Operations Intern — Delta Corp (06/2016 – 02/2018)"
+   ]
+  },
+  "R4.1": {
+   "kind": "responsibility",
+   "text": "Weekly reports",
+   "quotes": [
+    "Prepared weekly reports and supported the logistics team"
+   ]
+  },
+  "S1": {
+   "kind": "skill",
+   "text": "C#",
+   "quotes": [
+    "C#, .NET, Python"
+   ]
+  },
+  "S2": {
+   "kind": "skill",
+   "text": "Node.js",
+   "quotes": []
+  },
+  "S3": {
+   "kind": "skill",
+   "text": "PostgreSQL",
+   "quotes": [
+    "PostgreSQL"
+   ]
+  },
+  "S4": {
+   "kind": "skill",
+   "text": "Docker",
+   "quotes": [
+    "Git, Docker"
+   ]
+  },
+  "S5": {
+   "kind": "skill",
+   "text": "SQL",
+   "quotes": [
+    "SQL"
+   ]
+  },
+  "S6": {
+   "kind": "skill",
+   "text": "Kubernetes",
+   "quotes": [
+    "Kubernetes"
+   ]
+  },
+  "S7": {
+   "kind": "skill",
+   "text": "Avalonia",
+   "quotes": [
+    "Avalonia"
+   ]
+  },
+  "T1": {
+   "kind": "transferable",
+   "text": "Suporte a usuários",
+   "quotes": [
+    "Suporte a usuários internos"
+   ]
+  },
+  "E1": {
+   "kind": "education",
+   "text": "Bacharelado em Sistemas de Informação",
+   "quotes": [
+    "Bacharelado em Sistemas de Informação — Universidade Gama"
+   ]
+  },
+  "P1": {
+   "kind": "projects",
+   "text": "Painel de vagas com C# e Avalonia",
+   "quotes": [
+    "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia"
+   ],
+   "source": "portfolio",
+   "url": "https://example.test/p"
+  },
+  "L1": {
+   "kind": "language",
+   "text": "Inglês avançado",
+   "quotes": [
+    "Inglês avançado"
+   ]
+  },
+  "L2": {
+   "kind": "language",
+   "text": "English advanced",
+   "quotes": [
+    "English advanced"
+   ]
+  }
+ },
+ "legacy_pt": {
+  "headline": "Desenvolvedora de software com foco em automação",
+  "professional_profile": "Atua com sistemas internos. Também tem experiência administrativa.",
+  "seniority": "pleno",
+  "technical_skills": [
+   "C#",
+   "Node.js",
+   "PostgreSQL",
+   "Docker"
+  ],
+  "tools": [],
+  "soft_skills": [],
+  "domains": [],
+  "experience": [
+   {
+    "role": "Analista de Sistemas",
+    "employer": "Empresa Alfa",
+    "period": "2021-01 – present",
+    "is_current": true,
+    "responsibilities": [
+     "APIs REST em C# e .NET",
+     "Suporte a usuários"
+    ],
+    "highlights": []
+   },
+   {
+    "role": "Assistente Administrativo",
+    "employer": "Comércio Beta",
+    "period": "2018-01 – 2020-12",
+    "is_current": false,
+    "responsibilities": [
+     "Atendimento"
+    ],
+    "highlights": []
+   }
+  ],
+  "projects": [
+   "Painel de vagas com C# e Avalonia"
+  ],
+  "achievements": [],
+  "education": [
+   "Bacharelado em Sistemas de Informação"
+  ],
+  "certifications": [],
+  "languages": [
+   "Inglês avançado"
+  ],
+  "work_authorization_notes": "",
+  "location_notes": "Belo Horizonte, MG",
+  "years_of_experience": "8.9 anos (calculado das datas)",
+  "current_employer": "Empresa Alfa",
+  "coverage_notes": "10 fatos verificados no texto do PDF; 7 descartados por falta de citação."
+ },
+ "quote_probes": [
+  {
+   "quote": "Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos",
+   "pt": true,
+   "en": false
+  },
+  {
+   "quote": "desenvolvimento de apis rest em c# e net para integracao entre sistemas internos",
+   "pt": true,
+   "en": false
+  },
+  {
+   "quote": "Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas externos",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "Desenvolvimento de APIs REST em Java e Spring para integração entre sistemas externos",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "APIs REST em C#",
+   "pt": true,
+   "en": false
+  },
+  {
+   "quote": "C#",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "Go",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "Atendimento a clientes e fornecedores agendamentos",
+   "pt": true,
+   "en": false
+  },
+  {
+   "quote": "Atendimento a fornecedores e clientes, agendamentos e rotinas",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "Relatórios em planilhas para a diretoria executiva",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "Relatórios para a diretoria em planilhas",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "Suporte a usuários internos e controle de documentos em planilhas mensais",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "analista de sistemas empresa alfa 01 2021 atual",
+   "pt": true,
+   "en": false
+  },
+  {
+   "quote": "totalmente diferente de qualquer coisa no texto original aqui",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "Automacao de rotinas financeiras com Python e Postgres",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "rotinas financeiras Python PostgreSQL automação de",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "",
+   "pt": false,
+   "en": false
+  },
+  {
+   "quote": "ab",
+   "pt": false,
+   "en": false
+  }
+ ],
+ "sections_pt": [
+  {
+   "title": "",
+   "kind": "header",
+   "start": 0,
+   "end": 59
+  },
+  {
+   "title": "Resumo",
+   "kind": "summary",
+   "start": 59,
+   "end": 149
+  },
+  {
+   "title": "Experiência Profissional",
+   "kind": "experience",
+   "start": 149,
+   "end": 630
+  },
+  {
+   "title": "Formação Acadêmica",
+   "kind": "education",
+   "start": 630,
+   "end": 722
+  },
+  {
+   "title": "Habilidades",
+   "kind": "skills",
+   "start": 722,
+   "end": 786
+  },
+  {
+   "title": "Idiomas",
+   "kind": "languages",
+   "start": 786,
+   "end": 829
+  },
+  {
+   "title": "Projetos",
+   "kind": "projects",
+   "start": 829,
+   "end": 915
+  }
+ ],
+ "sections_en": [
+  {
+   "title": "",
+   "kind": "header",
+   "start": 0,
+   "end": 32
+  },
+  {
+   "title": "Experience",
+   "kind": "experience",
+   "start": 32,
+   "end": 330
+  },
+  {
+   "title": "Skills",
+   "kind": "skills",
+   "start": 330,
+   "end": 366
+  },
+  {
+   "title": "Languages",
+   "kind": "languages",
+   "start": 366,
+   "end": 393
+  }
+ ],
+ "excerpts_pt": [
+  {
+   "section": "header",
+   "label": "Cabeçalho — Ana Exemplo",
+   "text": "Ana Exemplo\nDesenvolvedora de software\nBelo Horizonte, MG"
+  },
+  {
+   "section": "summary",
+   "label": "Resumo — Profissional com experiência em automação de processos e desenvolvimento de APIs",
+   "text": "Resumo\nProfissional com experiência em automação de processos e desenvolvimento de APIs."
+  },
+  {
+   "section": "experience",
+   "label": "Experiência Profissional — Analista de Sistemas — Empresa Alfa (01/2021 – atual)",
+   "text": "Experiência Profissional\nAnalista de Sistemas — Empresa Alfa (01/2021 – atual)\n- Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos.\n- Suporte a usuários internos e controle de documentos em planilhas.\n- Automação de rotinas financeiras com Python e PostgreSQL."
+  },
+  {
+   "section": "experience",
+   "label": "Experiência Profissional — Assistente Administrativo — Comércio Beta (03/2018 – 12/2020)",
+   "text": "Assistente Administrativo — Comércio Beta (03/2018 – 12/2020)\n- Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas.\n- Relatórios em planilhas para a diretoria."
+  },
+  {
+   "section": "education",
+   "label": "Formação Acadêmica — Bacharelado em Sistemas de Informação — Universidade Gama (2017 – 2021)",
+   "text": "Formação Acadêmica\nBacharelado em Sistemas de Informação — Universidade Gama (2017 – 2021)"
+  },
+  {
+   "section": "skills",
+   "label": "Habilidades — C#, .NET, Python, PostgreSQL, Node.js, Git, Docker",
+   "text": "Habilidades\nC#, .NET, Python, PostgreSQL, Node.js, Git, Docker"
+  },
+  {
+   "section": "languages",
+   "label": "Idiomas — Inglês avançado; Português nativo",
+   "text": "Idiomas\nInglês avançado; Português nativo"
+  },
+  {
+   "section": "projects",
+   "label": "Projetos — Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.",
+   "text": "Projetos\nPainel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia."
+  }
+ ],
+ "months_for_roles": 107,
+ "format_months": {
+  "0": "0m",
+  "5": "5m",
+  "12": "1y",
+  "17": "1y5m",
+  "30": "2y6m",
+  "125": "10y5m"
+ }
+}

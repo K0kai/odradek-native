@@ -1,0 +1,2430 @@
+{
+ "normalize": [
+  {
+   "raw": {
+    "name": "Software Engineer",
+    "keywords": [
+     "Software Engineer",
+     "Engenheiro de Software"
+    ],
+    "experience_levels": [
+     3,
+     4
+    ],
+    "reason": "r",
+    "source": "ai"
+   },
+   "slot": "main",
+   "result": "{\"id\": \"main-6292846e62\", \"name\": \"Software Engineer\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Software Engineer\", \"Engenheiro de Software\"], \"experience_levels\": [3, 4], \"reason\": \"r\", \"source\": \"ai\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "name": "Software Engineer",
+    "keywords": [
+     "Software Engineer",
+     "Engenheiro de Software"
+    ],
+    "experience_levels": [
+     3,
+     4
+    ],
+    "reason": "r",
+    "source": "ai"
+   },
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-6292846e62\", \"name\": \"Software Engineer\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"Software Engineer\", \"Engenheiro de Software\"], \"experience_levels\": [3, 4], \"reason\": \"r\", \"source\": \"ai\", \"track\": \"transferable\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "keywords": [
+     {
+      "phrase": "  Dev Backend  "
+     },
+     {
+      "phrase": "dev backend"
+     },
+     "Terceira"
+    ],
+    "experience_levels": [
+     "2",
+     2,
+     9,
+     "x",
+     null,
+     4.7,
+     true
+    ]
+   },
+   "slot": "main",
+   "result": "{\"id\": \"main-a31ba759a7\", \"name\": \"Dev Backend\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Dev Backend\", \"Terceira\"], \"experience_levels\": [2, 4, 1], \"reason\": \"\", \"source\": \"manual\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "keywords": [
+     {
+      "phrase": "  Dev Backend  "
+     },
+     {
+      "phrase": "dev backend"
+     },
+     "Terceira"
+    ],
+    "experience_levels": [
+     "2",
+     2,
+     9,
+     "x",
+     null,
+     4.7,
+     true
+    ]
+   },
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-a31ba759a7\", \"name\": \"Dev Backend\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"Dev Backend\", \"Terceira\"], \"experience_levels\": [2, 4, 1], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "keywords": [
+     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "enabled": false,
+    "slot": "zzz",
+    "reason": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+    "source": "ssssssssssssssssssssssssssssssssssssssss"
+   },
+   "slot": "main",
+   "result": "{\"id\": \"main-acfb2a162b\", \"name\": \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"], \"experience_levels\": [], \"reason\": \"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\", \"source\": \"ssssssssssssssssssss\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "keywords": [
+     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "enabled": false,
+    "slot": "zzz",
+    "reason": "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+    "source": "ssssssssssssssssssssssssssssssssssssssss"
+   },
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-acfb2a162b\", \"name\": \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\", \"slot\": \"secondary\", \"enabled\": false, \"keywords\": [\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"], \"experience_levels\": [], \"reason\": \"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr\", \"source\": \"ssssssssssssssssssss\", \"track\": \"transferable\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "name": "Sec",
+    "keywords": [
+     "Suporte"
+    ],
+    "enabled": false,
+    "sector": "  Saúde ",
+    "resilience_reason": "",
+    "evidence": {
+     "Suporte": [
+      "role.1",
+      2,
+      "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+      "a",
+      "b",
+      "c"
+     ],
+     "outra": [
+      "x"
+     ]
+    }
+   },
+   "slot": "main",
+   "result": "{\"id\": \"main-58748653cc\", \"name\": \"Sec\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Suporte\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"evidence\": {\"Suporte\": [\"role.1\", \"2\", \"zzzzzzzzzzzz\", \"a\"]}, \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "name": "Sec",
+    "keywords": [
+     "Suporte"
+    ],
+    "enabled": false,
+    "sector": "  Saúde ",
+    "resilience_reason": "",
+    "evidence": {
+     "Suporte": [
+      "role.1",
+      2,
+      "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+      "a",
+      "b",
+      "c"
+     ],
+     "outra": [
+      "x"
+     ]
+    }
+   },
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-58748653cc\", \"name\": \"Sec\", \"slot\": \"secondary\", \"enabled\": false, \"keywords\": [\"Suporte\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"sector\": \"Saúde\", \"evidence\": {\"Suporte\": [\"role.1\", \"2\", \"zzzzzzzzzzzz\", \"a\"]}, \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "name": "Sec2",
+    "keywords": [
+     "Suporte",
+     "Helpdesk"
+    ],
+    "evidence": {
+     "Suporte": "nao-lista",
+     "Helpdesk": []
+    },
+    "anchor_roles": [
+     {
+      "id": "r1",
+      "title": "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "employer": "E",
+      "months": "24"
+     },
+     {
+      "id": "",
+      "title": "ignorado"
+     },
+     "lixo",
+     {
+      "id": "r2",
+      "months": "abc"
+     },
+     {
+      "id": "r3"
+     },
+     {
+      "id": 4,
+      "months": 3.9
+     },
+     {
+      "id": "r5"
+     },
+     {
+      "id": "r6"
+     },
+     {
+      "id": "r7"
+     }
+    ],
+    "career_months": "36",
+    "generated_at": "2026-01-01T00:00:00+00:00xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+   },
+   "slot": "main",
+   "result": "{\"id\": \"main-aec440a19f\", \"name\": \"Sec2\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Suporte\", \"Helpdesk\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"evidence\": {\"Helpdesk\": []}, \"anchor_roles\": [{\"id\": \"r1\", \"title\": \"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\", \"employer\": \"E\", \"months\": 24}, {\"id\": \"r2\", \"title\": \"\", \"employer\": \"\", \"months\": 0}, {\"id\": \"r3\", \"title\": \"\", \"employer\": \"\", \"months\": 0}, {\"id\": \"4\", \"title\": \"\", \"employer\": \"\", \"months\": 3}, {\"id\": \"r5\", \"title\": \"\", \"employer\": \"\", \"months\": 0}, {\"id\": \"r6\", \"title\": \"\", \"employer\": \"\", \"months\": 0}], \"career_months\": 36, \"generated_at\": \"2026-01-01T00:00:00+00:00xxxxxxxxxxxxxxx\"}"
+  },
+  {
+   "raw": {
+    "name": "Sec2",
+    "keywords": [
+     "Suporte",
+     "Helpdesk"
+    ],
+    "evidence": {
+     "Suporte": "nao-lista",
+     "Helpdesk": []
+    },
+    "anchor_roles": [
+     {
+      "id": "r1",
+      "title": "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+      "employer": "E",
+      "months": "24"
+     },
+     {
+      "id": "",
+      "title": "ignorado"
+     },
+     "lixo",
+     {
+      "id": "r2",
+      "months": "abc"
+     },
+     {
+      "id": "r3"
+     },
+     {
+      "id": 4,
+      "months": 3.9
+     },
+     {
+      "id": "r5"
+     },
+     {
+      "id": "r6"
+     },
+     {
+      "id": "r7"
+     }
+    ],
+    "career_months": "36",
+    "generated_at": "2026-01-01T00:00:00+00:00xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+   },
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-aec440a19f\", \"name\": \"Sec2\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"Suporte\", \"Helpdesk\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"evidence\": {\"Helpdesk\": []}, \"anchor_roles\": [{\"id\": \"r1\", \"title\": \"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\", \"employer\": \"E\", \"months\": 24}, {\"id\": \"r2\", \"title\": \"\", \"employer\": \"\", \"months\": 0}, {\"id\": \"r3\", \"title\": \"\", \"employer\": \"\", \"months\": 0}, {\"id\": \"4\", \"title\": \"\", \"employer\": \"\", \"months\": 3}, {\"id\": \"r5\", \"title\": \"\", \"employer\": \"\", \"months\": 0}, {\"id\": \"r6\", \"title\": \"\", \"employer\": \"\", \"months\": 0}], \"career_months\": 36, \"generated_at\": \"2026-01-01T00:00:00+00:00xxxxxxxxxxxxxxx\"}"
+  },
+  {
+   "raw": {
+    "keywords": [],
+    "name": "vazio"
+   },
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": {
+    "keywords": [],
+    "name": "vazio"
+   },
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": {
+    "keywords": "texto"
+   },
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": {
+    "keywords": "texto"
+   },
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": {
+    "keywords": [
+     null,
+     "",
+     "  ",
+     {
+      "phrase": null
+     },
+     {
+      "nada": 1
+     }
+    ]
+   },
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": {
+    "keywords": [
+     null,
+     "",
+     "  ",
+     {
+      "phrase": null
+     },
+     {
+      "nada": 1
+     }
+    ]
+   },
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": {
+    "keywords": [
+     "ok"
+    ],
+    "career_months": -5
+   },
+   "slot": "main",
+   "result": "{\"id\": \"main-e37d7e0946\", \"name\": \"ok\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"ok\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "keywords": [
+     "ok"
+    ],
+    "career_months": -5
+   },
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-e37d7e0946\", \"name\": \"ok\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"ok\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "keywords": [
+     "ok"
+    ],
+    "career_months": "x"
+   },
+   "slot": "main",
+   "result": "{\"id\": \"main-e37d7e0946\", \"name\": \"ok\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"ok\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\"}"
+  },
+  {
+   "raw": {
+    "keywords": [
+     "ok"
+    ],
+    "career_months": "x"
+   },
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-e37d7e0946\", \"name\": \"ok\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"ok\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\"}"
+  },
+  {
+   "raw": {
+    "keywords": [
+     "ok"
+    ],
+    "career_months": 0,
+    "enabled": 0
+   },
+   "slot": "main",
+   "result": "{\"id\": \"main-e37d7e0946\", \"name\": \"ok\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"ok\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "keywords": [
+     "ok"
+    ],
+    "career_months": 0,
+    "enabled": 0
+   },
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-e37d7e0946\", \"name\": \"ok\", \"slot\": \"secondary\", \"enabled\": false, \"keywords\": [\"ok\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "keywords": [
+     "Ação Çedilha"
+    ],
+    "name": "Ünï"
+   },
+   "slot": "main",
+   "result": "{\"id\": \"main-c522cbc460\", \"name\": \"Ünï\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Ação Çedilha\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"career_months\": 0}"
+  },
+  {
+   "raw": {
+    "keywords": [
+     "Ação Çedilha"
+    ],
+    "name": "Ünï"
+   },
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-c522cbc460\", \"name\": \"Ünï\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"Ação Çedilha\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"career_months\": 0}"
+  },
+  {
+   "raw": [],
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": [],
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": "texto",
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": "texto",
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": null,
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": null,
+   "slot": "secondary",
+   "result": "null"
+  }
+ ],
+ "validate": [
+  {
+   "form": "",
+   "slot": "main",
+   "result": ""
+  },
+  {
+   "form": "",
+   "slot": "secondary",
+   "result": ""
+  },
+  {
+   "form": "   ",
+   "slot": "main",
+   "result": ""
+  },
+  {
+   "form": "   ",
+   "slot": "secondary",
+   "result": ""
+  },
+  {
+   "form": "{",
+   "slot": "main",
+   "error": "JSON inválido"
+  },
+  {
+   "form": "{",
+   "slot": "secondary",
+   "error": "JSON inválido"
+  },
+  {
+   "form": "[]",
+   "slot": "main",
+   "error": "Use um único filtro (objeto), não uma lista."
+  },
+  {
+   "form": "[]",
+   "slot": "secondary",
+   "error": "Use um único filtro (objeto), não uma lista."
+  },
+  {
+   "form": "[1]",
+   "slot": "main",
+   "error": "Use um único filtro (objeto), não uma lista."
+  },
+  {
+   "form": "[1]",
+   "slot": "secondary",
+   "error": "Use um único filtro (objeto), não uma lista."
+  },
+  {
+   "form": "3",
+   "slot": "main",
+   "error": "Filtro inválido."
+  },
+  {
+   "form": "3",
+   "slot": "secondary",
+   "error": "Filtro inválido."
+  },
+  {
+   "form": "null",
+   "slot": "main",
+   "error": "Filtro inválido."
+  },
+  {
+   "form": "null",
+   "slot": "secondary",
+   "error": "Filtro inválido."
+  },
+  {
+   "form": "{\"keywords\":[\"a\"]}",
+   "slot": "main",
+   "error": "Dê um nome ao filtro."
+  },
+  {
+   "form": "{\"keywords\":[\"a\"]}",
+   "slot": "secondary",
+   "error": "Dê um nome ao filtro."
+  },
+  {
+   "form": "{\"name\":\"n\"}",
+   "slot": "main",
+   "error": "Adicione ao menos uma keyword ao filtro."
+  },
+  {
+   "form": "{\"name\":\"n\"}",
+   "slot": "secondary",
+   "error": "Adicione ao menos uma keyword ao filtro."
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[]}",
+   "slot": "main",
+   "error": "Adicione ao menos uma keyword ao filtro."
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[]}",
+   "slot": "secondary",
+   "error": "Adicione ao menos uma keyword ao filtro."
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[\"a\",\"b\",\"c\"]}",
+   "slot": "main",
+   "error": "Use no máximo 2 frases por filtro: o cargo e uma variante equivalente dele."
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[\"a\",\"b\",\"c\"]}",
+   "slot": "secondary",
+   "error": "Use no máximo 2 frases por filtro: o cargo e uma variante equivalente dele."
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[\"a\",\"A\"]}",
+   "slot": "main",
+   "result": "{\"id\": \"main-ed8ba39e80\", \"name\": \"n\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"a\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"career_months\": 0}"
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[\"a\",\"A\"]}",
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-ed8ba39e80\", \"name\": \"n\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"a\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"career_months\": 0}"
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[\"a\",\"b\"],\"experience_levels\":[1,2]}",
+   "slot": "main",
+   "result": "{\"id\": \"main-b5dd70aa66\", \"name\": \"n\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"a\", \"b\"], \"experience_levels\": [1, 2], \"reason\": \"\", \"source\": \"manual\", \"career_months\": 0}"
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[\"a\",\"b\"],\"experience_levels\":[1,2]}",
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-b5dd70aa66\", \"name\": \"n\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"a\", \"b\"], \"experience_levels\": [1, 2], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"career_months\": 0}"
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[{\"nada\":1}]}",
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[{\"nada\":1}]}",
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[{\"phrase\":\"x\"},{\"nada\":1},\"c\"]}",
+   "slot": "main",
+   "error": "Use no máximo 2 frases por filtro: o cargo e uma variante equivalente dele."
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[{\"phrase\":\"x\"},{\"nada\":1},\"c\"]}",
+   "slot": "secondary",
+   "error": "Use no máximo 2 frases por filtro: o cargo e uma variante equivalente dele."
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":\"x\"}",
+   "slot": "main",
+   "error": "Adicione ao menos uma keyword ao filtro."
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":\"x\"}",
+   "slot": "secondary",
+   "error": "Adicione ao menos uma keyword ao filtro."
+  },
+  {
+   "form": "{\"name\":\"  \",\"keywords\":[\"a\"]}",
+   "slot": "main",
+   "error": "Dê um nome ao filtro."
+  },
+  {
+   "form": "{\"name\":\"  \",\"keywords\":[\"a\"]}",
+   "slot": "secondary",
+   "error": "Dê um nome ao filtro."
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[null,\"a\"]}",
+   "slot": "main",
+   "result": "{\"id\": \"main-ed8ba39e80\", \"name\": \"n\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"a\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"career_months\": 0}"
+  },
+  {
+   "form": "{\"name\":\"n\",\"keywords\":[null,\"a\"]}",
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-ed8ba39e80\", \"name\": \"n\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"a\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"career_months\": 0}"
+  }
+ ],
+ "load": [
+  {
+   "raw": "",
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": "",
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": "  ",
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": "  ",
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": "{",
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": "{",
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": "{\"keywords\":[\"a\"],\"name\":\"n\"}",
+   "slot": "main",
+   "result": "{\"id\": \"main-ed8ba39e80\", \"name\": \"n\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"a\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"career_months\": 0}"
+  },
+  {
+   "raw": "{\"keywords\":[\"a\"],\"name\":\"n\"}",
+   "slot": "secondary",
+   "result": "{\"id\": \"sec-ed8ba39e80\", \"name\": \"n\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"a\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"manual\", \"track\": \"transferable\", \"career_months\": 0}"
+  },
+  {
+   "raw": "[1]",
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": "[1]",
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": "{\"keywords\":[]}",
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": "{\"keywords\":[]}",
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": "null",
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": "null",
+   "slot": "secondary",
+   "result": "null"
+  },
+  {
+   "raw": "\"x\"",
+   "slot": "main",
+   "result": "null"
+  },
+  {
+   "raw": "\"x\"",
+   "slot": "secondary",
+   "result": "null"
+  }
+ ],
+ "items": [
+  {
+   "label": "LinkedIn Jobs",
+   "max_age": 7,
+   "preferred": [
+    "Brazil"
+   ],
+   "items": [
+    {
+     "id": 1,
+     "title": "Dev A",
+     "companyName": "Acme",
+     "location": "Brazil",
+     "descriptionText": "desc",
+     "link": "https://x/a",
+     "postedAt": "2999-01-01T00:00:00+00:00"
+    },
+    {
+     "jobId": "j2",
+     "position": "Dev B",
+     "company": {
+      "name": "Beta"
+     },
+     "formattedLocation": "Lisbon",
+     "descriptionHtml": "<p>x</p>",
+     "url": "https://x/b",
+     "publishedAt": "3 days ago"
+    },
+    {
+     "title": "Velha",
+     "companyName": "Old",
+     "location": "BR",
+     "url": "https://x/old",
+     "postedAt": "2020-01-01T00:00:00+00:00"
+    },
+    {
+     "title": "Sem data",
+     "companyName": "N",
+     "url": "https://x/nodate"
+    },
+    {
+     "title": "Fechada",
+     "companyName": "N",
+     "url": "https://x/closed",
+     "closed": true
+    },
+    {
+     "title": "Fechada2",
+     "companyName": "N",
+     "url": "https://x/closed2",
+     "jobState": "Expired"
+    },
+    {
+     "title": "Fechada3",
+     "companyName": "N",
+     "url": "https://x/closed3",
+     "description": "This job is no longer available"
+    },
+    {
+     "title": "Indeed ms",
+     "company": "Ind",
+     "jobLocationCity": "São Paulo",
+     "jobLocationState": "SP",
+     "viewJobLink": "/viewjob?jk=1",
+     "pubDate": 4102444800000,
+     "companyUrl": "https://br.indeed.com/cmp/x"
+    },
+    {
+     "title": "Indeed relativo",
+     "company": "Ind",
+     "location": {
+      "formatted": {
+       "long": "Rio de Janeiro, RJ",
+       "short": "RJ"
+      }
+     },
+     "viewJobLink": "/viewjob?jk=2"
+    },
+    {
+     "title": "Loc dict",
+     "company": "Ind",
+     "location": {
+      "fullAddress": "Curitiba, PR"
+     },
+     "applyUrl": "https://x/loc"
+    },
+    {
+     "title": "Loc dict2",
+     "company": "Ind",
+     "location": {
+      "formatted": "texto",
+      "name": "Nome"
+     },
+     "applyUrl": "https://x/loc2"
+    },
+    {
+     "title": "Loc dict3",
+     "company": "Ind",
+     "location": {
+      "formatted": {},
+      "display_name": "Dn"
+     },
+     "applyUrl": "https://x/loc3"
+    },
+    {
+     "title": "Sem url",
+     "companyName": "N"
+    },
+    {
+     "url": "https://x/semtitulo"
+    },
+    "string solta",
+    null,
+    {
+     "title": "Secs",
+     "companyName": "N",
+     "url": "https://x/secs",
+     "postedAt": 1000000000
+    },
+    {
+     "title": "Relativo",
+     "companyName": "N",
+     "url": "https://x/rel",
+     "postedAt": "2 days ago"
+    },
+    {
+     "title": "Relativo velho",
+     "companyName": "N",
+     "url": "https://x/rel2",
+     "postedAt": "3 weeks ago"
+    },
+    {
+     "title": "Relativo mes",
+     "companyName": "N",
+     "url": "https://x/rel3",
+     "postedAt": "2 meses atrás"
+    },
+    {
+     "title": "Relativo curto",
+     "companyName": "N",
+     "url": "https://x/rel4",
+     "postedAt": "5d"
+    },
+    {
+     "title": "Agora",
+     "companyName": "N",
+     "url": "https://x/now",
+     "postedAt": "Just now"
+    },
+    {
+     "title": "Z",
+     "companyName": "N",
+     "url": "https://x/z",
+     "postedAt": "2 hours ago",
+     "location": "United States"
+    },
+    {
+     "title": "A",
+     "companyName": "N",
+     "url": "https://x/aa",
+     "postedAt": "5 hours ago",
+     "location": "Portugal"
+    },
+    {
+     "title": "A",
+     "companyName": "N",
+     "url": "https://x/ab",
+     "postedAt": "5 hours ago",
+     "location": "Brazil"
+    },
+    {
+     "id": 0,
+     "jobId": 77,
+     "title": "Id zero",
+     "companyName": "N",
+     "url": "https://x/id0"
+    },
+    {
+     "title": "Cdet",
+     "companyDetails": {
+      "display_name": "DetCo"
+     },
+     "url": "https://x/det"
+    },
+    {
+     "title": "Src",
+     "jobSourceName": "SrcName",
+     "url": "https://x/src"
+    },
+    {
+     "title": "Numero",
+     "companyName": "N",
+     "url": "https://x/num",
+     "postedAt": 12345
+    },
+    {
+     "title": "Dict data",
+     "companyName": "N",
+     "url": "https://x/dd",
+     "postedAt": {
+      "a": 1
+     }
+    }
+   ],
+   "result": [
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "1",
+     "title": "Dev A",
+     "company": "Acme",
+     "location": "Brazil",
+     "description": "desc",
+     "url": "https://x/a",
+     "posted_at": "2999-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/ab",
+     "title": "A",
+     "company": "N",
+     "location": "Brazil",
+     "description": "",
+     "url": "https://x/ab",
+     "posted_at": "5 hours ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/now",
+     "title": "Agora",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/now",
+     "posted_at": "Just now"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://br.indeed.com/viewjob?jk=1",
+     "title": "Indeed ms",
+     "company": "Ind",
+     "location": "São Paulo, SP",
+     "description": "",
+     "url": "https://br.indeed.com/viewjob?jk=1",
+     "posted_at": "2100-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/z",
+     "title": "Z",
+     "company": "N",
+     "location": "United States",
+     "description": "",
+     "url": "https://x/z",
+     "posted_at": "2 hours ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/aa",
+     "title": "A",
+     "company": "N",
+     "location": "Portugal",
+     "description": "",
+     "url": "https://x/aa",
+     "posted_at": "5 hours ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/rel",
+     "title": "Relativo",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel",
+     "posted_at": "2 days ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "j2",
+     "title": "Dev B",
+     "company": "Beta",
+     "location": "Lisbon",
+     "description": "<p>x</p>",
+     "url": "https://x/b",
+     "posted_at": "3 days ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/rel4",
+     "title": "Relativo curto",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel4",
+     "posted_at": "5d"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/det",
+     "title": "Cdet",
+     "company": "DetCo",
+     "location": "",
+     "description": "",
+     "url": "https://x/det",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/dd",
+     "title": "Dict data",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/dd",
+     "posted_at": {
+      "a": 1
+     }
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "77",
+     "title": "Id zero",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/id0",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://www.indeed.com/viewjob?jk=2",
+     "title": "Indeed relativo",
+     "company": "Ind",
+     "location": "Rio de Janeiro, RJ",
+     "description": "",
+     "url": "https://www.indeed.com/viewjob?jk=2",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/loc",
+     "title": "Loc dict",
+     "company": "Ind",
+     "location": "Curitiba, PR",
+     "description": "",
+     "url": "https://x/loc",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/loc2",
+     "title": "Loc dict2",
+     "company": "Ind",
+     "location": "Nome",
+     "description": "",
+     "url": "https://x/loc2",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/loc3",
+     "title": "Loc dict3",
+     "company": "Ind",
+     "location": "Dn",
+     "description": "",
+     "url": "https://x/loc3",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/nodate",
+     "title": "Sem data",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/nodate",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/src",
+     "title": "Src",
+     "company": "SrcName",
+     "location": "",
+     "description": "",
+     "url": "https://x/src",
+     "posted_at": null
+    }
+   ]
+  },
+  {
+   "label": "LinkedIn Jobs",
+   "max_age": 30,
+   "preferred": [],
+   "items": [
+    {
+     "id": 1,
+     "title": "Dev A",
+     "companyName": "Acme",
+     "location": "Brazil",
+     "descriptionText": "desc",
+     "link": "https://x/a",
+     "postedAt": "2999-01-01T00:00:00+00:00"
+    },
+    {
+     "jobId": "j2",
+     "position": "Dev B",
+     "company": {
+      "name": "Beta"
+     },
+     "formattedLocation": "Lisbon",
+     "descriptionHtml": "<p>x</p>",
+     "url": "https://x/b",
+     "publishedAt": "3 days ago"
+    },
+    {
+     "title": "Velha",
+     "companyName": "Old",
+     "location": "BR",
+     "url": "https://x/old",
+     "postedAt": "2020-01-01T00:00:00+00:00"
+    },
+    {
+     "title": "Sem data",
+     "companyName": "N",
+     "url": "https://x/nodate"
+    },
+    {
+     "title": "Fechada",
+     "companyName": "N",
+     "url": "https://x/closed",
+     "closed": true
+    },
+    {
+     "title": "Fechada2",
+     "companyName": "N",
+     "url": "https://x/closed2",
+     "jobState": "Expired"
+    },
+    {
+     "title": "Fechada3",
+     "companyName": "N",
+     "url": "https://x/closed3",
+     "description": "This job is no longer available"
+    },
+    {
+     "title": "Indeed ms",
+     "company": "Ind",
+     "jobLocationCity": "São Paulo",
+     "jobLocationState": "SP",
+     "viewJobLink": "/viewjob?jk=1",
+     "pubDate": 4102444800000,
+     "companyUrl": "https://br.indeed.com/cmp/x"
+    },
+    {
+     "title": "Indeed relativo",
+     "company": "Ind",
+     "location": {
+      "formatted": {
+       "long": "Rio de Janeiro, RJ",
+       "short": "RJ"
+      }
+     },
+     "viewJobLink": "/viewjob?jk=2"
+    },
+    {
+     "title": "Loc dict",
+     "company": "Ind",
+     "location": {
+      "fullAddress": "Curitiba, PR"
+     },
+     "applyUrl": "https://x/loc"
+    },
+    {
+     "title": "Loc dict2",
+     "company": "Ind",
+     "location": {
+      "formatted": "texto",
+      "name": "Nome"
+     },
+     "applyUrl": "https://x/loc2"
+    },
+    {
+     "title": "Loc dict3",
+     "company": "Ind",
+     "location": {
+      "formatted": {},
+      "display_name": "Dn"
+     },
+     "applyUrl": "https://x/loc3"
+    },
+    {
+     "title": "Sem url",
+     "companyName": "N"
+    },
+    {
+     "url": "https://x/semtitulo"
+    },
+    "string solta",
+    null,
+    {
+     "title": "Secs",
+     "companyName": "N",
+     "url": "https://x/secs",
+     "postedAt": 1000000000
+    },
+    {
+     "title": "Relativo",
+     "companyName": "N",
+     "url": "https://x/rel",
+     "postedAt": "2 days ago"
+    },
+    {
+     "title": "Relativo velho",
+     "companyName": "N",
+     "url": "https://x/rel2",
+     "postedAt": "3 weeks ago"
+    },
+    {
+     "title": "Relativo mes",
+     "companyName": "N",
+     "url": "https://x/rel3",
+     "postedAt": "2 meses atrás"
+    },
+    {
+     "title": "Relativo curto",
+     "companyName": "N",
+     "url": "https://x/rel4",
+     "postedAt": "5d"
+    },
+    {
+     "title": "Agora",
+     "companyName": "N",
+     "url": "https://x/now",
+     "postedAt": "Just now"
+    },
+    {
+     "title": "Z",
+     "companyName": "N",
+     "url": "https://x/z",
+     "postedAt": "2 hours ago",
+     "location": "United States"
+    },
+    {
+     "title": "A",
+     "companyName": "N",
+     "url": "https://x/aa",
+     "postedAt": "5 hours ago",
+     "location": "Portugal"
+    },
+    {
+     "title": "A",
+     "companyName": "N",
+     "url": "https://x/ab",
+     "postedAt": "5 hours ago",
+     "location": "Brazil"
+    },
+    {
+     "id": 0,
+     "jobId": 77,
+     "title": "Id zero",
+     "companyName": "N",
+     "url": "https://x/id0"
+    },
+    {
+     "title": "Cdet",
+     "companyDetails": {
+      "display_name": "DetCo"
+     },
+     "url": "https://x/det"
+    },
+    {
+     "title": "Src",
+     "jobSourceName": "SrcName",
+     "url": "https://x/src"
+    },
+    {
+     "title": "Numero",
+     "companyName": "N",
+     "url": "https://x/num",
+     "postedAt": 12345
+    },
+    {
+     "title": "Dict data",
+     "companyName": "N",
+     "url": "https://x/dd",
+     "postedAt": {
+      "a": 1
+     }
+    }
+   ],
+   "result": [
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/now",
+     "title": "Agora",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/now",
+     "posted_at": "Just now"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "1",
+     "title": "Dev A",
+     "company": "Acme",
+     "location": "Brazil",
+     "description": "desc",
+     "url": "https://x/a",
+     "posted_at": "2999-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://br.indeed.com/viewjob?jk=1",
+     "title": "Indeed ms",
+     "company": "Ind",
+     "location": "São Paulo, SP",
+     "description": "",
+     "url": "https://br.indeed.com/viewjob?jk=1",
+     "posted_at": "2100-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/z",
+     "title": "Z",
+     "company": "N",
+     "location": "United States",
+     "description": "",
+     "url": "https://x/z",
+     "posted_at": "2 hours ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/aa",
+     "title": "A",
+     "company": "N",
+     "location": "Portugal",
+     "description": "",
+     "url": "https://x/aa",
+     "posted_at": "5 hours ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/ab",
+     "title": "A",
+     "company": "N",
+     "location": "Brazil",
+     "description": "",
+     "url": "https://x/ab",
+     "posted_at": "5 hours ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/rel",
+     "title": "Relativo",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel",
+     "posted_at": "2 days ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "j2",
+     "title": "Dev B",
+     "company": "Beta",
+     "location": "Lisbon",
+     "description": "<p>x</p>",
+     "url": "https://x/b",
+     "posted_at": "3 days ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/rel4",
+     "title": "Relativo curto",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel4",
+     "posted_at": "5d"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/rel2",
+     "title": "Relativo velho",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel2",
+     "posted_at": "3 weeks ago"
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/det",
+     "title": "Cdet",
+     "company": "DetCo",
+     "location": "",
+     "description": "",
+     "url": "https://x/det",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/dd",
+     "title": "Dict data",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/dd",
+     "posted_at": {
+      "a": 1
+     }
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "77",
+     "title": "Id zero",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/id0",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://www.indeed.com/viewjob?jk=2",
+     "title": "Indeed relativo",
+     "company": "Ind",
+     "location": "Rio de Janeiro, RJ",
+     "description": "",
+     "url": "https://www.indeed.com/viewjob?jk=2",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/loc",
+     "title": "Loc dict",
+     "company": "Ind",
+     "location": "Curitiba, PR",
+     "description": "",
+     "url": "https://x/loc",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/loc2",
+     "title": "Loc dict2",
+     "company": "Ind",
+     "location": "Nome",
+     "description": "",
+     "url": "https://x/loc2",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/loc3",
+     "title": "Loc dict3",
+     "company": "Ind",
+     "location": "Dn",
+     "description": "",
+     "url": "https://x/loc3",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/nodate",
+     "title": "Sem data",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/nodate",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:LinkedIn Jobs",
+     "source_id": "https://x/src",
+     "title": "Src",
+     "company": "SrcName",
+     "location": "",
+     "description": "",
+     "url": "https://x/src",
+     "posted_at": null
+    }
+   ]
+  },
+  {
+   "label": "Indeed",
+   "max_age": 7,
+   "preferred": [
+    "Brazil"
+   ],
+   "items": [
+    {
+     "id": 1,
+     "title": "Dev A",
+     "companyName": "Acme",
+     "location": "Brazil",
+     "descriptionText": "desc",
+     "link": "https://x/a",
+     "postedAt": "2999-01-01T00:00:00+00:00"
+    },
+    {
+     "jobId": "j2",
+     "position": "Dev B",
+     "company": {
+      "name": "Beta"
+     },
+     "formattedLocation": "Lisbon",
+     "descriptionHtml": "<p>x</p>",
+     "url": "https://x/b",
+     "publishedAt": "3 days ago"
+    },
+    {
+     "title": "Velha",
+     "companyName": "Old",
+     "location": "BR",
+     "url": "https://x/old",
+     "postedAt": "2020-01-01T00:00:00+00:00"
+    },
+    {
+     "title": "Sem data",
+     "companyName": "N",
+     "url": "https://x/nodate"
+    },
+    {
+     "title": "Fechada",
+     "companyName": "N",
+     "url": "https://x/closed",
+     "closed": true
+    },
+    {
+     "title": "Fechada2",
+     "companyName": "N",
+     "url": "https://x/closed2",
+     "jobState": "Expired"
+    },
+    {
+     "title": "Fechada3",
+     "companyName": "N",
+     "url": "https://x/closed3",
+     "description": "This job is no longer available"
+    },
+    {
+     "title": "Indeed ms",
+     "company": "Ind",
+     "jobLocationCity": "São Paulo",
+     "jobLocationState": "SP",
+     "viewJobLink": "/viewjob?jk=1",
+     "pubDate": 4102444800000,
+     "companyUrl": "https://br.indeed.com/cmp/x"
+    },
+    {
+     "title": "Indeed relativo",
+     "company": "Ind",
+     "location": {
+      "formatted": {
+       "long": "Rio de Janeiro, RJ",
+       "short": "RJ"
+      }
+     },
+     "viewJobLink": "/viewjob?jk=2"
+    },
+    {
+     "title": "Loc dict",
+     "company": "Ind",
+     "location": {
+      "fullAddress": "Curitiba, PR"
+     },
+     "applyUrl": "https://x/loc"
+    },
+    {
+     "title": "Loc dict2",
+     "company": "Ind",
+     "location": {
+      "formatted": "texto",
+      "name": "Nome"
+     },
+     "applyUrl": "https://x/loc2"
+    },
+    {
+     "title": "Loc dict3",
+     "company": "Ind",
+     "location": {
+      "formatted": {},
+      "display_name": "Dn"
+     },
+     "applyUrl": "https://x/loc3"
+    },
+    {
+     "title": "Sem url",
+     "companyName": "N"
+    },
+    {
+     "url": "https://x/semtitulo"
+    },
+    "string solta",
+    null,
+    {
+     "title": "Secs",
+     "companyName": "N",
+     "url": "https://x/secs",
+     "postedAt": 1000000000
+    },
+    {
+     "title": "Relativo",
+     "companyName": "N",
+     "url": "https://x/rel",
+     "postedAt": "2 days ago"
+    },
+    {
+     "title": "Relativo velho",
+     "companyName": "N",
+     "url": "https://x/rel2",
+     "postedAt": "3 weeks ago"
+    },
+    {
+     "title": "Relativo mes",
+     "companyName": "N",
+     "url": "https://x/rel3",
+     "postedAt": "2 meses atrás"
+    },
+    {
+     "title": "Relativo curto",
+     "companyName": "N",
+     "url": "https://x/rel4",
+     "postedAt": "5d"
+    },
+    {
+     "title": "Agora",
+     "companyName": "N",
+     "url": "https://x/now",
+     "postedAt": "Just now"
+    },
+    {
+     "title": "Z",
+     "companyName": "N",
+     "url": "https://x/z",
+     "postedAt": "2 hours ago",
+     "location": "United States"
+    },
+    {
+     "title": "A",
+     "companyName": "N",
+     "url": "https://x/aa",
+     "postedAt": "5 hours ago",
+     "location": "Portugal"
+    },
+    {
+     "title": "A",
+     "companyName": "N",
+     "url": "https://x/ab",
+     "postedAt": "5 hours ago",
+     "location": "Brazil"
+    },
+    {
+     "id": 0,
+     "jobId": 77,
+     "title": "Id zero",
+     "companyName": "N",
+     "url": "https://x/id0"
+    },
+    {
+     "title": "Cdet",
+     "companyDetails": {
+      "display_name": "DetCo"
+     },
+     "url": "https://x/det"
+    },
+    {
+     "title": "Src",
+     "jobSourceName": "SrcName",
+     "url": "https://x/src"
+    },
+    {
+     "title": "Numero",
+     "companyName": "N",
+     "url": "https://x/num",
+     "postedAt": 12345
+    },
+    {
+     "title": "Dict data",
+     "companyName": "N",
+     "url": "https://x/dd",
+     "postedAt": {
+      "a": 1
+     }
+    }
+   ],
+   "result": [
+    {
+     "source": "Apify:Indeed",
+     "source_id": "1",
+     "title": "Dev A",
+     "company": "Acme",
+     "location": "Brazil",
+     "description": "desc",
+     "url": "https://x/a",
+     "posted_at": "2999-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "j2",
+     "title": "Dev B",
+     "company": "Beta",
+     "location": "Lisbon",
+     "description": "<p>x</p>",
+     "url": "https://x/b",
+     "posted_at": "3 days ago"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/old",
+     "title": "Velha",
+     "company": "Old",
+     "location": "BR",
+     "description": "",
+     "url": "https://x/old",
+     "posted_at": "2020-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/nodate",
+     "title": "Sem data",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/nodate",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://br.indeed.com/viewjob?jk=1",
+     "title": "Indeed ms",
+     "company": "Ind",
+     "location": "São Paulo, SP",
+     "description": "",
+     "url": "https://br.indeed.com/viewjob?jk=1",
+     "posted_at": "2100-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://www.indeed.com/viewjob?jk=2",
+     "title": "Indeed relativo",
+     "company": "Ind",
+     "location": "Rio de Janeiro, RJ",
+     "description": "",
+     "url": "https://www.indeed.com/viewjob?jk=2",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/loc",
+     "title": "Loc dict",
+     "company": "Ind",
+     "location": "Curitiba, PR",
+     "description": "",
+     "url": "https://x/loc",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/loc2",
+     "title": "Loc dict2",
+     "company": "Ind",
+     "location": "Nome",
+     "description": "",
+     "url": "https://x/loc2",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/loc3",
+     "title": "Loc dict3",
+     "company": "Ind",
+     "location": "Dn",
+     "description": "",
+     "url": "https://x/loc3",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/secs",
+     "title": "Secs",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/secs",
+     "posted_at": 1000000000
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/rel",
+     "title": "Relativo",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel",
+     "posted_at": "2 days ago"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/rel2",
+     "title": "Relativo velho",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel2",
+     "posted_at": "3 weeks ago"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/rel3",
+     "title": "Relativo mes",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel3",
+     "posted_at": "2 meses atrás"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/rel4",
+     "title": "Relativo curto",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel4",
+     "posted_at": "5d"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/now",
+     "title": "Agora",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/now",
+     "posted_at": "Just now"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/z",
+     "title": "Z",
+     "company": "N",
+     "location": "United States",
+     "description": "",
+     "url": "https://x/z",
+     "posted_at": "2 hours ago"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/aa",
+     "title": "A",
+     "company": "N",
+     "location": "Portugal",
+     "description": "",
+     "url": "https://x/aa",
+     "posted_at": "5 hours ago"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/ab",
+     "title": "A",
+     "company": "N",
+     "location": "Brazil",
+     "description": "",
+     "url": "https://x/ab",
+     "posted_at": "5 hours ago"
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "77",
+     "title": "Id zero",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/id0",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/det",
+     "title": "Cdet",
+     "company": "DetCo",
+     "location": "",
+     "description": "",
+     "url": "https://x/det",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/src",
+     "title": "Src",
+     "company": "SrcName",
+     "location": "",
+     "description": "",
+     "url": "https://x/src",
+     "posted_at": null
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/num",
+     "title": "Numero",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/num",
+     "posted_at": 12345
+    },
+    {
+     "source": "Apify:Indeed",
+     "source_id": "https://x/dd",
+     "title": "Dict data",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/dd",
+     "posted_at": {
+      "a": 1
+     }
+    }
+   ]
+  },
+  {
+   "label": "",
+   "max_age": 7,
+   "preferred": [],
+   "items": [
+    {
+     "id": 1,
+     "title": "Dev A",
+     "companyName": "Acme",
+     "location": "Brazil",
+     "descriptionText": "desc",
+     "link": "https://x/a",
+     "postedAt": "2999-01-01T00:00:00+00:00"
+    },
+    {
+     "jobId": "j2",
+     "position": "Dev B",
+     "company": {
+      "name": "Beta"
+     },
+     "formattedLocation": "Lisbon",
+     "descriptionHtml": "<p>x</p>",
+     "url": "https://x/b",
+     "publishedAt": "3 days ago"
+    },
+    {
+     "title": "Velha",
+     "companyName": "Old",
+     "location": "BR",
+     "url": "https://x/old",
+     "postedAt": "2020-01-01T00:00:00+00:00"
+    },
+    {
+     "title": "Sem data",
+     "companyName": "N",
+     "url": "https://x/nodate"
+    },
+    {
+     "title": "Fechada",
+     "companyName": "N",
+     "url": "https://x/closed",
+     "closed": true
+    },
+    {
+     "title": "Fechada2",
+     "companyName": "N",
+     "url": "https://x/closed2",
+     "jobState": "Expired"
+    },
+    {
+     "title": "Fechada3",
+     "companyName": "N",
+     "url": "https://x/closed3",
+     "description": "This job is no longer available"
+    },
+    {
+     "title": "Indeed ms",
+     "company": "Ind",
+     "jobLocationCity": "São Paulo",
+     "jobLocationState": "SP",
+     "viewJobLink": "/viewjob?jk=1",
+     "pubDate": 4102444800000,
+     "companyUrl": "https://br.indeed.com/cmp/x"
+    },
+    {
+     "title": "Indeed relativo",
+     "company": "Ind",
+     "location": {
+      "formatted": {
+       "long": "Rio de Janeiro, RJ",
+       "short": "RJ"
+      }
+     },
+     "viewJobLink": "/viewjob?jk=2"
+    },
+    {
+     "title": "Loc dict",
+     "company": "Ind",
+     "location": {
+      "fullAddress": "Curitiba, PR"
+     },
+     "applyUrl": "https://x/loc"
+    },
+    {
+     "title": "Loc dict2",
+     "company": "Ind",
+     "location": {
+      "formatted": "texto",
+      "name": "Nome"
+     },
+     "applyUrl": "https://x/loc2"
+    },
+    {
+     "title": "Loc dict3",
+     "company": "Ind",
+     "location": {
+      "formatted": {},
+      "display_name": "Dn"
+     },
+     "applyUrl": "https://x/loc3"
+    },
+    {
+     "title": "Sem url",
+     "companyName": "N"
+    },
+    {
+     "url": "https://x/semtitulo"
+    },
+    "string solta",
+    null,
+    {
+     "title": "Secs",
+     "companyName": "N",
+     "url": "https://x/secs",
+     "postedAt": 1000000000
+    },
+    {
+     "title": "Relativo",
+     "companyName": "N",
+     "url": "https://x/rel",
+     "postedAt": "2 days ago"
+    },
+    {
+     "title": "Relativo velho",
+     "companyName": "N",
+     "url": "https://x/rel2",
+     "postedAt": "3 weeks ago"
+    },
+    {
+     "title": "Relativo mes",
+     "companyName": "N",
+     "url": "https://x/rel3",
+     "postedAt": "2 meses atrás"
+    },
+    {
+     "title": "Relativo curto",
+     "companyName": "N",
+     "url": "https://x/rel4",
+     "postedAt": "5d"
+    },
+    {
+     "title": "Agora",
+     "companyName": "N",
+     "url": "https://x/now",
+     "postedAt": "Just now"
+    },
+    {
+     "title": "Z",
+     "companyName": "N",
+     "url": "https://x/z",
+     "postedAt": "2 hours ago",
+     "location": "United States"
+    },
+    {
+     "title": "A",
+     "companyName": "N",
+     "url": "https://x/aa",
+     "postedAt": "5 hours ago",
+     "location": "Portugal"
+    },
+    {
+     "title": "A",
+     "companyName": "N",
+     "url": "https://x/ab",
+     "postedAt": "5 hours ago",
+     "location": "Brazil"
+    },
+    {
+     "id": 0,
+     "jobId": 77,
+     "title": "Id zero",
+     "companyName": "N",
+     "url": "https://x/id0"
+    },
+    {
+     "title": "Cdet",
+     "companyDetails": {
+      "display_name": "DetCo"
+     },
+     "url": "https://x/det"
+    },
+    {
+     "title": "Src",
+     "jobSourceName": "SrcName",
+     "url": "https://x/src"
+    },
+    {
+     "title": "Numero",
+     "companyName": "N",
+     "url": "https://x/num",
+     "postedAt": 12345
+    },
+    {
+     "title": "Dict data",
+     "companyName": "N",
+     "url": "https://x/dd",
+     "postedAt": {
+      "a": 1
+     }
+    }
+   ],
+   "result": [
+    {
+     "source": "Apify",
+     "source_id": "1",
+     "title": "Dev A",
+     "company": "Acme",
+     "location": "Brazil",
+     "description": "desc",
+     "url": "https://x/a",
+     "posted_at": "2999-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify",
+     "source_id": "j2",
+     "title": "Dev B",
+     "company": "Beta",
+     "location": "Lisbon",
+     "description": "<p>x</p>",
+     "url": "https://x/b",
+     "posted_at": "3 days ago"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/old",
+     "title": "Velha",
+     "company": "Old",
+     "location": "BR",
+     "description": "",
+     "url": "https://x/old",
+     "posted_at": "2020-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/nodate",
+     "title": "Sem data",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/nodate",
+     "posted_at": null
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://br.indeed.com/viewjob?jk=1",
+     "title": "Indeed ms",
+     "company": "Ind",
+     "location": "São Paulo, SP",
+     "description": "",
+     "url": "https://br.indeed.com/viewjob?jk=1",
+     "posted_at": "2100-01-01T00:00:00+00:00"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://www.indeed.com/viewjob?jk=2",
+     "title": "Indeed relativo",
+     "company": "Ind",
+     "location": "Rio de Janeiro, RJ",
+     "description": "",
+     "url": "https://www.indeed.com/viewjob?jk=2",
+     "posted_at": null
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/loc",
+     "title": "Loc dict",
+     "company": "Ind",
+     "location": "Curitiba, PR",
+     "description": "",
+     "url": "https://x/loc",
+     "posted_at": null
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/loc2",
+     "title": "Loc dict2",
+     "company": "Ind",
+     "location": "Nome",
+     "description": "",
+     "url": "https://x/loc2",
+     "posted_at": null
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/loc3",
+     "title": "Loc dict3",
+     "company": "Ind",
+     "location": "Dn",
+     "description": "",
+     "url": "https://x/loc3",
+     "posted_at": null
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/secs",
+     "title": "Secs",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/secs",
+     "posted_at": 1000000000
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/rel",
+     "title": "Relativo",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel",
+     "posted_at": "2 days ago"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/rel2",
+     "title": "Relativo velho",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel2",
+     "posted_at": "3 weeks ago"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/rel3",
+     "title": "Relativo mes",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel3",
+     "posted_at": "2 meses atrás"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/rel4",
+     "title": "Relativo curto",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/rel4",
+     "posted_at": "5d"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/now",
+     "title": "Agora",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/now",
+     "posted_at": "Just now"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/z",
+     "title": "Z",
+     "company": "N",
+     "location": "United States",
+     "description": "",
+     "url": "https://x/z",
+     "posted_at": "2 hours ago"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/aa",
+     "title": "A",
+     "company": "N",
+     "location": "Portugal",
+     "description": "",
+     "url": "https://x/aa",
+     "posted_at": "5 hours ago"
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/ab",
+     "title": "A",
+     "company": "N",
+     "location": "Brazil",
+     "description": "",
+     "url": "https://x/ab",
+     "posted_at": "5 hours ago"
+    },
+    {
+     "source": "Apify",
+     "source_id": "77",
+     "title": "Id zero",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/id0",
+     "posted_at": null
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/det",
+     "title": "Cdet",
+     "company": "DetCo",
+     "location": "",
+     "description": "",
+     "url": "https://x/det",
+     "posted_at": null
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/src",
+     "title": "Src",
+     "company": "SrcName",
+     "location": "",
+     "description": "",
+     "url": "https://x/src",
+     "posted_at": null
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/num",
+     "title": "Numero",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/num",
+     "posted_at": 12345
+    },
+    {
+     "source": "Apify",
+     "source_id": "https://x/dd",
+     "title": "Dict data",
+     "company": "N",
+     "location": "",
+     "description": "",
+     "url": "https://x/dd",
+     "posted_at": {
+      "a": 1
+     }
+    }
+   ]
+  }
+ ],
+ "language": [
+  {
+   "text": "",
+   "language": "unknown",
+   "confidence": 0.0
+  },
+  {
+   "text": "short",
+   "language": "unknown",
+   "confidence": 0.0
+  },
+  {
+   "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "language": "unknown",
+   "confidence": 0.0
+  },
+  {
+   "text": "<p>Estamos procurando uma pessoa com experiência para trabalhar com a nossa equipe de desenvolvimento de software.</p>",
+   "language": "pt",
+   "confidence": 0.8611111111111112
+  },
+  {
+   "text": "We are looking for a software engineer with experience in the team to work with us and build the product for you.",
+   "language": "en",
+   "confidence": 0.8884615384615385
+  },
+  {
+   "text": "Vaga de desenvolvedor com requisitos e benefícios e responsabilidades para trabalho remoto.",
+   "language": "pt",
+   "confidence": 0.8611111111111112
+  },
+  {
+   "text": "the and with for the and with for",
+   "language": "en",
+   "confidence": 0.8700000000000001
+  },
+  {
+   "text": "de para com uma de para com uma",
+   "language": "pt",
+   "confidence": 0.8700000000000001
+  },
+  {
+   "text": "1234567890 1234567890 1234567890 1234567890 1234567890",
+   "language": "unknown",
+   "confidence": 0.0
+  },
+  {
+   "text": "Python Django AWS Docker Kubernetes PostgreSQL Redis microservices REST GraphQL CI/CD",
+   "language": "unknown",
+   "confidence": 0.0
+  },
+  {
+   "text": "Experiência com a gente e you the",
+   "language": "unknown",
+   "confidence": 0.0
+  },
+  {
+   "text": "á é í ó ú ç ã õ á é í ó ú ç ã õ á é í ó ú ç ã õ á é í ó ú ç ã õ á é í ó ú ç ã õ ",
+   "language": "unknown",
+   "confidence": 0.0
+  }
+ ],
+ "closed": [],
+ "urls": []
+}

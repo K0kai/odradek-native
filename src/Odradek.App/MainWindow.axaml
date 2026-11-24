@@ -1,0 +1,311 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="clr-namespace:Odradek.Core.Data;assembly=Odradek.Core"
+        xmlns:local="clr-namespace:Odradek.App"
+        x:Class="Odradek.App.MainWindow"
+        Title="Odradek"
+        Width="1280" Height="860" MinWidth="900" MinHeight="600"
+        WindowStartupLocation="CenterScreen">
+  <Grid ColumnDefinitions="248,*">
+    <!-- Barra lateral -->
+    <Border x:Name="Sidebar" Grid.Column="0" Background="{DynamicResource SidebarBg}" Padding="14,18,14,14">
+      <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="10" Margin="6,0,0,18">
+          <Border Background="#F4F5F7" CornerRadius="8" Padding="3"><Image Source="avares://Odradek/Assets/odradek-icon.png" Width="26" Height="26" /></Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Odradek" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="coleta · triagem · candidaturas" Classes="muted" FontSize="11" />
+          </StackPanel>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+          <StackPanel Spacing="4">
+            <ListBox x:Name="NavList" Classes="nav">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="local:NavItem">
+                  <StackPanel Orientation="Horizontal" Spacing="12" Background="Transparent" ToolTip.Tip="{Binding Hint}">
+                    <TextBlock Classes="glyph" Text="{Binding Glyph}" Width="20" TextAlignment="Center" />
+                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Text="VAGAS POR STATUS" Classes="muted" FontSize="11" FontWeight="SemiBold" Margin="10,18,0,4" />
+            <ItemsControl x:Name="CountsList" Margin="10,0,6,0">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="local:CountRow">
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,3">
+                    <TextBlock Text="{Binding Label}" Classes="muted" FontSize="13" />
+                    <TextBlock Grid.Column="1" Text="{Binding Count}" FontSize="13" FontWeight="SemiBold" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </ScrollViewer>
+        <Border Grid.Row="2" Classes="card" Padding="12" Margin="0,12,0,0">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Coleta de vagas" Classes="h2" />
+            <TextBlock x:Name="CollectorText" TextWrapping="Wrap" Classes="muted" Text="Coleta parada" />
+            <Button x:Name="CollectorButton" Classes="icon primary" Content="Iniciar coleta" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"  Tag="&#xE768;"/>
+          </StackPanel>
+        </Border>
+        <Grid Grid.Row="3" ColumnDefinitions="Auto,*" Margin="4,10,0,0">
+          <TextBlock Text="Tema" Classes="muted" VerticalAlignment="Center" Margin="0,0,10,0" />
+          <ComboBox x:Name="ThemeBox" Grid.Column="1" HorizontalAlignment="Stretch" />
+        </Grid>
+      </Grid>
+    </Border>
+
+    <!-- Conteúdo -->
+    <Grid x:Name="ContentHost" Grid.Column="1" Background="Transparent" Margin="0" RowDefinitions="Auto,Auto,Auto,*,Auto">
+      <StackPanel Grid.Row="0" Spacing="4" Margin="28,20,28,0">
+        <TextBlock x:Name="StartupText" IsVisible="False" />
+        <Border Classes="notice" Margin="0,0,0,12" IsVisible="{Binding #NoticeText.IsVisible}">
+          <TextBlock x:Name="NoticeText" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="False" />
+        </Border>
+      </StackPanel>
+      <Grid x:Name="HeaderGrid" Grid.Row="1" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Margin="28,0,28,14">
+        <StackPanel VerticalAlignment="Center">
+          <TextBlock x:Name="JobsTitle" Text="Vale a pena olhar" Classes="h1" TextTrimming="CharacterEllipsis" />
+          <TextBlock x:Name="JobsSubtitle" Classes="muted" IsVisible="False" Margin="0,2,0,0" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" x:Name="JobsControls" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <ComboBox x:Name="StatusBox" MinWidth="180" />
+          <ComboBox x:Name="SortBox" MinWidth="150" />
+          <Button x:Name="PrevButton" Classes="page" Content="‹" />
+          <TextBlock x:Name="PageText" VerticalAlignment="Center" MinWidth="48" TextAlignment="Center" Classes="muted" />
+          <Button x:Name="NextButton" Classes="page" Content="›" />
+        </StackPanel>
+      </Grid>
+      <StackPanel Grid.Row="2" x:Name="FilterHost" Spacing="0" Margin="28,0,28,4">
+        <WrapPanel x:Name="FilterBar">
+          <ComboBox x:Name="MinBox" MinWidth="130" Margin="0,0,8,8" />
+          <TextBox x:Name="SearchBox" PlaceholderText="Buscar (só em Não selecionadas)" MinWidth="220" Margin="0,0,8,8" />
+          <TextBox x:Name="DateFromBox" PlaceholderText="De AAAA-MM-DD" MinWidth="140" Margin="0,0,8,8" />
+          <TextBox x:Name="DateToBox" PlaceholderText="Até AAAA-MM-DD" MinWidth="140" Margin="0,0,8,8" />
+          <Button x:Name="ReviewedButton" Content="Marcar esta página como conferida" IsVisible="False" Margin="0,0,8,8"  Classes="icon" Tag="&#xE73E;"/>
+        </WrapPanel>
+        <Expander x:Name="BulkExpander" Header="Ignorar vagas em revisão por critérios" IsVisible="False" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Afeta somente vagas em “Vale a pena olhar”. País procura o texto informado na localização da vaga." TextWrapping="Wrap" Classes="muted" />
+            <WrapPanel>
+              <TextBox x:Name="BulkCountry" PlaceholderText="País (ex.: Brazil)" MinWidth="150" Margin="0,0,8,8" />
+              <TextBox x:Name="BulkFoundFrom" PlaceholderText="Encontrada de" MinWidth="120" Margin="0,0,8,8" />
+              <TextBox x:Name="BulkFoundTo" PlaceholderText="Encontrada até" MinWidth="120" Margin="0,0,8,8" />
+              <TextBox x:Name="BulkPostedFrom" PlaceholderText="Publicada de" MinWidth="120" Margin="0,0,8,8" />
+              <TextBox x:Name="BulkPostedTo" PlaceholderText="Publicada até" MinWidth="120" Margin="0,0,8,8" />
+              <TextBox x:Name="BulkMatchMin" PlaceholderText="Match mín." MinWidth="90" Margin="0,0,8,8" />
+              <TextBox x:Name="BulkMatchMax" PlaceholderText="Match máx." MinWidth="90" Margin="0,0,8,8" />
+            </WrapPanel>
+            <CheckBox x:Name="BulkAll" Content="Ignorar todas as vagas em revisão" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button x:Name="BulkPreviewButton" Content="Ver quantidade"  Classes="icon" Tag="&#xE721;"/>
+              <TextBlock x:Name="BulkPreviewText" VerticalAlignment="Center" />
+              <Button x:Name="BulkApplyButton" Classes="danger" IsVisible="False" />
+            </StackPanel>
+            <TextBlock Text="Datas no formato AAAA-MM-DD." Classes="muted" />
+          </StackPanel>
+        </Expander>
+      </StackPanel>
+
+      <!-- Logs -->
+      <Grid Grid.Row="3" x:Name="LogsPane" Classes="page" IsVisible="False" RowDefinitions="Auto,*" Margin="28,0">
+        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+          <Button x:Name="LogsRefreshButton" Content="Atualizar"  Classes="icon" Tag="&#xE72C;"/>
+          <Button x:Name="LogsClearButton" Classes="icon danger" Content="Limpar logs"  Tag="&#xE74D;"/>
+          <Button x:Name="LogsClearCancel" Content="Cancelar" IsVisible="False" />
+        </StackPanel>
+        <Border Grid.Row="1" Classes="card" Padding="6">
+          <Grid>
+            <ListBox x:Name="LogsList" Classes="log" Background="Transparent">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="d:LogEntry">
+                  <Grid ColumnDefinitions="118,72,110,*">
+                    <TextBlock Text="{Binding CreatedAt, Converter={x:Static local:Palette.LogTime}}" Classes="muted" FontFamily="Cascadia Mono, Consolas" />
+                    <TextBlock Grid.Column="1" Text="{Binding Level}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"
+                               Foreground="{Binding Level, Converter={x:Static local:Palette.LevelForeground}}" />
+                    <TextBlock Grid.Column="2" Text="{Binding Source}" Classes="muted" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                    <TextBlock Grid.Column="3" Text="{Binding Message}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock x:Name="LogsEmpty" Text="Carregando…" Classes="muted" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+          </Grid>
+        </Border>
+      </Grid>
+
+      <!-- Filas de IA: botões em cima, lista à esquerda, detalhe (decisão, histórico, checklist) à direita -->
+      <Grid Grid.Row="3" x:Name="QueuePane" Classes="page" IsVisible="False" RowDefinitions="Auto,*" ColumnDefinitions="*,12,1.3*" Margin="28,0">
+        <StackPanel Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+          <Button x:Name="QueueEvaluateButton" Classes="icon primary" Content="Triar vagas novas"  Tag="&#xE9D9;"/>
+          <Button x:Name="QueueRetryAllButton" Content="Reenfileirar falhas"  Classes="icon" Tag="&#xE72C;"/>
+          <Button x:Name="QueueClearButton" Classes="icon danger" Content="Limpar concluídos"  Tag="&#xE74D;"/>
+          <Button x:Name="QueueClearCancel" Content="Cancelar" IsVisible="False" />
+        </StackPanel>
+        <Grid Grid.Row="1">
+          <ListBox x:Name="QueueList" Classes="cards">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="local:QueueRow">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Subtitle}" Classes="muted" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock x:Name="QueueEmpty" Text="Carregando…" Classes="muted" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+        </Grid>
+        <Border Grid.Row="1" Grid.Column="2" Classes="card">
+          <ScrollViewer>
+            <StackPanel Spacing="10">
+              <TextBlock x:Name="QueueDetailTitle" Classes="h2" FontSize="18" TextWrapping="Wrap" Text="Selecione um item da fila" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="QueueOpenButton" Content="Abrir vaga" IsVisible="False"  Classes="icon" Tag="&#xE8A7;"/>
+                <Button x:Name="QueueCancelButton" Classes="icon danger" Content="Cancelar item" IsVisible="False"  Tag="&#xE711;"/>
+                <Button x:Name="QueueRetryButton" Classes="icon primary" Content="Reenfileirar item" IsVisible="False"  Tag="&#xE72C;"/>
+              </StackPanel>
+              <SelectableTextBlock x:Name="QueueDetailBody" TextWrapping="Wrap" LineHeight="21" />
+            </StackPanel>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+
+      <!-- Currículos e Regras de formulário (montados em código) -->
+      <ScrollViewer Grid.Row="3" x:Name="ResumesPane" Classes="page" IsVisible="False" Margin="28,0"><StackPanel x:Name="ResumesHost" Spacing="12" MaxWidth="900" HorizontalAlignment="Left" /></ScrollViewer>
+      <Grid Grid.Row="3" x:Name="RulesPane" Classes="page" IsVisible="False" RowDefinitions="Auto,*" Margin="28,0">
+        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+          <Button x:Name="RulesAddButton" Content="Adicionar regra"  Classes="icon" Tag="&#xE710;"/>
+          <Button x:Name="RulesSaveButton" Classes="icon primary" Content="Salvar regras"  Tag="&#xE74E;"/>
+          <TextBlock x:Name="RulesState" VerticalAlignment="Center" Classes="muted" />
+        </StackPanel>
+        <ScrollViewer Grid.Row="1"><StackPanel x:Name="RulesHost" Spacing="8" MaxWidth="1000" HorizontalAlignment="Left" /></ScrollViewer>
+      </Grid>
+
+      <!-- Uso e cotas -->
+      <ScrollViewer Grid.Row="3" x:Name="UsagePane" Classes="page" IsVisible="False" Margin="28,0">
+        <StackPanel Spacing="12" MaxWidth="760" HorizontalAlignment="Left">
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Apify — consumo do ciclo" Classes="h2" />
+              <TextBlock x:Name="ApifyText" TextWrapping="Wrap" />
+              <ProgressBar x:Name="ApifyBar" Minimum="0" Maximum="100" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Text="TokenHarbor" Classes="h2" />
+              <TextBlock x:Name="TokenHarborText" TextWrapping="Wrap" />
+              <ProgressBar x:Name="TokenHarborBar" Minimum="0" Maximum="100" IsVisible="False" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Backup na nuvem" Classes="h2" />
+              <TextBlock x:Name="BackupText" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock x:Name="AiTitle" Classes="h2" />
+              <TextBlock x:Name="AiText" TextWrapping="Wrap" LineHeight="22" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- Assistente: pergunta de formulário → resposta pronta para colar (perfil + currículos analisados) -->
+      <Grid Grid.Row="3" x:Name="AssistantPane" Classes="page" IsVisible="False" RowDefinitions="Auto,*,Auto" MaxWidth="760" HorizontalAlignment="Left" Margin="28,0">
+        <TextBlock Text="Cole a pergunta de um formulário. A resposta usa seu perfil e os currículos analisados." TextWrapping="Wrap" Classes="muted" FontSize="13" Margin="0,0,0,10" />
+        <ScrollViewer Grid.Row="1" x:Name="AssistantScroll">
+          <StackPanel x:Name="AssistantHost" Spacing="8">
+            <TextBlock x:Name="AssistantEmpty" Text="A conversa começa quando você enviar uma pergunta." Classes="muted" Margin="0,24,0,0" HorizontalAlignment="Center" />
+          </StackPanel>
+        </ScrollViewer>
+        <StackPanel Grid.Row="2" Spacing="8" Margin="0,8,0,0">
+          <TextBox x:Name="AssistantInput" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="96" MaxHeight="200" MaxLength="4000"
+                   PlaceholderText="Ex.: Quantos anos de experiência você tem com Python?" />
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <Button x:Name="AssistantSendButton" Classes="icon primary" Content="Enviar pergunta"  Tag="&#xE724;"/>
+            <Button x:Name="AssistantClearButton" Content="Nova conversa"  Classes="icon" Tag="&#xE8BB;"/>
+            <TextBlock x:Name="AssistantState" VerticalAlignment="Center" Classes="muted" />
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+
+      <!-- Configurações: 4 abas editáveis com rascunho -->
+      <TabControl Grid.Row="3" x:Name="SettingsTabs" Classes="page" IsVisible="False" Margin="28,0" />
+
+      <!-- Vagas -->
+      <Grid Grid.Row="3" x:Name="JobsPane" Classes="page" ColumnDefinitions="*,12,1.1*" Margin="28,0">
+        <Grid>
+          <ListBox x:Name="JobsList" Classes="cards">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="d:JobRecord">
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Spacing="2">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Classes="muted" TextTrimming="CharacterEllipsis">
+                      <Run Text="{Binding Company}" /><Run Text=" · " /><Run Text="{Binding Location}" />
+                    </TextBlock>
+                  </StackPanel>
+                  <Border Grid.Column="1" Classes="badge" MinWidth="36" Margin="10,0,0,0"
+                          IsVisible="{Binding MatchScore, Converter={x:Static local:Palette.HasScore}}"
+                          Background="{Binding MatchScore, Converter={x:Static local:Palette.ScoreBackground}}">
+                    <TextBlock Text="{Binding MatchScore}" FontWeight="SemiBold" HorizontalAlignment="Center"
+                               Foreground="{Binding MatchScore, Converter={x:Static local:Palette.ScoreForeground}}" />
+                  </Border>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock x:Name="JobsEmpty" Text="Carregando…" Classes="muted" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+        </Grid>
+        <Border Grid.Column="2" Classes="card">
+          <ScrollViewer>
+            <StackPanel Spacing="10">
+              <TextBlock x:Name="DetailTitle" Classes="h2" FontSize="18" TextWrapping="Wrap" Text="Selecione uma vaga" />
+              <Border x:Name="DetailStatus" Classes="badge" HorizontalAlignment="Left" IsVisible="False">
+                <TextBlock x:Name="DetailStatusText" FontSize="12" FontWeight="SemiBold" />
+              </Border>
+              <TextBlock x:Name="DetailMeta" Classes="muted" TextWrapping="Wrap" />
+              <WrapPanel x:Name="JobButtons" IsVisible="False">
+                <Button x:Name="OpenJobButton" Content="Abrir vaga" Margin="0,0,8,8"  Classes="icon" Tag="&#xE8A7;"/>
+                <Button x:Name="AppliedButton" Classes="icon primary" Content="Marcar aplicada" Margin="0,0,8,8"  Tag="&#xE73E;"/>
+                <Button x:Name="SavedButton" Content="Salvar" Margin="0,0,8,8"  Classes="icon" Tag="&#xE734;"/>
+                <Button x:Name="IgnoredButton" Classes="icon danger" Content="Ignorar" Margin="0,0,8,8"  Tag="&#xE711;"/>
+                <Button x:Name="WorthButton" Content="Mover para revisão" Margin="0,0,8,8"  Classes="icon" Tag="&#xE7B3;"/>
+                <Button x:Name="LetterTxtButton" Content="Carta em TXT" Margin="0,0,8,8"  Classes="icon" Tag="&#xE8A5;"/>
+                <Button x:Name="LetterPdfButton" Content="Carta em PDF" Margin="0,0,8,8"  Classes="icon" Tag="&#xEA90;"/>
+              </WrapPanel>
+              <Border Classes="notice" IsVisible="{Binding #EmailPanel.IsVisible}">
+                <StackPanel x:Name="EmailPanel" IsVisible="False" Spacing="6">
+                  <TextBlock Text="Candidatura por e-mail" Classes="h2" />
+                  <TextBlock Text="A IA não envia sozinha. Estes contatos foram detectados no texto da vaga; confira se pertencem à empresa. O e-mail leva a carta e o currículo em PDF." TextWrapping="Wrap" Classes="muted" />
+                  <StackPanel x:Name="EmailList" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="EmailSendButton" Classes="icon primary" Content="Enviar por e-mail…"  Tag="&#xE715;"/>
+                    <Button x:Name="EmailCancelButton" Content="Cancelar" IsVisible="False" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+              <SelectableTextBlock x:Name="DetailBody" TextWrapping="Wrap" LineHeight="21" />
+              <StackPanel Spacing="6" IsVisible="{Binding #JobButtons.IsVisible}">
+                <TextBlock Text="Anotações" Classes="h2" />
+                <TextBox x:Name="NotesBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" />
+                <Button x:Name="NotesSaveButton" Content="Salvar anotação" HorizontalAlignment="Left"  Classes="icon" Tag="&#xE74E;"/>
+              </StackPanel>
+            </StackPanel>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+
+      <!-- Barra de estado: servidor local, banco e pasta de dados -->
+      <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="18" Margin="28,12,28,10">
+        <TextBlock x:Name="ServerText" Classes="muted" />
+        <TextBlock x:Name="DbText" Classes="muted" />
+        <TextBlock x:Name="DataText" Classes="muted" MaxWidth="420" TextTrimming="CharacterEllipsis" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

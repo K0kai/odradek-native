@@ -1,0 +1,177 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Odradek.App.App"
+             RequestedThemeVariant="Default">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="AppBg" Color="#F3F4F7" />
+          <SolidColorBrush x:Key="SidebarBg" Color="#E9EBF0" />
+          <SolidColorBrush x:Key="CardBg" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="CardBorder" Color="#DCDFE6" />
+          <SolidColorBrush x:Key="Muted" Color="#667085" />
+          <SolidColorBrush x:Key="Accent" Color="#2F6FED" />
+          <SolidColorBrush x:Key="AccentHover" Color="#2559C4" />
+          <SolidColorBrush x:Key="AccentSoft" Color="#E3ECFF" />
+          <SolidColorBrush x:Key="HoverBg" Color="#E0E3EA" />
+          <SolidColorBrush x:Key="Danger" Color="#C0392B" />
+          <SolidColorBrush x:Key="Success" Color="#1E8A5A" />
+          <SolidColorBrush x:Key="Warning" Color="#B7791F" />
+          <SolidColorBrush x:Key="SuccessSoft" Color="#DDF3E8" />
+          <SolidColorBrush x:Key="WarningSoft" Color="#FBEFD5" />
+          <SolidColorBrush x:Key="NeutralSoft" Color="#E6E8EE" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="AppBg" Color="#16171B" />
+          <SolidColorBrush x:Key="SidebarBg" Color="#1C1D22" />
+          <SolidColorBrush x:Key="CardBg" Color="#212228" />
+          <SolidColorBrush x:Key="CardBorder" Color="#30323A" />
+          <SolidColorBrush x:Key="Muted" Color="#98A0AE" />
+          <SolidColorBrush x:Key="Accent" Color="#5B93FF" />
+          <SolidColorBrush x:Key="AccentHover" Color="#7AA7FF" />
+          <SolidColorBrush x:Key="AccentSoft" Color="#26344F" />
+          <SolidColorBrush x:Key="HoverBg" Color="#2A2C33" />
+          <SolidColorBrush x:Key="Danger" Color="#F07167" />
+          <SolidColorBrush x:Key="Success" Color="#4CC38A" />
+          <SolidColorBrush x:Key="Warning" Color="#E5B454" />
+          <SolidColorBrush x:Key="SuccessSoft" Color="#1F3A2E" />
+          <SolidColorBrush x:Key="WarningSoft" Color="#3D3320" />
+          <SolidColorBrush x:Key="NeutralSoft" Color="#2D2F37" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme />
+
+    <Style Selector="Window">
+      <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, Inter, sans-serif" />
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="Background" Value="{DynamicResource AppBg}" />
+    </Style>
+
+    <!-- Tipografia -->
+    <Style Selector="TextBlock.h1"><Setter Property="FontSize" Value="24" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+    <Style Selector="TextBlock.h2"><Setter Property="FontSize" Value="15" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+    <Style Selector="TextBlock.muted"><Setter Property="Foreground" Value="{DynamicResource Muted}" /><Setter Property="FontSize" Value="12" /></Style>
+    <Style Selector="SelectableTextBlock.muted"><Setter Property="Foreground" Value="{DynamicResource Muted}" /><Setter Property="FontSize" Value="12" /></Style>
+    <Style Selector="TextBlock.glyph"><Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" /><Setter Property="FontSize" Value="16" /><Setter Property="VerticalAlignment" Value="Center" /></Style>
+
+    <!-- Cartões -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{DynamicResource CardBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="16" />
+    </Style>
+    <Style Selector="Border.notice">
+      <Setter Property="Background" Value="{DynamicResource CardBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="12,8" />
+    </Style>
+    <Style Selector="Border.badge">
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="8,2" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Botões -->
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="12,6" />
+      <Setter Property="Background" Value="{DynamicResource CardBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource HoverBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+    </Style>
+    <Style Selector="Button.primary"><Setter Property="Background" Value="{DynamicResource Accent}" /><Setter Property="Foreground" Value="White" /><Setter Property="BorderBrush" Value="{DynamicResource Accent}" /></Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentHover}" /><Setter Property="Foreground" Value="White" /><Setter Property="BorderBrush" Value="{DynamicResource AccentHover}" />
+    </Style>
+    <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Opacity" Value="0.5" /></Style>
+    <Style Selector="Button.danger"><Setter Property="Foreground" Value="{DynamicResource Danger}" /></Style>
+    <Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Foreground" Value="{DynamicResource Danger}" /></Style>
+    <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Opacity" Value="0.45" /></Style>
+    <!-- Botão com ícone: o texto continua sendo o Content (código e testes seguem lendo "Salvar", "Ignorar"…); o glifo vem de Tag -->
+    <Style Selector="Button.icon">
+      <Setter Property="ContentTemplate">
+        <DataTemplate x:DataType="x:String">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Classes="glyph" FontSize="14" Text="{Binding $parent[Button].Tag}" />
+            <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+          </StackPanel>
+        </DataTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.page"><Setter Property="Padding" Value="10,4" /></Style>
+
+    <!-- Campos -->
+    <Style Selector="TextBox, ComboBox"><Setter Property="CornerRadius" Value="6" /></Style>
+
+    <!-- Menu lateral -->
+    <Style Selector="ListBox.nav"><Setter Property="Background" Value="Transparent" /><Setter Property="Padding" Value="0" /></Style>
+    <Style Selector="ListBox.nav ListBoxItem">
+      <Setter Property="Padding" Value="10,9" />
+      <Setter Property="Margin" Value="0,1" />
+      <Setter Property="CornerRadius" Value="8" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource HoverBg}" /></Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentSoft}" /><Setter Property="Foreground" Value="{DynamicResource Accent}" />
+    </Style>
+
+    <!-- Listas de cartões (vagas, fila, logs) -->
+    <Style Selector="ListBox.cards"><Setter Property="Background" Value="Transparent" /><Setter Property="Padding" Value="0" /></Style>
+    <Style Selector="ListBox.cards ListBoxItem">
+      <Setter Property="Padding" Value="14,10" />
+      <Setter Property="Margin" Value="0,0,8,6" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource CardBg}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource CardBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="ListBox.cards ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Transitions">
+        <Transitions><BrushTransition Property="Background" Duration="0:0:0.12" /><BrushTransition Property="BorderBrush" Duration="0:0:0.12" /></Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Transitions"><Transitions><BrushTransition Property="Background" Duration="0:0:0.12" /></Transitions></Setter>
+    </Style>
+    <Style Selector="ListBox.cards ListBoxItem">
+      <Style.Animations>
+        <Animation Duration="0:0:0.22" FillMode="Both">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0" /><Setter Property="TranslateTransform.Y" Value="6" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1" /><Setter Property="TranslateTransform.Y" Value="0" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="ListBox.cards ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource HoverBg}" /></Style>
+    <Style Selector="ListBox.cards ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentSoft}" /><Setter Property="BorderBrush" Value="{DynamicResource Accent}" />
+    </Style>
+    <Style Selector="ListBox.log ListBoxItem"><Setter Property="Padding" Value="10,3" /><Setter Property="Margin" Value="0" /><Setter Property="CornerRadius" Value="4" /></Style>
+
+    <!-- Troca de tela: a tela nova aparece com um fade curto (a opacidade é zerada e devolvida em MainWindow.Navigate) -->
+    <Style Selector="Control.page">
+      <Setter Property="Transitions">
+        <Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.18" /></Transitions>
+      </Setter>
+    </Style>
+
+    <!-- Abas -->
+    <Style Selector="TabItem"><Setter Property="FontSize" Value="14" /><Setter Property="FontWeight" Value="SemiBold" /><Setter Property="Padding" Value="14,8" /></Style>
+
+    <Style Selector="ProgressBar"><Setter Property="Background" Value="{DynamicResource NeutralSoft}" /><Setter Property="Foreground" Value="{DynamicResource Accent}" /><Setter Property="Height" Value="8" /><Setter Property="MinHeight" Value="8" /><Setter Property="CornerRadius" Value="4" /></Style>
+    <Style Selector="ProgressBar /template/ Border#PART_Indicator"><Setter Property="CornerRadius" Value="4" /></Style>
+    <Style Selector="Expander"><Setter Property="CornerRadius" Value="8" /></Style>
+  </Application.Styles>
+</Application>

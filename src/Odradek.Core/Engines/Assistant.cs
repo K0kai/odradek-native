@@ -1,0 +1,175 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using Dapper;
+using Odradek.Core.Actions;
+using Odradek.Core.Ai;
+using Odradek.Core.Candidate;
+using Odradek.Core.Data;
+
+namespace Odradek.Core.Engines;
+
+/// <summary>Assistente do painel: pergunta de formulário → resposta pronta para colar (<c>candidate/assistant_chat.py</c>, <c>candidate_context.py</c>).</summary>
+public sealed class Assistant(Database db, AiClient ai, Func<string, string>? secret = null)
+{
+    public const int MaxQuestionChars = 4000;
+    public const int MaxHistoryTurns = 8;
+    public const int MaxAnswerChars = 2000;
+    public const int ResumeBudget = 6000;
+
+    public sealed record Turn(string Role, string Content);
+
+    private static readonly (string Key, string Label)[] PanelProfileFields =
+    [
+        ("candidate_name", "name"), ("candidate_email", "email"), ("candidate_phone", "phone"), ("candidate_linkedin", "linkedin"),
+        ("candidate_city", "city"), ("candidate_street", "street"), ("candidate_postal_code", "postal_code"), ("candidate_state", "state"),
+        ("candidate_country", "country"), ("candidate_current_company", "current_company"), ("candidate_cpf", "cpf"),
+        ("salary_expectation_brl", "salary_brl"), ("salary_expectation_usd", "salary_usd"), ("candidate_contract_type", "contract_type"),
+    ];
+
+    private static string Cfg(IReadOnlyDictionary<string, string>? cfg, string key) => cfg is not null && cfg.TryGetValue(key, out var v) ? v.Trim() : "";
+
+    /// <summary>Valores não vazios do perfil do painel para os prompts do assistente.</summary>
+    public static string PanelProfileBlock(IReadOnlyDictionary<string, string>? cfg)
+    {
+        var lines = new List<string>();
+        foreach (var (key, label) in PanelProfileFields)
+        {
+            var value = Cfg(cfg, key);
+            if (value.Length > 0) lines.Add($"{label}: {value}");
+        }
+        if (Cfg(cfg, "salary_expectation_brl").Length > 0 || Cfg(cfg, "salary_expectation_usd").Length > 0)
+            lines.Add("salary_note: panel amounts are MONTHLY mid-level targets; convert FX; "
+                + "match field period; for intern/junior LOWER unrealistic figures "
+                + "(may go below panel); for mid+ stay above Brazil floor and slightly "
+                + "under local market; prefer salary_usd when present");
+        return string.Join('\n', lines);
+    }
+
+    private static string DiversityBlock(IReadOnlyDictionary<string, string> cfg)
+    {
+        var lines = new List<string>();
+        foreach (var (key, label) in new[]
+        {
+            ("candidate_gender", "gender"), ("candidate_race", "race_ethnicity"), ("candidate_pcd", "pcd_disability"),
+            ("candidate_lgbtq", "lgbtq"), ("candidate_diversity_note", "diversity_note"),
+        })
+        {
+            var value = Cfg(cfg, key);
+            if (value.Length > 0) lines.Add($"{label}: {value}");
+        }
+        return string.Join('\n', lines);
+    }
+
+    private static string ResumeDossier((string Summary, string AnalysisJson)? row, string language)
+    {
+        if (row is null) return "";
+        var summary = row.Value.Summary.Trim();
+        var raw = row.Value.AnalysisJson.Trim();
+        if (raw.Length > 0)
+        {
+            try
+            {
+                if (JsonNode.Parse(raw) is JsonObject { Count: > 0 } data)
+                {
+                    var dossier = ResumeAnalysis.ComposeDossier(data, language);
+                    if (dossier.Length > 0) return Text.Take(dossier, ResumeBudget);
+                }
+            }
+            catch (JsonException) { }
+        }
+        return Text.Take(summary, ResumeBudget);
+    }
+
+    /// <summary>Contexto do prompt: perfil do painel + fatos + dossiê dos currículos.</summary>
+    public static string BuildContext(IReadOnlyDictionary<string, string> cfg, Func<string, (string Summary, string AnalysisJson)?> resume)
+    {
+        var parts = new List<string>();
+        var profile = PanelProfileBlock(cfg);
+        if (profile.Length > 0) parts.Add("Panel profile:\n" + profile);
+        var diversity = DiversityBlock(cfg);
+        if (diversity.Length > 0) parts.Add("Diversity preferences:\n" + diversity);
+        var factsPt = Cfg(cfg, "candidate_facts_pt");
+        var factsEn = Cfg(cfg, "candidate_facts_en");
+        if (factsPt.Length > 0) parts.Add("Candidate facts (PT):\n" + Text.Take(factsPt, 3000));
+        if (factsEn.Length > 0) parts.Add("Candidate facts (EN):\n" + Text.Take(factsEn, 3000));
+        foreach (var (lang, title) in new[] { ("pt", "Resume dossier (PT)"), ("en", "Resume dossier (EN)") })
+        {
+            var dossier = ResumeDossier(resume(lang), lang);
+            if (dossier.Length > 0) parts.Add($"{title}:\n{dossier}");
+        }
+        var context = string.Join("\n\n", parts).Trim();
+        return context.Length > 0 ? context : "[no profile or resume data available]";
+    }
+
+    /// <summary>Histórico do chat: aceita lista ou JSON em texto; só turnos user/assistant com conteúdo, os últimos 16.</summary>
+    public static List<Turn> NormalizeHistory(JsonNode? raw)
+    {
+        if (raw is JsonValue value && value.TryGetValue<string>(out var text))
+        {
+            text = text.Trim();
+            if (text.Length == 0) return [];
+            try { raw = JsonNode.Parse(text); }
+            catch (JsonException) { return []; }
+        }
+        if (raw is not JsonArray items) return [];
+        var output = new List<Turn>();
+        foreach (var item in items.Skip(Math.Max(0, items.Count - MaxHistoryTurns * 2)))
+        {
+            if (item is not JsonObject turn) continue;
+            var role = Text.PyStr(turn["role"]).Trim().ToLowerInvariant();
+            var content = Text.PyStr(turn["content"]).Trim();
+            if (role is not ("user" or "assistant") || content.Length == 0) continue;
+            output.Add(new Turn(role, Text.Take(content, MaxQuestionChars)));
+        }
+        return output;
+    }
+
+    public static string BuildPrompt(string question, string context, IReadOnlyList<Turn>? history = null)
+    {
+        var historyBlock = "";
+        if (history is { Count: > 0 })
+            historyBlock = "Prior turns in this chat:\n" + string.Join("\n", history.Select(t => $"{(t.Role == "user" ? "User" : "Assistant")}: {t.Content}")) + "\n\n";
+        return $"""
+You help a job applicant fill application form fields.
+Reply with ONLY the value they should paste into the form (or a short ready-to-paste answer).
+Match the language of the question (Portuguese or English).
+Use ONLY the candidate context below. Never invent employers, projects, metrics, skills, addresses, or identity facts.
+If the context is insufficient, reply with a single short sentence starting with "FALTA:" (or "MISSING:" if the question is in English) naming exactly what is missing — do not invent a guess.
+Do not wrap the answer in quotes unless the form value itself needs quotes.
+Do not add explanations, markdown, or preamble.
+
+{TriageService.ExperiencePriorityRule}
+
+Candidate context:
+{context}
+
+{historyBlock}Form question / label:
+{question}
+
+""";
+    }
+
+    /// <summary>Gera a resposta pronta para colar. Lança <see cref="ActionException"/> (validação) ou <see cref="AiUnavailableException"/>.</summary>
+    public async Task<string> AnswerAsync(string message, JsonNode? history = null, CancellationToken ct = default)
+    {
+        var question = (message ?? "").Trim();
+        if (question.Length == 0) throw new ActionException("Cole a pergunta do formulário.");
+        if (Validate.Length(question) > MaxQuestionChars) throw new ActionException($"Pergunta muito longa (máx. {MaxQuestionChars} caracteres).");
+        var cfg = new SettingsStore(db).All();
+        var provider = (cfg.GetValueOrDefault("ai_provider") is { Length: > 0 } p ? p : "gemini").Trim();
+        var model = (cfg.GetValueOrDefault("ai_model") is { Length: > 0 } m ? m : "gemini-3.5-flash-lite").Trim();
+        var apiKey = (secret ?? (name => SecretStore.Get(name)))(provider);
+        if (apiKey.Length == 0) throw new AiUnavailableException("IA indisponível: chave não configurada.");
+
+        Dictionary<string, (string Summary, string AnalysisJson)> resumes;
+        using (var connection = db.Open())
+            resumes = connection.Query<(string Language, string? Summary, string? Json)>("SELECT language, analysis_summary AS Summary, analysis_json AS Json FROM resumes")
+                .ToDictionary(r => r.Language, r => (r.Summary ?? "", r.Json ?? ""));
+        var context = BuildContext(cfg, lang => resumes.TryGetValue(lang, out var row) ? row : null);
+        var prompt = BuildPrompt(Text.Take(question, MaxQuestionChars), context, NormalizeHistory(history));
+        var answer = (await ai.TextAsync(prompt, new AiCall(provider, model, apiKey), maxOutputTokens: 800, temperature: 0.2, timeoutSeconds: 90, ct: ct) ?? "").Trim();
+        if (answer.Length == 0) throw new ActionException("A IA não retornou resposta.");
+        new EventLogStore(db).Add("info", "assistant", "Resposta gerada no Assistente.");
+        return Text.Take(answer, MaxAnswerChars);
+    }
+}

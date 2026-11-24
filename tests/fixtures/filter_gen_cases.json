@@ -1,0 +1,520 @@
+{
+ "profile_source": "resume_profile_cases.json#merged",
+ "now": "2026-06-01T12:00:00+00:00",
+ "cases": [
+  {
+   "name": "good_main",
+   "slot": "main",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite"
+   },
+   "decision": {
+    "filter": {
+     "name": "Analista de Sistemas",
+     "keywords": [
+      {
+       "phrase": "Systems Analyst",
+       "evidence_ids": [
+        "R1",
+        "R1.1",
+        "zzz"
+       ]
+      },
+      {
+       "phrase": "Analista de Sistemas",
+       "evidence_ids": [
+        "R1.2"
+       ]
+      },
+      {
+       "phrase": "Terceira",
+       "evidence_ids": [
+        "R2"
+       ]
+      }
+     ],
+     "anchor_role_ids": [
+      "R3",
+      "R1",
+      "nope"
+     ],
+     "experience_levels": [
+      3,
+      4,
+      9
+     ],
+     "reason": "porque sim",
+     "sector": "x",
+     "resilience_reason": "y"
+    }
+   },
+   "result": "{\"id\": \"main-242f4fea2c\", \"name\": \"Analista de Sistemas\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Systems Analyst\", \"Analista de Sistemas\"], \"experience_levels\": [3, 4], \"reason\": \"porque sim\", \"source\": \"ai\", \"evidence\": {\"Systems Analyst\": [\"R1\", \"R1.1\"], \"Analista de Sistemas\": [\"R1.2\"]}, \"anchor_roles\": [{\"id\": \"R1\", \"title\": \"Analista de Sistemas\", \"employer\": \"Empresa Alfa\", \"months\": 71}, {\"id\": \"R3\", \"title\": \"Systems Analyst\", \"employer\": \"Alpha Company\", \"months\": 71}], \"career_months\": 71, \"generated_at\": \"2026-06-01T12:00:00+00:00\"}",
+   "logs": [],
+   "call": {
+    "prompt": "You design the ONE main LinkedIn Jobs search filter for this candidate (Apify, curious_coder linkedin-jobs-scraper).\nThe main area is IT and programming: the area where the candidate has the most verified experience, the one that defines their career. Return EXACTLY ONE filter, as sharp as possible: the single job title that best captures what is most career-defining for this candidate, grounded ONLY in the verified profile below.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nKEYWORD RULES (mandatory):\n- `keywords` holds 1 or 2 phrases that all name the SAME role: the title plus at most ONE equivalent variant of that same title (for example its Portuguese/English version or its most common synonym). Never a second, different role and never an intersection of unrelated skills.\n- NO PROGRAMMING LANGUAGE, FRAMEWORK OR TOOL in any phrase (no \"C#\", \"Python\", \"Java\", \"ASP.NET Core\", \"React\", \"SQL\", \"AWS\"...). With AI-assisted development, the specific language matters little for this candidate; what defines the career is logical reasoning, problem solving and knowledge of software architecture (system design, APIs, data modeling, integrations, automation). Search by stack-agnostic role title (\"Software Engineer\", \"Software Developer\", \"Desenvolvedor de Software\", \"Backend Engineer\", \"Full Stack Developer\"...). Phrases that name a language, framework or tool found in the profile are discarded by the program.\n- Choose the role family from what the dated roles show the candidate DOES (building, designing and automating software and integrations), not from the language used. A role whose title is not a developer title but whose responsibilities are software development or automation can anchor the filter; explain it in `reason`.\n- EVERY phrase must list `evidence_ids`, and at least one must be a ROLE id ([R1]) or one of its responsibilities ([R1.2]). Phrases that do not are discarded by the program. Prefer responsibilities that show reasoning, architecture, integrations or automation.\n- `anchor_role_ids`: the role ids that prove this career line.\n- Do NOT invent employers, titles or skills. No fixed seniority-to-code mapping and no universal years cutoff: choose `experience_levels` from the computed months of the anchor roles and explain the level and the evidence in `reason` (Portuguese).\n- Location and work model are NOT yours to choose (the program derives them); do not mention them.\n\nPanel keyword preferences (roles/skills context only): [none]\nCandidate facts PT: [none]\nCandidate facts EN: [none]\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\nTOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\n\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "drops_tech_and_unsupported",
+   "slot": "main",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite"
+   },
+   "decision": {
+    "filter": {
+     "name": "Dev",
+     "keywords": [
+      {
+       "phrase": "C# Developer",
+       "evidence_ids": [
+        "R1"
+       ]
+      },
+      {
+       "phrase": "Sem evidência",
+       "evidence_ids": []
+      },
+      {
+       "phrase": "Skill só",
+       "evidence_ids": [
+        "S1"
+       ]
+      },
+      {
+       "phrase": "Analista",
+       "evidence_ids": [
+        "R1"
+       ]
+      },
+      "texto solto",
+      {
+       "phrase": "",
+       "evidence_ids": [
+        "R1"
+       ]
+      }
+     ],
+     "experience_levels": [
+      2
+     ]
+    }
+   },
+   "result": "{\"id\": \"main-3ffe8ab2a3\", \"name\": \"Dev\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Analista\"], \"experience_levels\": [2], \"reason\": \"\", \"source\": \"ai\", \"evidence\": {\"Analista\": [\"R1\"]}, \"anchor_roles\": [{\"id\": \"R1\", \"title\": \"Analista de Sistemas\", \"employer\": \"Empresa Alfa\", \"months\": 71}], \"career_months\": 71, \"generated_at\": \"2026-06-01T12:00:00+00:00\"}",
+   "logs": [
+    [
+     "info",
+     "apify",
+     "Keyword descartada (cita a tecnologia 'C#'; o filtro é pelo cargo, não pela stack): C# Developer"
+    ],
+    [
+     "info",
+     "apify",
+     "Keyword descartada (sem evidência válida no perfil): Sem evidência"
+    ],
+    [
+     "info",
+     "apify",
+     "Keyword descartada (não cita um cargo do currículo): Skill só"
+    ],
+    [
+     "info",
+     "apify",
+     "Keyword descartada (sem evidência válida no perfil): texto solto"
+    ]
+   ],
+   "call": {
+    "prompt": "You design the ONE main LinkedIn Jobs search filter for this candidate (Apify, curious_coder linkedin-jobs-scraper).\nThe main area is IT and programming: the area where the candidate has the most verified experience, the one that defines their career. Return EXACTLY ONE filter, as sharp as possible: the single job title that best captures what is most career-defining for this candidate, grounded ONLY in the verified profile below.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nKEYWORD RULES (mandatory):\n- `keywords` holds 1 or 2 phrases that all name the SAME role: the title plus at most ONE equivalent variant of that same title (for example its Portuguese/English version or its most common synonym). Never a second, different role and never an intersection of unrelated skills.\n- NO PROGRAMMING LANGUAGE, FRAMEWORK OR TOOL in any phrase (no \"C#\", \"Python\", \"Java\", \"ASP.NET Core\", \"React\", \"SQL\", \"AWS\"...). With AI-assisted development, the specific language matters little for this candidate; what defines the career is logical reasoning, problem solving and knowledge of software architecture (system design, APIs, data modeling, integrations, automation). Search by stack-agnostic role title (\"Software Engineer\", \"Software Developer\", \"Desenvolvedor de Software\", \"Backend Engineer\", \"Full Stack Developer\"...). Phrases that name a language, framework or tool found in the profile are discarded by the program.\n- Choose the role family from what the dated roles show the candidate DOES (building, designing and automating software and integrations), not from the language used. A role whose title is not a developer title but whose responsibilities are software development or automation can anchor the filter; explain it in `reason`.\n- EVERY phrase must list `evidence_ids`, and at least one must be a ROLE id ([R1]) or one of its responsibilities ([R1.2]). Phrases that do not are discarded by the program. Prefer responsibilities that show reasoning, architecture, integrations or automation.\n- `anchor_role_ids`: the role ids that prove this career line.\n- Do NOT invent employers, titles or skills. No fixed seniority-to-code mapping and no universal years cutoff: choose `experience_levels` from the computed months of the anchor roles and explain the level and the evidence in `reason` (Portuguese).\n- Location and work model are NOT yours to choose (the program derives them); do not mention them.\n\nPanel keyword preferences (roles/skills context only): [none]\nCandidate facts PT: [none]\nCandidate facts EN: [none]\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\nTOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\n\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "none_valid_main",
+   "slot": "main",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite"
+   },
+   "decision": {
+    "filter": {
+     "name": "x",
+     "keywords": [
+      {
+       "phrase": "Docker Engineer",
+       "evidence_ids": [
+        "R1"
+       ]
+      }
+     ]
+    }
+   },
+   "result": "{\"id\": \"main-2199f3b756\", \"name\": \"x\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Docker Engineer\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"ai\", \"evidence\": {\"Docker Engineer\": [\"R1\"]}, \"anchor_roles\": [{\"id\": \"R1\", \"title\": \"Analista de Sistemas\", \"employer\": \"Empresa Alfa\", \"months\": 71}], \"career_months\": 71, \"generated_at\": \"2026-06-01T12:00:00+00:00\"}",
+   "logs": [],
+   "call": {
+    "prompt": "You design the ONE main LinkedIn Jobs search filter for this candidate (Apify, curious_coder linkedin-jobs-scraper).\nThe main area is IT and programming: the area where the candidate has the most verified experience, the one that defines their career. Return EXACTLY ONE filter, as sharp as possible: the single job title that best captures what is most career-defining for this candidate, grounded ONLY in the verified profile below.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nKEYWORD RULES (mandatory):\n- `keywords` holds 1 or 2 phrases that all name the SAME role: the title plus at most ONE equivalent variant of that same title (for example its Portuguese/English version or its most common synonym). Never a second, different role and never an intersection of unrelated skills.\n- NO PROGRAMMING LANGUAGE, FRAMEWORK OR TOOL in any phrase (no \"C#\", \"Python\", \"Java\", \"ASP.NET Core\", \"React\", \"SQL\", \"AWS\"...). With AI-assisted development, the specific language matters little for this candidate; what defines the career is logical reasoning, problem solving and knowledge of software architecture (system design, APIs, data modeling, integrations, automation). Search by stack-agnostic role title (\"Software Engineer\", \"Software Developer\", \"Desenvolvedor de Software\", \"Backend Engineer\", \"Full Stack Developer\"...). Phrases that name a language, framework or tool found in the profile are discarded by the program.\n- Choose the role family from what the dated roles show the candidate DOES (building, designing and automating software and integrations), not from the language used. A role whose title is not a developer title but whose responsibilities are software development or automation can anchor the filter; explain it in `reason`.\n- EVERY phrase must list `evidence_ids`, and at least one must be a ROLE id ([R1]) or one of its responsibilities ([R1.2]). Phrases that do not are discarded by the program. Prefer responsibilities that show reasoning, architecture, integrations or automation.\n- `anchor_role_ids`: the role ids that prove this career line.\n- Do NOT invent employers, titles or skills. No fixed seniority-to-code mapping and no universal years cutoff: choose `experience_levels` from the computed months of the anchor roles and explain the level and the evidence in `reason` (Portuguese).\n- Location and work model are NOT yours to choose (the program derives them); do not mention them.\n\nPanel keyword preferences (roles/skills context only): [none]\nCandidate facts PT: [none]\nCandidate facts EN: [none]\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\nTOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\n\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "not_a_dict",
+   "slot": "main",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite"
+   },
+   "decision": {
+    "filter": "lixo"
+   },
+   "error": "ValueError: A IA não retornou uma frase com evidência válida no currículo (o filtro principal precisa citar um cargo seu).",
+   "logs": [],
+   "call": {
+    "prompt": "You design the ONE main LinkedIn Jobs search filter for this candidate (Apify, curious_coder linkedin-jobs-scraper).\nThe main area is IT and programming: the area where the candidate has the most verified experience, the one that defines their career. Return EXACTLY ONE filter, as sharp as possible: the single job title that best captures what is most career-defining for this candidate, grounded ONLY in the verified profile below.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nKEYWORD RULES (mandatory):\n- `keywords` holds 1 or 2 phrases that all name the SAME role: the title plus at most ONE equivalent variant of that same title (for example its Portuguese/English version or its most common synonym). Never a second, different role and never an intersection of unrelated skills.\n- NO PROGRAMMING LANGUAGE, FRAMEWORK OR TOOL in any phrase (no \"C#\", \"Python\", \"Java\", \"ASP.NET Core\", \"React\", \"SQL\", \"AWS\"...). With AI-assisted development, the specific language matters little for this candidate; what defines the career is logical reasoning, problem solving and knowledge of software architecture (system design, APIs, data modeling, integrations, automation). Search by stack-agnostic role title (\"Software Engineer\", \"Software Developer\", \"Desenvolvedor de Software\", \"Backend Engineer\", \"Full Stack Developer\"...). Phrases that name a language, framework or tool found in the profile are discarded by the program.\n- Choose the role family from what the dated roles show the candidate DOES (building, designing and automating software and integrations), not from the language used. A role whose title is not a developer title but whose responsibilities are software development or automation can anchor the filter; explain it in `reason`.\n- EVERY phrase must list `evidence_ids`, and at least one must be a ROLE id ([R1]) or one of its responsibilities ([R1.2]). Phrases that do not are discarded by the program. Prefer responsibilities that show reasoning, architecture, integrations or automation.\n- `anchor_role_ids`: the role ids that prove this career line.\n- Do NOT invent employers, titles or skills. No fixed seniority-to-code mapping and no universal years cutoff: choose `experience_levels` from the computed months of the anchor roles and explain the level and the evidence in `reason` (Portuguese).\n- Location and work model are NOT yours to choose (the program derives them); do not mention them.\n\nPanel keyword preferences (roles/skills context only): [none]\nCandidate facts PT: [none]\nCandidate facts EN: [none]\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\nTOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\n\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "empty_decision",
+   "slot": "main",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite"
+   },
+   "decision": {},
+   "error": "ValueError: A IA não retornou uma frase com evidência válida no currículo (o filtro principal precisa citar um cargo seu).",
+   "logs": [],
+   "call": {
+    "prompt": "You design the ONE main LinkedIn Jobs search filter for this candidate (Apify, curious_coder linkedin-jobs-scraper).\nThe main area is IT and programming: the area where the candidate has the most verified experience, the one that defines their career. Return EXACTLY ONE filter, as sharp as possible: the single job title that best captures what is most career-defining for this candidate, grounded ONLY in the verified profile below.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nKEYWORD RULES (mandatory):\n- `keywords` holds 1 or 2 phrases that all name the SAME role: the title plus at most ONE equivalent variant of that same title (for example its Portuguese/English version or its most common synonym). Never a second, different role and never an intersection of unrelated skills.\n- NO PROGRAMMING LANGUAGE, FRAMEWORK OR TOOL in any phrase (no \"C#\", \"Python\", \"Java\", \"ASP.NET Core\", \"React\", \"SQL\", \"AWS\"...). With AI-assisted development, the specific language matters little for this candidate; what defines the career is logical reasoning, problem solving and knowledge of software architecture (system design, APIs, data modeling, integrations, automation). Search by stack-agnostic role title (\"Software Engineer\", \"Software Developer\", \"Desenvolvedor de Software\", \"Backend Engineer\", \"Full Stack Developer\"...). Phrases that name a language, framework or tool found in the profile are discarded by the program.\n- Choose the role family from what the dated roles show the candidate DOES (building, designing and automating software and integrations), not from the language used. A role whose title is not a developer title but whose responsibilities are software development or automation can anchor the filter; explain it in `reason`.\n- EVERY phrase must list `evidence_ids`, and at least one must be a ROLE id ([R1]) or one of its responsibilities ([R1.2]). Phrases that do not are discarded by the program. Prefer responsibilities that show reasoning, architecture, integrations or automation.\n- `anchor_role_ids`: the role ids that prove this career line.\n- Do NOT invent employers, titles or skills. No fixed seniority-to-code mapping and no universal years cutoff: choose `experience_levels` from the computed months of the anchor roles and explain the level and the evidence in `reason` (Portuguese).\n- Location and work model are NOT yours to choose (the program derives them); do not mention them.\n\nPanel keyword preferences (roles/skills context only): [none]\nCandidate facts PT: [none]\nCandidate facts EN: [none]\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\nTOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\n\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "secondary_with_main",
+   "slot": "secondary",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite",
+    "linkedin_main_filter_json": "{\"id\": \"main-d26aad78bd\", \"name\": \"Principal\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Systems Analyst\"], \"experience_levels\": [3], \"reason\": \"\", \"source\": \"manual\", \"career_months\": 0}",
+    "secondary_area_hint": "  saúde e atendimento  "
+   },
+   "decision": {
+    "filter": {
+     "name": "Suporte",
+     "keywords": [
+      {
+       "phrase": "systems analyst",
+       "evidence_ids": [
+        "R1"
+       ]
+      },
+      {
+       "phrase": "Suporte a Usuários",
+       "evidence_ids": [
+        "T1"
+       ]
+      },
+      {
+       "phrase": "Assistente Administrativo",
+       "evidence_ids": [
+        "R2"
+       ]
+      }
+     ],
+     "anchor_role_ids": [
+      "R2"
+     ],
+     "experience_levels": [
+      1,
+      2
+     ],
+     "reason": "reserva",
+     "sector": "Saúde",
+     "resilience_reason": "demanda estável"
+    }
+   },
+   "result": "{\"id\": \"sec-2cfbc6264f\", \"name\": \"Suporte\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"Suporte a Usuários\", \"Assistente Administrativo\"], \"experience_levels\": [1, 2], \"reason\": \"reserva\", \"source\": \"ai\", \"track\": \"transferable\", \"sector\": \"Saúde\", \"resilience_reason\": \"demanda estável\", \"evidence\": {\"Suporte a Usuários\": [\"T1\"], \"Assistente Administrativo\": [\"R2\"]}, \"anchor_roles\": [{\"id\": \"R2\", \"title\": \"Assistente Administrativo\", \"employer\": \"Comércio Beta\", \"months\": 36}], \"career_months\": 36, \"generated_at\": \"2026-06-01T12:00:00+00:00\"}",
+   "logs": [
+    [
+     "info",
+     "apify",
+     "Keyword descartada (repete o filtro principal): systems analyst"
+    ]
+   ],
+   "call": {
+    "prompt": "You design the ONE secondary (backup) LinkedIn Jobs search filter for this candidate.\nGoal: ONE role, in a sector and function that are historically LESS exposed to economic downturns, where this candidate's VERIFIED capabilities transfer, especially the combination of IT/programming skills with administrative/operational experience.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nHow to choose (use the profile's TRANSFERABLE CAPABILITIES, roles and skills as evidence):\n- Think function x sector. Functions where IT plus an administrative background is a differentiator: IT support/helpdesk, systems/ERP-oriented administrative analyst, process/automation analyst, data/BI assistant, back-office with systems, implementation or support of business software. Sectors that tend to hold up in downturns: healthcare, public sector and outsourced public services, education, utilities/energy, logistics/supply chain, insurance, accounting/tax, back-office of financial services. These lists are only illustrative: choose what THIS profile evidences and justify the choice.\n- The candidate's hint for the backup area (a direction, not an order; ignore it if the profile gives no evidence for it): saúde e atendimento\n- The MAIN filter already covers: Systems Analyst. Choose a DIFFERENT role family; do not repeat its titles.\n- `keywords` holds 1 or 2 phrases that all name the SAME role (the title plus at most one equivalent variant), optionally with a sector qualifier. Never a bare skill, and never a programming language, framework or tool name (phrases that name one found in the profile are discarded).\n- EVERY phrase must list `evidence_ids`, and at least one must be a TRANSFERABLE capability ([T1]) or a role/responsibility ([R1], [R1.2]). Phrases without valid ids are discarded.\n- `anchor_role_ids`: the roles whose experience transfers.\n- Fill `sector` (the target sector) and `resilience_reason` (why this sector/function is comparatively resilient AND which profile evidence transfers). Stay qualitative; no statistics you cannot support.\n- Choose experience codes realistic for moving into a new function (often Entry/Associate), justified by the profile. Explain in `reason` (Portuguese).\n- Location and work model are NOT yours to choose; do not mention them.\n\nPanel keyword preferences (context only): [none]\nCandidate facts PT: [none]\nCandidate facts EN: [none]\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\nTOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\n\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "secondary_none_valid",
+   "slot": "secondary",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite"
+   },
+   "decision": {
+    "filter": {
+     "name": "x",
+     "keywords": [
+      {
+       "phrase": "Qualquer",
+       "evidence_ids": [
+        "S1"
+       ]
+      }
+     ]
+    }
+   },
+   "error": "ValueError: A IA não retornou uma frase com evidência válida no currículo (capacidade transferível ou cargo).",
+   "logs": [
+    [
+     "info",
+     "apify",
+     "Keyword descartada (não cita capacidade transferível nem cargo): Qualquer"
+    ]
+   ],
+   "call": {
+    "prompt": "You design the ONE secondary (backup) LinkedIn Jobs search filter for this candidate.\nGoal: ONE role, in a sector and function that are historically LESS exposed to economic downturns, where this candidate's VERIFIED capabilities transfer, especially the combination of IT/programming skills with administrative/operational experience.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nHow to choose (use the profile's TRANSFERABLE CAPABILITIES, roles and skills as evidence):\n- Think function x sector. Functions where IT plus an administrative background is a differentiator: IT support/helpdesk, systems/ERP-oriented administrative analyst, process/automation analyst, data/BI assistant, back-office with systems, implementation or support of business software. Sectors that tend to hold up in downturns: healthcare, public sector and outsourced public services, education, utilities/energy, logistics/supply chain, insurance, accounting/tax, back-office of financial services. These lists are only illustrative: choose what THIS profile evidences and justify the choice.\n- The candidate's hint for the backup area (a direction, not an order; ignore it if the profile gives no evidence for it): [none: choose from the profile]\n- The MAIN filter already covers: [not generated yet]. Choose a DIFFERENT role family; do not repeat its titles.\n- `keywords` holds 1 or 2 phrases that all name the SAME role (the title plus at most one equivalent variant), optionally with a sector qualifier. Never a bare skill, and never a programming language, framework or tool name (phrases that name one found in the profile are discarded).\n- EVERY phrase must list `evidence_ids`, and at least one must be a TRANSFERABLE capability ([T1]) or a role/responsibility ([R1], [R1.2]). Phrases without valid ids are discarded.\n- `anchor_role_ids`: the roles whose experience transfers.\n- Fill `sector` (the target sector) and `resilience_reason` (why this sector/function is comparatively resilient AND which profile evidence transfers). Stay qualitative; no statistics you cannot support.\n- Choose experience codes realistic for moving into a new function (often Entry/Associate), justified by the profile. Explain in `reason` (Portuguese).\n- Location and work model are NOT yours to choose; do not mention them.\n\nPanel keyword preferences (context only): [none]\nCandidate facts PT: [none]\nCandidate facts EN: [none]\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\nTOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\n\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "custom_prompt_profile_placeholder",
+   "slot": "main",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite",
+    "linkedin_filter_prompt": "Meu prompt {profile}\nPrefs: {pref_keywords} / {facts_pt} / {facts_en} / {area_hint} / {main_filter}",
+    "keywords": "python, c#",
+    "candidate_facts_pt": " fatos pt ",
+    "candidate_facts_en": ""
+   },
+   "decision": {
+    "filter": {
+     "name": "N",
+     "keywords": [
+      {
+       "phrase": "Systems Analyst",
+       "evidence_ids": [
+        "R3"
+       ]
+      }
+     ]
+    }
+   },
+   "result": "{\"id\": \"main-3dd9e41214\", \"name\": \"N\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Systems Analyst\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"ai\", \"evidence\": {\"Systems Analyst\": [\"R3\"]}, \"anchor_roles\": [{\"id\": \"R3\", \"title\": \"Systems Analyst\", \"employer\": \"Alpha Company\", \"months\": 71}], \"career_months\": 71, \"generated_at\": \"2026-06-01T12:00:00+00:00\"}",
+   "logs": [],
+   "call": {
+    "prompt": "Meu prompt TOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\nPrefs: python, c# / fatos pt / [none] / [none: choose from the profile] / [not generated yet]\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "custom_prompt_legacy_resume",
+   "slot": "main",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite",
+    "linkedin_filter_prompt": "Legado {resume_pt} | {resume_en}"
+   },
+   "decision": {
+    "filter": {
+     "name": "N",
+     "keywords": [
+      {
+       "phrase": "Systems Analyst",
+       "evidence_ids": [
+        "R3"
+       ]
+      }
+     ]
+    }
+   },
+   "result": "{\"id\": \"main-3dd9e41214\", \"name\": \"N\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Systems Analyst\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"ai\", \"evidence\": {\"Systems Analyst\": [\"R3\"]}, \"anchor_roles\": [{\"id\": \"R3\", \"title\": \"Systems Analyst\", \"employer\": \"Alpha Company\", \"months\": 71}], \"career_months\": 71, \"generated_at\": \"2026-06-01T12:00:00+00:00\"}",
+   "logs": [],
+   "call": {
+    "prompt": "Legado TOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas | (PT and EN resumes are merged in the PT block above)\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "custom_prompt_without_placeholders",
+   "slot": "main",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite",
+    "linkedin_filter_prompt": "Sem marcadores {nada}"
+   },
+   "decision": {
+    "filter": {
+     "name": "N",
+     "keywords": [
+      {
+       "phrase": "Systems Analyst",
+       "evidence_ids": [
+        "R3"
+       ]
+      }
+     ]
+    }
+   },
+   "result": "{\"id\": \"main-3dd9e41214\", \"name\": \"N\", \"slot\": \"main\", \"enabled\": true, \"keywords\": [\"Systems Analyst\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"ai\", \"evidence\": {\"Systems Analyst\": [\"R3\"]}, \"anchor_roles\": [{\"id\": \"R3\", \"title\": \"Systems Analyst\", \"employer\": \"Alpha Company\", \"months\": 71}], \"career_months\": 71, \"generated_at\": \"2026-06-01T12:00:00+00:00\"}",
+   "logs": [],
+   "call": {
+    "prompt": "Sem marcadores {nada}\n\nVERIFIED CANDIDATE PROFILE (evidence ids in brackets):\nTOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\n\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  },
+  {
+   "name": "custom_secondary_prompt",
+   "slot": "secondary",
+   "cfg": {
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite",
+    "transferable_prompt": "Secundário {main_filter} {area_hint}",
+    "secondary_area_hint": "área"
+   },
+   "decision": {
+    "filter": {
+     "name": "S",
+     "keywords": [
+      {
+       "phrase": "Operations",
+       "evidence_ids": [
+        "R4"
+       ]
+      }
+     ],
+     "sector": "S"
+    }
+   },
+   "result": "{\"id\": \"sec-c0f33f3744\", \"name\": \"S\", \"slot\": \"secondary\", \"enabled\": true, \"keywords\": [\"Operations\"], \"experience_levels\": [], \"reason\": \"\", \"source\": \"ai\", \"track\": \"transferable\", \"sector\": \"S\", \"evidence\": {\"Operations\": [\"R4\"]}, \"anchor_roles\": [{\"id\": \"R4\", \"title\": \"Operations Intern\", \"employer\": \"Delta Corp\", \"months\": 21}], \"career_months\": 21, \"generated_at\": \"2026-06-01T12:00:00+00:00\"}",
+   "logs": [],
+   "call": {
+    "prompt": "Secundário [not generated yet] área\n\nVERIFIED CANDIDATE PROFILE (evidence ids in brackets):\nTOTAL PROFESSIONAL EXPERIENCE (computed from dated roles): 10y6m\nSELF-DESCRIBED LEVEL: pleno\nLANGUAGES: [L1] Inglês avançado; [L2] English advanced\nLOCATION: Belo Horizonte, MG\nROLES\n[R1] Analista de Sistemas — Empresa Alfa (2021-01 → present, 5y11m)\n  [R1.1] APIs REST em C# e .NET\n  [R1.2] Suporte a usuários\n[R2] Assistente Administrativo — Comércio Beta (2018-01 → 2020-12, 3y)\n  [R2.1] Atendimento\n[R3] Systems Analyst — Alpha Company (2021-01 → present, 5y11m)\n  [R3.1] REST APIs in C# and .NET\n[R4] Operations Intern — Delta Corp (2016-06 → 2018-02, 1y9m)\n  [R4.1] Weekly reports\nSKILLS (id name: months used, last used)\n[S1] C#: 5y11m, last 2026-11; portfolio projects 7m (P1), last 2025-09\n[S3] PostgreSQL: 5y11m, last 2026-11\n[S6] Kubernetes: 5y11m, last 2026-11\n[S7] Avalonia: no dated professional usage; portfolio projects 7m (P1), last 2025-09\nLISTED SKILLS, NO DATED USAGE: [S2] Node.js, [S4] Docker, [S5] SQL\nTRANSFERABLE CAPABILITIES\n[T1] Suporte a usuários\nEDUCATION\n[E1] Bacharelado em Sistemas de Informação\nPROJECTS\n[P1] Painel de vagas (2025-03 → 2025-09; C#, Avalonia) — Triagem de vagas\n\n\nOUTPUT: JSON {\"filter\": {...}} with EXACTLY ONE filter: name (short, Portuguese), keywords (1-2 objects {\"phrase\", \"evidence_ids\"} naming the SAME role), anchor_role_ids, experience_levels, reason (Portuguese), sector and resilience_reason (empty strings for the main filter).",
+    "max_output_tokens": 3000,
+    "thinking_budget": 1024,
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "api_key": "KEY-gemini"
+   }
+  }
+ ],
+ "effective": [
+  {
+   "cfg": {},
+   "main": "You design the ONE main LinkedIn Jobs search filter for this candidate (Apify, curious_coder linkedin-jobs-scraper).\nThe main area is IT and programming: the area where the candidate has the most verified experience, the one that defines their career. Return EXACTLY ONE filter, as sharp as possible: the single job title that best captures what is most career-defining for this candidate, grounded ONLY in the verified profile below.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nKEYWORD RULES (mandatory):\n- `keywords` holds 1 or 2 phrases that all name the SAME role: the title plus at most ONE equivalent variant of that same title (for example its Portuguese/English version or its most common synonym). Never a second, different role and never an intersection of unrelated skills.\n- NO PROGRAMMING LANGUAGE, FRAMEWORK OR TOOL in any phrase (no \"C#\", \"Python\", \"Java\", \"ASP.NET Core\", \"React\", \"SQL\", \"AWS\"...). With AI-assisted development, the specific language matters little for this candidate; what defines the career is logical reasoning, problem solving and knowledge of software architecture (system design, APIs, data modeling, integrations, automation). Search by stack-agnostic role title (\"Software Engineer\", \"Software Developer\", \"Desenvolvedor de Software\", \"Backend Engineer\", \"Full Stack Developer\"...). Phrases that name a language, framework or tool found in the profile are discarded by the program.\n- Choose the role family from what the dated roles show the candidate DOES (building, designing and automating software and integrations), not from the language used. A role whose title is not a developer title but whose responsibilities are software development or automation can anchor the filter; explain it in `reason`.\n- EVERY phrase must list `evidence_ids`, and at least one must be a ROLE id ([R1]) or one of its responsibilities ([R1.2]). Phrases that do not are discarded by the program. Prefer responsibilities that show reasoning, architecture, integrations or automation.\n- `anchor_role_ids`: the role ids that prove this career line.\n- Do NOT invent employers, titles or skills. No fixed seniority-to-code mapping and no universal years cutoff: choose `experience_levels` from the computed months of the anchor roles and explain the level and the evidence in `reason` (Portuguese).\n- Location and work model are NOT yours to choose (the program derives them); do not mention them.\n\nPanel keyword preferences (roles/skills context only): {pref_keywords}\nCandidate facts PT: {facts_pt}\nCandidate facts EN: {facts_en}\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\n{profile}\n",
+   "secondary": "You design the ONE secondary (backup) LinkedIn Jobs search filter for this candidate.\nGoal: ONE role, in a sector and function that are historically LESS exposed to economic downturns, where this candidate's VERIFIED capabilities transfer, especially the combination of IT/programming skills with administrative/operational experience.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nHow to choose (use the profile's TRANSFERABLE CAPABILITIES, roles and skills as evidence):\n- Think function x sector. Functions where IT plus an administrative background is a differentiator: IT support/helpdesk, systems/ERP-oriented administrative analyst, process/automation analyst, data/BI assistant, back-office with systems, implementation or support of business software. Sectors that tend to hold up in downturns: healthcare, public sector and outsourced public services, education, utilities/energy, logistics/supply chain, insurance, accounting/tax, back-office of financial services. These lists are only illustrative: choose what THIS profile evidences and justify the choice.\n- The candidate's hint for the backup area (a direction, not an order; ignore it if the profile gives no evidence for it): {area_hint}\n- The MAIN filter already covers: {main_filter}. Choose a DIFFERENT role family; do not repeat its titles.\n- `keywords` holds 1 or 2 phrases that all name the SAME role (the title plus at most one equivalent variant), optionally with a sector qualifier. Never a bare skill, and never a programming language, framework or tool name (phrases that name one found in the profile are discarded).\n- EVERY phrase must list `evidence_ids`, and at least one must be a TRANSFERABLE capability ([T1]) or a role/responsibility ([R1], [R1.2]). Phrases without valid ids are discarded.\n- `anchor_role_ids`: the roles whose experience transfers.\n- Fill `sector` (the target sector) and `resilience_reason` (why this sector/function is comparatively resilient AND which profile evidence transfers). Stay qualitative; no statistics you cannot support.\n- Choose experience codes realistic for moving into a new function (often Entry/Associate), justified by the profile. Explain in `reason` (Portuguese).\n- Location and work model are NOT yours to choose; do not mention them.\n\nPanel keyword preferences (context only): {pref_keywords}\nCandidate facts PT: {facts_pt}\nCandidate facts EN: {facts_en}\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\n{profile}\n"
+  },
+  {
+   "cfg": {
+    "linkedin_filter_prompt": "  custom  ",
+    "transferable_prompt": ""
+   },
+   "main": "custom",
+   "secondary": "You design the ONE secondary (backup) LinkedIn Jobs search filter for this candidate.\nGoal: ONE role, in a sector and function that are historically LESS exposed to economic downturns, where this candidate's VERIFIED capabilities transfer, especially the combination of IT/programming skills with administrative/operational experience.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nHow to choose (use the profile's TRANSFERABLE CAPABILITIES, roles and skills as evidence):\n- Think function x sector. Functions where IT plus an administrative background is a differentiator: IT support/helpdesk, systems/ERP-oriented administrative analyst, process/automation analyst, data/BI assistant, back-office with systems, implementation or support of business software. Sectors that tend to hold up in downturns: healthcare, public sector and outsourced public services, education, utilities/energy, logistics/supply chain, insurance, accounting/tax, back-office of financial services. These lists are only illustrative: choose what THIS profile evidences and justify the choice.\n- The candidate's hint for the backup area (a direction, not an order; ignore it if the profile gives no evidence for it): {area_hint}\n- The MAIN filter already covers: {main_filter}. Choose a DIFFERENT role family; do not repeat its titles.\n- `keywords` holds 1 or 2 phrases that all name the SAME role (the title plus at most one equivalent variant), optionally with a sector qualifier. Never a bare skill, and never a programming language, framework or tool name (phrases that name one found in the profile are discarded).\n- EVERY phrase must list `evidence_ids`, and at least one must be a TRANSFERABLE capability ([T1]) or a role/responsibility ([R1], [R1.2]). Phrases without valid ids are discarded.\n- `anchor_role_ids`: the roles whose experience transfers.\n- Fill `sector` (the target sector) and `resilience_reason` (why this sector/function is comparatively resilient AND which profile evidence transfers). Stay qualitative; no statistics you cannot support.\n- Choose experience codes realistic for moving into a new function (often Entry/Associate), justified by the profile. Explain in `reason` (Portuguese).\n- Location and work model are NOT yours to choose; do not mention them.\n\nPanel keyword preferences (context only): {pref_keywords}\nCandidate facts PT: {facts_pt}\nCandidate facts EN: {facts_en}\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\n{profile}\n"
+  },
+  {
+   "cfg": {
+    "linkedin_filter_prompt": "   "
+   },
+   "main": "You design the ONE main LinkedIn Jobs search filter for this candidate (Apify, curious_coder linkedin-jobs-scraper).\nThe main area is IT and programming: the area where the candidate has the most verified experience, the one that defines their career. Return EXACTLY ONE filter, as sharp as possible: the single job title that best captures what is most career-defining for this candidate, grounded ONLY in the verified profile below.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nKEYWORD RULES (mandatory):\n- `keywords` holds 1 or 2 phrases that all name the SAME role: the title plus at most ONE equivalent variant of that same title (for example its Portuguese/English version or its most common synonym). Never a second, different role and never an intersection of unrelated skills.\n- NO PROGRAMMING LANGUAGE, FRAMEWORK OR TOOL in any phrase (no \"C#\", \"Python\", \"Java\", \"ASP.NET Core\", \"React\", \"SQL\", \"AWS\"...). With AI-assisted development, the specific language matters little for this candidate; what defines the career is logical reasoning, problem solving and knowledge of software architecture (system design, APIs, data modeling, integrations, automation). Search by stack-agnostic role title (\"Software Engineer\", \"Software Developer\", \"Desenvolvedor de Software\", \"Backend Engineer\", \"Full Stack Developer\"...). Phrases that name a language, framework or tool found in the profile are discarded by the program.\n- Choose the role family from what the dated roles show the candidate DOES (building, designing and automating software and integrations), not from the language used. A role whose title is not a developer title but whose responsibilities are software development or automation can anchor the filter; explain it in `reason`.\n- EVERY phrase must list `evidence_ids`, and at least one must be a ROLE id ([R1]) or one of its responsibilities ([R1.2]). Phrases that do not are discarded by the program. Prefer responsibilities that show reasoning, architecture, integrations or automation.\n- `anchor_role_ids`: the role ids that prove this career line.\n- Do NOT invent employers, titles or skills. No fixed seniority-to-code mapping and no universal years cutoff: choose `experience_levels` from the computed months of the anchor roles and explain the level and the evidence in `reason` (Portuguese).\n- Location and work model are NOT yours to choose (the program derives them); do not mention them.\n\nPanel keyword preferences (roles/skills context only): {pref_keywords}\nCandidate facts PT: {facts_pt}\nCandidate facts EN: {facts_en}\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\n{profile}\n",
+   "secondary": "You design the ONE secondary (backup) LinkedIn Jobs search filter for this candidate.\nGoal: ONE role, in a sector and function that are historically LESS exposed to economic downturns, where this candidate's VERIFIED capabilities transfer, especially the combination of IT/programming skills with administrative/operational experience.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nHow to choose (use the profile's TRANSFERABLE CAPABILITIES, roles and skills as evidence):\n- Think function x sector. Functions where IT plus an administrative background is a differentiator: IT support/helpdesk, systems/ERP-oriented administrative analyst, process/automation analyst, data/BI assistant, back-office with systems, implementation or support of business software. Sectors that tend to hold up in downturns: healthcare, public sector and outsourced public services, education, utilities/energy, logistics/supply chain, insurance, accounting/tax, back-office of financial services. These lists are only illustrative: choose what THIS profile evidences and justify the choice.\n- The candidate's hint for the backup area (a direction, not an order; ignore it if the profile gives no evidence for it): {area_hint}\n- The MAIN filter already covers: {main_filter}. Choose a DIFFERENT role family; do not repeat its titles.\n- `keywords` holds 1 or 2 phrases that all name the SAME role (the title plus at most one equivalent variant), optionally with a sector qualifier. Never a bare skill, and never a programming language, framework or tool name (phrases that name one found in the profile are discarded).\n- EVERY phrase must list `evidence_ids`, and at least one must be a TRANSFERABLE capability ([T1]) or a role/responsibility ([R1], [R1.2]). Phrases without valid ids are discarded.\n- `anchor_role_ids`: the roles whose experience transfers.\n- Fill `sector` (the target sector) and `resilience_reason` (why this sector/function is comparatively resilient AND which profile evidence transfers). Stay qualitative; no statistics you cannot support.\n- Choose experience codes realistic for moving into a new function (often Entry/Associate), justified by the profile. Explain in `reason` (Portuguese).\n- Location and work model are NOT yours to choose; do not mention them.\n\nPanel keyword preferences (context only): {pref_keywords}\nCandidate facts PT: {facts_pt}\nCandidate facts EN: {facts_en}\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\n{profile}\n"
+  }
+ ],
+ "render": [
+  {
+   "args": {
+    "template": "",
+    "pref_keywords": "",
+    "facts_pt": "",
+    "facts_en": ""
+   },
+   "result": "You design the ONE main LinkedIn Jobs search filter for this candidate (Apify, curious_coder linkedin-jobs-scraper).\nThe main area is IT and programming: the area where the candidate has the most verified experience, the one that defines their career. Return EXACTLY ONE filter, as sharp as possible: the single job title that best captures what is most career-defining for this candidate, grounded ONLY in the verified profile below.\n\nLinkedIn experience codes (f_E): 1 Internship, 2 Entry, 3 Associate, 4 Mid-Senior, 5 Director, 6 Executive.\n\nKEYWORD RULES (mandatory):\n- `keywords` holds 1 or 2 phrases that all name the SAME role: the title plus at most ONE equivalent variant of that same title (for example its Portuguese/English version or its most common synonym). Never a second, different role and never an intersection of unrelated skills.\n- NO PROGRAMMING LANGUAGE, FRAMEWORK OR TOOL in any phrase (no \"C#\", \"Python\", \"Java\", \"ASP.NET Core\", \"React\", \"SQL\", \"AWS\"...). With AI-assisted development, the specific language matters little for this candidate; what defines the career is logical reasoning, problem solving and knowledge of software architecture (system design, APIs, data modeling, integrations, automation). Search by stack-agnostic role title (\"Software Engineer\", \"Software Developer\", \"Desenvolvedor de Software\", \"Backend Engineer\", \"Full Stack Developer\"...). Phrases that name a language, framework or tool found in the profile are discarded by the program.\n- Choose the role family from what the dated roles show the candidate DOES (building, designing and automating software and integrations), not from the language used. A role whose title is not a developer title but whose responsibilities are software development or automation can anchor the filter; explain it in `reason`.\n- EVERY phrase must list `evidence_ids`, and at least one must be a ROLE id ([R1]) or one of its responsibilities ([R1.2]). Phrases that do not are discarded by the program. Prefer responsibilities that show reasoning, architecture, integrations or automation.\n- `anchor_role_ids`: the role ids that prove this career line.\n- Do NOT invent employers, titles or skills. No fixed seniority-to-code mapping and no universal years cutoff: choose `experience_levels` from the computed months of the anchor roles and explain the level and the evidence in `reason` (Portuguese).\n- Location and work model are NOT yours to choose (the program derives them); do not mention them.\n\nPanel keyword preferences (roles/skills context only): [none]\nCandidate facts PT: [none]\nCandidate facts EN: [none]\n\nVERIFIED CANDIDATE PROFILE (PT and EN resumes merged; evidence ids in brackets):\n[none]\n"
+  },
+  {
+   "args": {
+    "template": "{pref_keywords}|{facts_pt}|{facts_en}|{resume_pt}|{resume_en}|{profile}|{area_hint}|{main_filter}",
+    "pref_keywords": "a",
+    "facts_pt": "b",
+    "facts_en": "c",
+    "profile": "P",
+    "area_hint": "d",
+    "main_filter": "e"
+   },
+   "result": "a|b|c|P|(PT and EN resumes are merged in the PT block above)|P|d|e"
+  },
+  {
+   "args": {
+    "template": "sem placeholders {x}",
+    "pref_keywords": "a",
+    "facts_pt": "",
+    "facts_en": "",
+    "profile": "PERFIL"
+   },
+   "result": "sem placeholders {x}\n\nVERIFIED CANDIDATE PROFILE (evidence ids in brackets):\nPERFIL\n"
+  },
+  {
+   "args": {
+    "template": "{resume_pt}",
+    "pref_keywords": "",
+    "facts_pt": "",
+    "facts_en": "",
+    "resume_pt": "RPT",
+    "resume_en": "REN"
+   },
+   "result": "RPT"
+  },
+  {
+   "args": {
+    "template": "{resume_en}",
+    "pref_keywords": "",
+    "facts_pt": "",
+    "facts_en": "",
+    "resume_pt": "RPT"
+   },
+   "result": "(PT and EN resumes are merged in the PT block above)"
+  }
+ ]
+}

@@ -1,0 +1,1421 @@
+{
+ "schema": {
+  "type": "object",
+  "properties": {
+   "headline": {
+    "type": "string"
+   },
+   "professional_profile": {
+    "type": "string"
+   },
+   "seniority": {
+    "type": "string"
+   },
+   "roles": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "title": {
+       "type": "string"
+      },
+      "employer": {
+       "type": "string"
+      },
+      "start": {
+       "type": "string"
+      },
+      "end": {
+       "type": "string"
+      },
+      "quote": {
+       "type": "string"
+      },
+      "responsibilities": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "text": {
+          "type": "string"
+         },
+         "quote": {
+          "type": "string"
+         }
+        }
+       }
+      },
+      "skills_used": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "skills": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "canonical": {
+       "type": "string"
+      },
+      "category": {
+       "type": "string",
+       "enum": [
+        "language",
+        "framework",
+        "tool",
+        "cloud",
+        "db",
+        "domain",
+        "soft",
+        "other"
+       ]
+      },
+      "quotes": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "transferable_skills": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "capability": {
+       "type": "string"
+      },
+      "from_roles": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "quotes": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "education": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "quote": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "certifications": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "quote": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "projects": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "quote": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "achievements": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "text": {
+       "type": "string"
+      },
+      "quote": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "language": {
+       "type": "string"
+      },
+      "level": {
+       "type": "string"
+      },
+      "quote": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "location_notes": {
+    "type": "string"
+   },
+   "work_authorization_notes": {
+    "type": "string"
+   }
+  }
+ },
+ "prompts": [
+  {
+   "text": "Ana Exemplo\nDesenvolvedora de software\nBelo Horizonte, MG\n\nResumo\nProfissional com experiência em automação de processos e desenvolvimento de APIs.\n\nExperiência Profissional\nAnalista de Sistemas — Empresa Alfa (01/2021 – atual)\n- Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos.\n- Suporte a usuários internos e controle de documentos em planilhas.\n- Automação de rotinas financeiras com Python e PostgreSQL.\nAssistente Administrativo — Comércio Beta (03/2018 – 12/2020)\n- Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas.\n- Relatórios em planilhas para a diretoria.\n\nFormação Acadêmica\nBacharelado em Sistemas de Informação — Universidade Gama (2017 – 2021)\n\nHabilidades\nC#, .NET, Python, PostgreSQL, Node.js, Git, Docker\n\nIdiomas\nInglês avançado; Português nativo\n\nProjetos\nPainel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.\n",
+   "language_name": "Portuguese",
+   "prompt": "You extract a structured, EVIDENCE-BACKED profile from a resume written primarily in Portuguese.\n\nHARD RULES\n- Every fact must carry a `quote`: a SHORT contiguous fragment (max ~200 characters) copied VERBATIM from the resume text below. Do not paraphrase inside quotes. Facts without a verbatim quote will be discarded by the program.\n- Never invent employers, dates, skills, tools, metrics or claims. If unsure, omit the item.\n- Include EVERY role (newest first), including non-IT roles such as administrative assistant. Do not drop any.\n- roles[].start / roles[].end use \"YYYY-MM\" (or \"YYYY\" if only the year is known, written as \"YYYY-01\" for start and \"YYYY-12\" for end). Use \"present\" as end for an ongoing role. Use \"\" when the resume gives no date. Never guess dates.\n- roles[].quote = the line(s) naming the title/employer/period. roles[].skills_used = canonical skill names used in that role, only if the resume ties them to it.\n- skills[]: every technology, language, framework, tool, platform, database, methodology or domain explicitly named. `canonical` = lowercase, no version, no punctuation variants (e.g. \"node.js\" -> \"nodejs\", \"Postgres\" -> \"postgresql\"). `quotes` = where it appears.\n- transferable_skills[]: abstract capabilities the candidate DEMONSTRATED in any role, including non-technical ones (e.g. user support, document/process control, spreadsheets and reporting, routine automation, communication with clients/suppliers, scheduling, financial/administrative routines). `from_roles` = titles of the roles where shown. Each needs a verbatim quote.\n- languages[]: spoken/written languages with the stated level only if present.\n- headline: one positioning sentence in Portuguese. professional_profile: 2-4 dense paragraphs in Portuguese covering the FULL career arc (all roles).\n- seniority: a short free-text label of the candidate's realistic level, based on actual dated experience.\n- Do NOT compute years of experience; the program does it from dates.\n\nResume text:\nAna Exemplo\nDesenvolvedora de software\nBelo Horizonte, MG\n\nResumo\nProfissional com experiência em automação de processos e desenvolvimento de APIs.\n\nExperiência Profissional\nAnalista de Sistemas — Empresa Alfa (01/2021 – atual)\n- Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos.\n- Suporte a usuários internos e controle de documentos em planilhas.\n- Automação de rotinas financeiras com Python e PostgreSQL.\nAssistente Administrativo — Comércio Beta (03/2018 – 12/2020)\n- Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas.\n- Relatórios em planilhas para a diretoria.\n\nFormação Acadêmica\nBacharelado em Sistemas de Informação — Universidade Gama (2017 – 2021)\n\nHabilidades\nC#, .NET, Python, PostgreSQL, Node.js, Git, Docker\n\nIdiomas\nInglês avançado; Português nativo\n\nProjetos\nPainel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.\n\n"
+  },
+  {
+   "text": "Ana Example\nSoftware developer\n\nExperience\nSystems Analyst — Alpha Company (01/2021 – present)\n- Built REST APIs in C# and .NET to integrate internal systems.\n- Automated financial routines with Python and PostgreSQL.\nOperations Intern — Delta Corp (06/2016 – 02/2018)\n- Prepared weekly reports and supported the logistics team.\n\nSkills\nC#, Python, SQL, Kubernetes\n\nLanguages\nEnglish advanced\n",
+   "language_name": "English",
+   "prompt": "You extract a structured, EVIDENCE-BACKED profile from a resume written primarily in English.\n\nHARD RULES\n- Every fact must carry a `quote`: a SHORT contiguous fragment (max ~200 characters) copied VERBATIM from the resume text below. Do not paraphrase inside quotes. Facts without a verbatim quote will be discarded by the program.\n- Never invent employers, dates, skills, tools, metrics or claims. If unsure, omit the item.\n- Include EVERY role (newest first), including non-IT roles such as administrative assistant. Do not drop any.\n- roles[].start / roles[].end use \"YYYY-MM\" (or \"YYYY\" if only the year is known, written as \"YYYY-01\" for start and \"YYYY-12\" for end). Use \"present\" as end for an ongoing role. Use \"\" when the resume gives no date. Never guess dates.\n- roles[].quote = the line(s) naming the title/employer/period. roles[].skills_used = canonical skill names used in that role, only if the resume ties them to it.\n- skills[]: every technology, language, framework, tool, platform, database, methodology or domain explicitly named. `canonical` = lowercase, no version, no punctuation variants (e.g. \"node.js\" -> \"nodejs\", \"Postgres\" -> \"postgresql\"). `quotes` = where it appears.\n- transferable_skills[]: abstract capabilities the candidate DEMONSTRATED in any role, including non-technical ones (e.g. user support, document/process control, spreadsheets and reporting, routine automation, communication with clients/suppliers, scheduling, financial/administrative routines). `from_roles` = titles of the roles where shown. Each needs a verbatim quote.\n- languages[]: spoken/written languages with the stated level only if present.\n- headline: one positioning sentence in English. professional_profile: 2-4 dense paragraphs in English covering the FULL career arc (all roles).\n- seniority: a short free-text label of the candidate's realistic level, based on actual dated experience.\n- Do NOT compute years of experience; the program does it from dates.\n\nResume text:\nAna Example\nSoftware developer\n\nExperience\nSystems Analyst — Alpha Company (01/2021 – present)\n- Built REST APIs in C# and .NET to integrate internal systems.\n- Automated financial routines with Python and PostgreSQL.\nOperations Intern — Delta Corp (06/2016 – 02/2018)\n- Prepared weekly reports and supported the logistics team.\n\nSkills\nC#, Python, SQL, Kubernetes\n\nLanguages\nEnglish advanced\n\n"
+  },
+  {
+   "text": "Ana Exemplo\nDesenvolvedora de software\nBelo Horizonte, MG\n\nResumo\nProfissional com experiência em automação de processos e desenvolvimento de APIs.\n\nExperiência Profissional\nAnalista de Sistemas — Empresa Alfa (01/2021 – atual)\n- Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos.\n- Suporte a usuários internos e controle de documentos em planilhas.\n- Automação de rotinas financeiras com Python e PostgreSQL.\nAssistente Administrativo — Comércio Beta (03/2018 – 12/2020)\n- Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas.\n- Relatórios em planilhas para a diretoria.\n\nFormação Acadêmica\nBacharelado em Sistemas de Informação — Universidade Gama (2017 – 2021)\n\nHabilidades\nC#, .NET, Python, PostgreSQL, Node.js, Git, Docker\n\nIdiomas\nInglês avançado; Português nativo\n\nProjetos\nPainel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.\n\nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte ",
+   "language_name": "Portuguese",
+   "prompt": "You extract a structured, EVIDENCE-BACKED profile from a resume written primarily in Portuguese.\n\nHARD RULES\n- Every fact must carry a `quote`: a SHORT contiguous fragment (max ~200 characters) copied VERBATIM from the resume text below. Do not paraphrase inside quotes. Facts without a verbatim quote will be discarded by the program.\n- Never invent employers, dates, skills, tools, metrics or claims. If unsure, omit the item.\n- Include EVERY role (newest first), including non-IT roles such as administrative assistant. Do not drop any.\n- roles[].start / roles[].end use \"YYYY-MM\" (or \"YYYY\" if only the year is known, written as \"YYYY-01\" for start and \"YYYY-12\" for end). Use \"present\" as end for an ongoing role. Use \"\" when the resume gives no date. Never guess dates.\n- roles[].quote = the line(s) naming the title/employer/period. roles[].skills_used = canonical skill names used in that role, only if the resume ties them to it.\n- skills[]: every technology, language, framework, tool, platform, database, methodology or domain explicitly named. `canonical` = lowercase, no version, no punctuation variants (e.g. \"node.js\" -> \"nodejs\", \"Postgres\" -> \"postgresql\"). `quotes` = where it appears.\n- transferable_skills[]: abstract capabilities the candidate DEMONSTRATED in any role, including non-technical ones (e.g. user support, document/process control, spreadsheets and reporting, routine automation, communication with clients/suppliers, scheduling, financial/administrative routines). `from_roles` = titles of the roles where shown. Each needs a verbatim quote.\n- languages[]: spoken/written languages with the stated level only if present.\n- headline: one positioning sentence in Portuguese. professional_profile: 2-4 dense paragraphs in Portuguese covering the FULL career arc (all roles).\n- seniority: a short free-text label of the candidate's realistic level, based on actual dated experience.\n- Do NOT compute years of experience; the program does it from dates.\n\nResume text:\nAna Exemplo\nDesenvolvedora de software\nBelo Horizonte, MG\n\nResumo\nProfissional com experiência em automação de processos e desenvolvimento de APIs.\n\nExperiência Profissional\nAnalista de Sistemas — Empresa Alfa (01/2021 – atual)\n- Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos.\n- Suporte a usuários internos e controle de documentos em planilhas.\n- Automação de rotinas financeiras com Python e PostgreSQL.\nAssistente Administrativo — Comércio Beta (03/2018 – 12/2020)\n- Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas.\n- Relatórios em planilhas para a diretoria.\n\nFormação Acadêmica\nBacharelado em Sistemas de Informação — Universidade Gama (2017 – 2021)\n\nHabilidades\nC#, .NET, Python, PostgreSQL, Node.js, Git, Docker\n\nIdiomas\nInglês avançado; Português nativo\n\nProjetos\nPainel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.\n\nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para passar do corte \nlinha extra para p\n"
+  }
+ ],
+ "analysis_cases": [
+  {
+   "language": "pt",
+   "text": "Ana Exemplo\nDesenvolvedora de software\nBelo Horizonte, MG\n\nResumo\nProfissional com experiência em automação de processos e desenvolvimento de APIs.\n\nExperiência Profissional\nAnalista de Sistemas — Empresa Alfa (01/2021 – atual)\n- Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos.\n- Suporte a usuários internos e controle de documentos em planilhas.\n- Automação de rotinas financeiras com Python e PostgreSQL.\nAssistente Administrativo — Comércio Beta (03/2018 – 12/2020)\n- Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas.\n- Relatórios em planilhas para a diretoria.\n\nFormação Acadêmica\nBacharelado em Sistemas de Informação — Universidade Gama (2017 – 2021)\n\nHabilidades\nC#, .NET, Python, PostgreSQL, Node.js, Git, Docker\n\nIdiomas\nInglês avançado; Português nativo\n\nProjetos\nPainel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.\n",
+   "raw": {
+    "headline": "Desenvolvedora de software com foco em automação",
+    "professional_profile": "Atua com   sistemas internos.\n\nTambém tem experiência administrativa.",
+    "seniority": "pleno",
+    "location_notes": "Belo Horizonte, MG",
+    "work_authorization_notes": "",
+    "roles": [
+     {
+      "title": "Analista de Sistemas",
+      "employer": "Empresa Alfa",
+      "start": "2021-01",
+      "end": "atual",
+      "quote": "Analista de Sistemas — Empresa Alfa (01/2021 – atual)",
+      "responsibilities": [
+       {
+        "text": "APIs REST em C# e .NET",
+        "quote": "Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos"
+       },
+       {
+        "text": "Suporte a usuários",
+        "quote": "Suporte a usuários internos e controle de documentos em planilhas"
+       },
+       {
+        "text": "Inventada",
+        "quote": "Liderou uma equipe de quarenta pessoas em três países"
+       },
+       {
+        "text": "Automação financeira",
+        "quote": "Automacao de rotinas financeiras com Python e Postgres"
+       }
+      ],
+      "skills_used": [
+       "C#",
+       ".NET",
+       "Python",
+       "PostgreSQL"
+      ]
+     },
+     {
+      "title": "Assistente Administrativo",
+      "employer": "Comércio Beta",
+      "start": "2018",
+      "end": "2020-12",
+      "quote": "Assistente Administrativo — Comércio Beta (03/2018 – 12/2020)",
+      "responsibilities": [
+       {
+        "text": "Atendimento",
+        "quote": "Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas"
+       }
+      ],
+      "skills_used": []
+     },
+     {
+      "title": "Gerente Fantasma",
+      "employer": "Empresa Inexistente",
+      "start": "2010-01",
+      "end": "2012-01",
+      "quote": "Gerente Fantasma — Empresa Inexistente",
+      "responsibilities": [],
+      "skills_used": []
+     }
+    ],
+    "skills": [
+     {
+      "name": "C#",
+      "canonical": "c#",
+      "category": "language",
+      "quotes": [
+       "C#, .NET, Python"
+      ]
+     },
+     {
+      "name": "Node.js",
+      "canonical": "node.js",
+      "category": "framework",
+      "quotes": []
+     },
+     {
+      "name": "Rust",
+      "canonical": "rust",
+      "category": "language",
+      "quotes": [
+       "Rust avançado"
+      ]
+     },
+     {
+      "name": "PostgreSQL",
+      "canonical": "postgresql",
+      "category": "db",
+      "quotes": [
+       "PostgreSQL"
+      ]
+     },
+     {
+      "name": "Postgres",
+      "canonical": "postgresql",
+      "category": "db",
+      "quotes": [
+       "PostgreSQL"
+      ]
+     },
+     {
+      "name": "Docker",
+      "category": "estranha",
+      "quotes": [
+       "Git, Docker"
+      ]
+     }
+    ],
+    "transferable_skills": [
+     {
+      "capability": "Suporte a usuários",
+      "from_roles": [
+       "Analista de Sistemas",
+       "Cargo que não existe"
+      ],
+      "quotes": [
+       "Suporte a usuários internos"
+      ]
+     },
+     {
+      "capability": "Sem citação",
+      "from_roles": [],
+      "quotes": [
+       "texto que não está no currículo de forma alguma"
+      ]
+     }
+    ],
+    "education": [
+     {
+      "text": "Bacharelado em Sistemas de Informação",
+      "quote": "Bacharelado em Sistemas de Informação — Universidade Gama"
+     },
+     {
+      "text": "Mestrado",
+      "quote": "Mestrado em Física"
+     }
+    ],
+    "certifications": [],
+    "projects": [
+     {
+      "text": "Painel de vagas com C# e Avalonia",
+      "quote": "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia"
+     }
+    ],
+    "achievements": [],
+    "languages": [
+     {
+      "language": "Inglês",
+      "level": "avançado",
+      "quote": "Inglês avançado"
+     },
+     {
+      "language": "Alemão",
+      "level": "fluente",
+      "quote": "Alemão fluente"
+     }
+    ]
+   },
+   "expected": {
+    "headline": "Desenvolvedora de software com foco em automação",
+    "professional_profile": "Atua com sistemas internos. Também tem experiência administrativa.",
+    "seniority": "pleno",
+    "technical_skills": [
+     "C#",
+     "Node.js",
+     "PostgreSQL",
+     "Docker"
+    ],
+    "tools": [],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [
+     {
+      "role": "Analista de Sistemas",
+      "employer": "Empresa Alfa",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "APIs REST em C# e .NET",
+       "Suporte a usuários"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Assistente Administrativo",
+      "employer": "Comércio Beta",
+      "period": "2018-01 – 2020-12",
+      "is_current": false,
+      "responsibilities": [
+       "Atendimento"
+      ],
+      "highlights": []
+     }
+    ],
+    "projects": [
+     "Painel de vagas com C# e Avalonia"
+    ],
+    "achievements": [],
+    "education": [
+     "Bacharelado em Sistemas de Informação"
+    ],
+    "certifications": [],
+    "languages": [
+     "Inglês avançado"
+    ],
+    "work_authorization_notes": "",
+    "location_notes": "Belo Horizonte, MG",
+    "years_of_experience": "8.9 anos (calculado das datas)",
+    "current_employer": "Empresa Alfa",
+    "coverage_notes": "10 fatos verificados no texto do PDF; 7 descartados por falta de citação.",
+    "summary": "Headline: Desenvolvedora de software com foco em automação\n\nPerfil profissional:\nAtua com sistemas internos. Também tem experiência administrativa.\n\nSenioridade: pleno | Anos de experiência: 8.9 anos (calculado das datas)\n\nExperiência profissional (todas as funções):\n- [CURRENT ROLE] Analista de Sistemas — Empresa Alfa (2021-01 – present)\n  - APIs REST em C# e .NET\n  - Suporte a usuários\n- Assistente Administrativo — Comércio Beta (2018-01 – 2020-12)\n  - Atendimento\n\nCompetências técnicas:\n- C#\n- Node.js\n- PostgreSQL\n- Docker\n\nProjetos e automações relevantes:\n- Painel de vagas com C# e Avalonia\n\nFormação:\n- Bacharelado em Sistemas de Informação\n\nIdiomas:\n- Inglês avançado\n\nLocalidade / mobilidade:\nBelo Horizonte, MG\n\nCobertura da extração:\n10 fatos verificados no texto do PDF; 7 descartados por falta de citação.",
+    "_profile": {
+     "version": "2",
+     "headline": "Desenvolvedora de software com foco em automação",
+     "professional_profile": "Atua com sistemas internos. Também tem experiência administrativa.",
+     "seniority": "pleno",
+     "location_notes": "Belo Horizonte, MG",
+     "work_authorization_notes": "",
+     "roles": [
+      {
+       "id": "R1",
+       "title": "Analista de Sistemas",
+       "employer": "Empresa Alfa",
+       "start": "2021-01",
+       "end": "present",
+       "quote": "Analista de Sistemas — Empresa Alfa (01/2021 – atual)",
+       "responsibilities": [
+        {
+         "id": "R1.1",
+         "text": "APIs REST em C# e .NET",
+         "quote": "Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos"
+        },
+        {
+         "id": "R1.2",
+         "text": "Suporte a usuários",
+         "quote": "Suporte a usuários internos e controle de documentos em planilhas"
+        }
+       ],
+       "skills_used": [
+        "C#",
+        ".NET",
+        "Python",
+        "PostgreSQL"
+       ]
+      },
+      {
+       "id": "R2",
+       "title": "Assistente Administrativo",
+       "employer": "Comércio Beta",
+       "start": "2018-01",
+       "end": "2020-12",
+       "quote": "Assistente Administrativo — Comércio Beta (03/2018 – 12/2020)",
+       "responsibilities": [
+        {
+         "id": "R2.1",
+         "text": "Atendimento",
+         "quote": "Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas"
+        }
+       ],
+       "skills_used": []
+      }
+     ],
+     "skills": [
+      {
+       "id": "S1",
+       "name": "C#",
+       "canonical": "c#",
+       "category": "language",
+       "quotes": [
+        "C#, .NET, Python"
+       ]
+      },
+      {
+       "id": "S2",
+       "name": "Node.js",
+       "canonical": "node js",
+       "category": "framework",
+       "quotes": []
+      },
+      {
+       "id": "S3",
+       "name": "PostgreSQL",
+       "canonical": "postgresql",
+       "category": "db",
+       "quotes": [
+        "PostgreSQL"
+       ]
+      },
+      {
+       "id": "S4",
+       "name": "Docker",
+       "canonical": "docker",
+       "category": "other",
+       "quotes": [
+        "Git, Docker"
+       ]
+      }
+     ],
+     "transferable_skills": [
+      {
+       "id": "T1",
+       "capability": "Suporte a usuários",
+       "from_role_ids": [
+        "R1"
+       ],
+       "quotes": [
+        "Suporte a usuários internos"
+       ]
+      }
+     ],
+     "education": [
+      {
+       "id": "E1",
+       "text": "Bacharelado em Sistemas de Informação",
+       "quote": "Bacharelado em Sistemas de Informação — Universidade Gama"
+      }
+     ],
+     "certifications": [],
+     "projects": [
+      {
+       "id": "P1",
+       "text": "Painel de vagas com C# e Avalonia",
+       "quote": "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia"
+      }
+     ],
+     "achievements": [],
+     "languages": [
+      {
+       "id": "L1",
+       "language": "Inglês",
+       "level": "avançado",
+       "quote": "Inglês avançado"
+      }
+     ],
+     "derived": {
+      "total_months": 107,
+      "skills": {
+       "S1": {
+        "canonical": "c#",
+        "months": 71,
+        "last_used": "2026-11",
+        "role_ids": [
+         "R1"
+        ],
+        "project_months": 0,
+        "project_ids": [],
+        "project_last_used": ""
+       },
+       "S2": {
+        "canonical": "node js",
+        "months": 0,
+        "last_used": "",
+        "role_ids": [],
+        "project_months": 0,
+        "project_ids": [],
+        "project_last_used": ""
+       },
+       "S3": {
+        "canonical": "postgresql",
+        "months": 71,
+        "last_used": "2026-11",
+        "role_ids": [
+         "R1"
+        ],
+        "project_months": 0,
+        "project_ids": [],
+        "project_last_used": ""
+       },
+       "S4": {
+        "canonical": "docker",
+        "months": 0,
+        "last_used": "",
+        "role_ids": [],
+        "project_months": 0,
+        "project_ids": [],
+        "project_last_used": ""
+       }
+      },
+      "role_months": {
+       "R1": 71,
+       "R2": 36
+      },
+      "current_role_ids": [
+       "R1"
+      ]
+     },
+     "coverage": {
+      "kept": 10,
+      "dropped": {
+       "responsibilities": 2,
+       "roles": 1,
+       "skills": 1,
+       "transferable_skills": 1,
+       "education": 1,
+       "languages": 1
+      },
+      "ungrounded": 7
+     }
+    }
+   },
+   "prompt": "You extract a structured, EVIDENCE-BACKED profile from a resume written primarily in Portuguese.\n\nHARD RULES\n- Every fact must carry a `quote`: a SHORT contiguous fragment (max ~200 characters) copied VERBATIM from the resume text below. Do not paraphrase inside quotes. Facts without a verbatim quote will be discarded by the program.\n- Never invent employers, dates, skills, tools, metrics or claims. If unsure, omit the item.\n- Include EVERY role (newest first), including non-IT roles such as administrative assistant. Do not drop any.\n- roles[].start / roles[].end use \"YYYY-MM\" (or \"YYYY\" if only the year is known, written as \"YYYY-01\" for start and \"YYYY-12\" for end). Use \"present\" as end for an ongoing role. Use \"\" when the resume gives no date. Never guess dates.\n- roles[].quote = the line(s) naming the title/employer/period. roles[].skills_used = canonical skill names used in that role, only if the resume ties them to it.\n- skills[]: every technology, language, framework, tool, platform, database, methodology or domain explicitly named. `canonical` = lowercase, no version, no punctuation variants (e.g. \"node.js\" -> \"nodejs\", \"Postgres\" -> \"postgresql\"). `quotes` = where it appears.\n- transferable_skills[]: abstract capabilities the candidate DEMONSTRATED in any role, including non-technical ones (e.g. user support, document/process control, spreadsheets and reporting, routine automation, communication with clients/suppliers, scheduling, financial/administrative routines). `from_roles` = titles of the roles where shown. Each needs a verbatim quote.\n- languages[]: spoken/written languages with the stated level only if present.\n- headline: one positioning sentence in Portuguese. professional_profile: 2-4 dense paragraphs in Portuguese covering the FULL career arc (all roles).\n- seniority: a short free-text label of the candidate's realistic level, based on actual dated experience.\n- Do NOT compute years of experience; the program does it from dates.\n\nResume text:\nAna Exemplo\nDesenvolvedora de software\nBelo Horizonte, MG\n\nResumo\nProfissional com experiência em automação de processos e desenvolvimento de APIs.\n\nExperiência Profissional\nAnalista de Sistemas — Empresa Alfa (01/2021 – atual)\n- Desenvolvimento de APIs REST em C# e .NET para integração entre sistemas internos.\n- Suporte a usuários internos e controle de documentos em planilhas.\n- Automação de rotinas financeiras com Python e PostgreSQL.\nAssistente Administrativo — Comércio Beta (03/2018 – 12/2020)\n- Atendimento a clientes e fornecedores, agendamentos e rotinas administrativas.\n- Relatórios em planilhas para a diretoria.\n\nFormação Acadêmica\nBacharelado em Sistemas de Informação — Universidade Gama (2017 – 2021)\n\nHabilidades\nC#, .NET, Python, PostgreSQL, Node.js, Git, Docker\n\nIdiomas\nInglês avançado; Português nativo\n\nProjetos\nPainel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.\n\n"
+  },
+  {
+   "language": "en",
+   "text": "Ana Example\nSoftware developer\n\nExperience\nSystems Analyst — Alpha Company (01/2021 – present)\n- Built REST APIs in C# and .NET to integrate internal systems.\n- Automated financial routines with Python and PostgreSQL.\nOperations Intern — Delta Corp (06/2016 – 02/2018)\n- Prepared weekly reports and supported the logistics team.\n\nSkills\nC#, Python, SQL, Kubernetes\n\nLanguages\nEnglish advanced\n",
+   "raw": {
+    "headline": "Software developer",
+    "professional_profile": "Builds integrations.",
+    "seniority": "mid",
+    "location_notes": "",
+    "work_authorization_notes": "",
+    "roles": [
+     {
+      "title": "Systems Analyst",
+      "employer": "Alpha Company",
+      "start": "2021-01",
+      "end": "present",
+      "quote": "Systems Analyst — Alpha Company (01/2021 – present)",
+      "responsibilities": [
+       {
+        "text": "REST APIs in C# and .NET",
+        "quote": "Built REST APIs in C# and .NET to integrate internal systems"
+       }
+      ],
+      "skills_used": [
+       "C#",
+       "Kubernetes"
+      ]
+     },
+     {
+      "title": "Operations Intern",
+      "employer": "Delta Corp",
+      "start": "2016-06",
+      "end": "2018-02",
+      "quote": "Operations Intern — Delta Corp (06/2016 – 02/2018)",
+      "responsibilities": [
+       {
+        "text": "Weekly reports",
+        "quote": "Prepared weekly reports and supported the logistics team"
+       }
+      ],
+      "skills_used": []
+     }
+    ],
+    "skills": [
+     {
+      "name": "C#",
+      "canonical": "c#",
+      "category": "language",
+      "quotes": [
+       "C#, Python, SQL"
+      ]
+     },
+     {
+      "name": "SQL",
+      "canonical": "sql",
+      "category": "db",
+      "quotes": [
+       "SQL"
+      ]
+     },
+     {
+      "name": "Kubernetes",
+      "canonical": "kubernetes",
+      "category": "tool",
+      "quotes": [
+       "Kubernetes"
+      ]
+     }
+    ],
+    "transferable_skills": [],
+    "education": [],
+    "certifications": [],
+    "achievements": [],
+    "projects": [],
+    "languages": [
+     {
+      "language": "English",
+      "level": "advanced",
+      "quote": "English advanced"
+     }
+    ]
+   },
+   "expected": {
+    "headline": "Software developer",
+    "professional_profile": "Builds integrations.",
+    "seniority": "mid",
+    "technical_skills": [
+     "C#",
+     "SQL"
+    ],
+    "tools": [
+     "Kubernetes"
+    ],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [
+     {
+      "role": "Systems Analyst",
+      "employer": "Alpha Company",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "REST APIs in C# and .NET"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Operations Intern",
+      "employer": "Delta Corp",
+      "period": "2016-06 – 2018-02",
+      "is_current": false,
+      "responsibilities": [
+       "Weekly reports"
+      ],
+      "highlights": []
+     }
+    ],
+    "projects": [],
+    "achievements": [],
+    "education": [],
+    "certifications": [],
+    "languages": [
+     "English advanced"
+    ],
+    "work_authorization_notes": "",
+    "location_notes": "",
+    "years_of_experience": "7.7 years (calculado das datas)",
+    "current_employer": "Alpha Company",
+    "coverage_notes": "6 facts verified against the PDF text; 0 discarded for lacking a quote.",
+    "summary": "Headline: Software developer\n\nProfessional profile:\nBuilds integrations.\n\nSeniority: mid | Years of experience: 7.7 years (calculado das datas)\n\nProfessional experience (all roles):\n- [CURRENT ROLE] Systems Analyst — Alpha Company (2021-01 – present)\n  - REST APIs in C# and .NET\n- Operations Intern — Delta Corp (2016-06 – 2018-02)\n  - Weekly reports\n\nTechnical skills:\n- C#\n- SQL\n\nTools and platforms:\n- Kubernetes\n\nLanguages:\n- English advanced\n\nExtraction coverage:\n6 facts verified against the PDF text; 0 discarded for lacking a quote.",
+    "_profile": {
+     "version": "2",
+     "headline": "Software developer",
+     "professional_profile": "Builds integrations.",
+     "seniority": "mid",
+     "location_notes": "",
+     "work_authorization_notes": "",
+     "roles": [
+      {
+       "id": "R1",
+       "title": "Systems Analyst",
+       "employer": "Alpha Company",
+       "start": "2021-01",
+       "end": "present",
+       "quote": "Systems Analyst — Alpha Company (01/2021 – present)",
+       "responsibilities": [
+        {
+         "id": "R1.1",
+         "text": "REST APIs in C# and .NET",
+         "quote": "Built REST APIs in C# and .NET to integrate internal systems"
+        }
+       ],
+       "skills_used": [
+        "C#",
+        "Kubernetes"
+       ]
+      },
+      {
+       "id": "R2",
+       "title": "Operations Intern",
+       "employer": "Delta Corp",
+       "start": "2016-06",
+       "end": "2018-02",
+       "quote": "Operations Intern — Delta Corp (06/2016 – 02/2018)",
+       "responsibilities": [
+        {
+         "id": "R2.1",
+         "text": "Weekly reports",
+         "quote": "Prepared weekly reports and supported the logistics team"
+        }
+       ],
+       "skills_used": []
+      }
+     ],
+     "skills": [
+      {
+       "id": "S1",
+       "name": "C#",
+       "canonical": "c#",
+       "category": "language",
+       "quotes": [
+        "C#, Python, SQL"
+       ]
+      },
+      {
+       "id": "S2",
+       "name": "SQL",
+       "canonical": "sql",
+       "category": "db",
+       "quotes": [
+        "SQL"
+       ]
+      },
+      {
+       "id": "S3",
+       "name": "Kubernetes",
+       "canonical": "kubernetes",
+       "category": "tool",
+       "quotes": [
+        "Kubernetes"
+       ]
+      }
+     ],
+     "transferable_skills": [],
+     "education": [],
+     "certifications": [],
+     "projects": [],
+     "achievements": [],
+     "languages": [
+      {
+       "id": "L1",
+       "language": "English",
+       "level": "advanced",
+       "quote": "English advanced"
+      }
+     ],
+     "derived": {
+      "total_months": 92,
+      "skills": {
+       "S1": {
+        "canonical": "c#",
+        "months": 71,
+        "last_used": "2026-11",
+        "role_ids": [
+         "R1"
+        ],
+        "project_months": 0,
+        "project_ids": [],
+        "project_last_used": ""
+       },
+       "S2": {
+        "canonical": "sql",
+        "months": 0,
+        "last_used": "",
+        "role_ids": [],
+        "project_months": 0,
+        "project_ids": [],
+        "project_last_used": ""
+       },
+       "S3": {
+        "canonical": "kubernetes",
+        "months": 71,
+        "last_used": "2026-11",
+        "role_ids": [
+         "R1"
+        ],
+        "project_months": 0,
+        "project_ids": [],
+        "project_last_used": ""
+       }
+      },
+      "role_months": {
+       "R1": 71,
+       "R2": 21
+      },
+      "current_role_ids": [
+       "R1"
+      ]
+     },
+     "coverage": {
+      "kept": 6,
+      "dropped": {},
+      "ungrounded": 0
+     }
+    }
+   },
+   "prompt": "You extract a structured, EVIDENCE-BACKED profile from a resume written primarily in English.\n\nHARD RULES\n- Every fact must carry a `quote`: a SHORT contiguous fragment (max ~200 characters) copied VERBATIM from the resume text below. Do not paraphrase inside quotes. Facts without a verbatim quote will be discarded by the program.\n- Never invent employers, dates, skills, tools, metrics or claims. If unsure, omit the item.\n- Include EVERY role (newest first), including non-IT roles such as administrative assistant. Do not drop any.\n- roles[].start / roles[].end use \"YYYY-MM\" (or \"YYYY\" if only the year is known, written as \"YYYY-01\" for start and \"YYYY-12\" for end). Use \"present\" as end for an ongoing role. Use \"\" when the resume gives no date. Never guess dates.\n- roles[].quote = the line(s) naming the title/employer/period. roles[].skills_used = canonical skill names used in that role, only if the resume ties them to it.\n- skills[]: every technology, language, framework, tool, platform, database, methodology or domain explicitly named. `canonical` = lowercase, no version, no punctuation variants (e.g. \"node.js\" -> \"nodejs\", \"Postgres\" -> \"postgresql\"). `quotes` = where it appears.\n- transferable_skills[]: abstract capabilities the candidate DEMONSTRATED in any role, including non-technical ones (e.g. user support, document/process control, spreadsheets and reporting, routine automation, communication with clients/suppliers, scheduling, financial/administrative routines). `from_roles` = titles of the roles where shown. Each needs a verbatim quote.\n- languages[]: spoken/written languages with the stated level only if present.\n- headline: one positioning sentence in English. professional_profile: 2-4 dense paragraphs in English covering the FULL career arc (all roles).\n- seniority: a short free-text label of the candidate's realistic level, based on actual dated experience.\n- Do NOT compute years of experience; the program does it from dates.\n\nResume text:\nAna Example\nSoftware developer\n\nExperience\nSystems Analyst — Alpha Company (01/2021 – present)\n- Built REST APIs in C# and .NET to integrate internal systems.\n- Automated financial routines with Python and PostgreSQL.\nOperations Intern — Delta Corp (06/2016 – 02/2018)\n- Prepared weekly reports and supported the logistics team.\n\nSkills\nC#, Python, SQL, Kubernetes\n\nLanguages\nEnglish advanced\n\n"
+  }
+ ],
+ "legacy": [
+  {
+   "profile_key": "pt",
+   "language": "pt",
+   "analysis": {
+    "headline": "Desenvolvedora de software com foco em automação",
+    "professional_profile": "Atua com sistemas internos. Também tem experiência administrativa.",
+    "seniority": "pleno",
+    "technical_skills": [
+     "C#",
+     "Node.js",
+     "PostgreSQL",
+     "Docker"
+    ],
+    "tools": [],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [
+     {
+      "role": "Analista de Sistemas",
+      "employer": "Empresa Alfa",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "APIs REST em C# e .NET",
+       "Suporte a usuários"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Assistente Administrativo",
+      "employer": "Comércio Beta",
+      "period": "2018-01 – 2020-12",
+      "is_current": false,
+      "responsibilities": [
+       "Atendimento"
+      ],
+      "highlights": []
+     }
+    ],
+    "projects": [
+     "Painel de vagas com C# e Avalonia"
+    ],
+    "achievements": [],
+    "education": [
+     "Bacharelado em Sistemas de Informação"
+    ],
+    "certifications": [],
+    "languages": [
+     "Inglês avançado"
+    ],
+    "work_authorization_notes": "",
+    "location_notes": "Belo Horizonte, MG",
+    "years_of_experience": "8.9 anos (calculado das datas)",
+    "current_employer": "Empresa Alfa",
+    "coverage_notes": "10 fatos verificados no texto do PDF; 7 descartados por falta de citação."
+   },
+   "dossier": "Headline: Desenvolvedora de software com foco em automação\n\nPerfil profissional:\nAtua com sistemas internos. Também tem experiência administrativa.\n\nSenioridade: pleno | Anos de experiência: 8.9 anos (calculado das datas)\n\nExperiência profissional (todas as funções):\n- [CURRENT ROLE] Analista de Sistemas — Empresa Alfa (2021-01 – present)\n  - APIs REST em C# e .NET\n  - Suporte a usuários\n- Assistente Administrativo — Comércio Beta (2018-01 – 2020-12)\n  - Atendimento\n\nCompetências técnicas:\n- C#\n- Node.js\n- PostgreSQL\n- Docker\n\nProjetos e automações relevantes:\n- Painel de vagas com C# e Avalonia\n\nFormação:\n- Bacharelado em Sistemas de Informação\n\nIdiomas:\n- Inglês avançado\n\nLocalidade / mobilidade:\nBelo Horizonte, MG\n\nCobertura da extração:\n10 fatos verificados no texto do PDF; 7 descartados por falta de citação."
+  },
+  {
+   "profile_key": "pt",
+   "language": "en",
+   "analysis": {
+    "headline": "Desenvolvedora de software com foco em automação",
+    "professional_profile": "Atua com sistemas internos. Também tem experiência administrativa.",
+    "seniority": "pleno",
+    "technical_skills": [
+     "C#",
+     "Node.js",
+     "PostgreSQL",
+     "Docker"
+    ],
+    "tools": [],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [
+     {
+      "role": "Analista de Sistemas",
+      "employer": "Empresa Alfa",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "APIs REST em C# e .NET",
+       "Suporte a usuários"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Assistente Administrativo",
+      "employer": "Comércio Beta",
+      "period": "2018-01 – 2020-12",
+      "is_current": false,
+      "responsibilities": [
+       "Atendimento"
+      ],
+      "highlights": []
+     }
+    ],
+    "projects": [
+     "Painel de vagas com C# e Avalonia"
+    ],
+    "achievements": [],
+    "education": [
+     "Bacharelado em Sistemas de Informação"
+    ],
+    "certifications": [],
+    "languages": [
+     "Inglês avançado"
+    ],
+    "work_authorization_notes": "",
+    "location_notes": "Belo Horizonte, MG",
+    "years_of_experience": "8.9 years (calculado das datas)",
+    "current_employer": "Empresa Alfa",
+    "coverage_notes": "10 facts verified against the PDF text; 7 discarded for lacking a quote."
+   },
+   "dossier": "Headline: Desenvolvedora de software com foco em automação\n\nProfessional profile:\nAtua com sistemas internos. Também tem experiência administrativa.\n\nSeniority: pleno | Years of experience: 8.9 years (calculado das datas)\n\nProfessional experience (all roles):\n- [CURRENT ROLE] Analista de Sistemas — Empresa Alfa (2021-01 – present)\n  - APIs REST em C# e .NET\n  - Suporte a usuários\n- Assistente Administrativo — Comércio Beta (2018-01 – 2020-12)\n  - Atendimento\n\nTechnical skills:\n- C#\n- Node.js\n- PostgreSQL\n- Docker\n\nRelevant projects and automations:\n- Painel de vagas com C# e Avalonia\n\nEducation:\n- Bacharelado em Sistemas de Informação\n\nLanguages:\n- Inglês avançado\n\nLocation / mobility:\nBelo Horizonte, MG\n\nExtraction coverage:\n10 facts verified against the PDF text; 7 discarded for lacking a quote."
+  },
+  {
+   "profile_key": "en",
+   "language": "pt",
+   "analysis": {
+    "headline": "Software developer",
+    "professional_profile": "Builds integrations.",
+    "seniority": "mid",
+    "technical_skills": [
+     "C#",
+     "SQL"
+    ],
+    "tools": [
+     "Kubernetes"
+    ],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [
+     {
+      "role": "Systems Analyst",
+      "employer": "Alpha Company",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "REST APIs in C# and .NET"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Operations Intern",
+      "employer": "Delta Corp",
+      "period": "2016-06 – 2018-02",
+      "is_current": false,
+      "responsibilities": [
+       "Weekly reports"
+      ],
+      "highlights": []
+     }
+    ],
+    "projects": [],
+    "achievements": [],
+    "education": [],
+    "certifications": [],
+    "languages": [
+     "English advanced"
+    ],
+    "work_authorization_notes": "",
+    "location_notes": "",
+    "years_of_experience": "7.7 anos (calculado das datas)",
+    "current_employer": "Alpha Company",
+    "coverage_notes": "6 fatos verificados no texto do PDF; 0 descartados por falta de citação."
+   },
+   "dossier": "Headline: Software developer\n\nPerfil profissional:\nBuilds integrations.\n\nSenioridade: mid | Anos de experiência: 7.7 anos (calculado das datas)\n\nExperiência profissional (todas as funções):\n- [CURRENT ROLE] Systems Analyst — Alpha Company (2021-01 – present)\n  - REST APIs in C# and .NET\n- Operations Intern — Delta Corp (2016-06 – 2018-02)\n  - Weekly reports\n\nCompetências técnicas:\n- C#\n- SQL\n\nFerramentas e plataformas:\n- Kubernetes\n\nIdiomas:\n- English advanced\n\nCobertura da extração:\n6 fatos verificados no texto do PDF; 0 descartados por falta de citação."
+  },
+  {
+   "profile_key": "en",
+   "language": "en",
+   "analysis": {
+    "headline": "Software developer",
+    "professional_profile": "Builds integrations.",
+    "seniority": "mid",
+    "technical_skills": [
+     "C#",
+     "SQL"
+    ],
+    "tools": [
+     "Kubernetes"
+    ],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [
+     {
+      "role": "Systems Analyst",
+      "employer": "Alpha Company",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "REST APIs in C# and .NET"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Operations Intern",
+      "employer": "Delta Corp",
+      "period": "2016-06 – 2018-02",
+      "is_current": false,
+      "responsibilities": [
+       "Weekly reports"
+      ],
+      "highlights": []
+     }
+    ],
+    "projects": [],
+    "achievements": [],
+    "education": [],
+    "certifications": [],
+    "languages": [
+     "English advanced"
+    ],
+    "work_authorization_notes": "",
+    "location_notes": "",
+    "years_of_experience": "7.7 years (calculado das datas)",
+    "current_employer": "Alpha Company",
+    "coverage_notes": "6 facts verified against the PDF text; 0 discarded for lacking a quote."
+   },
+   "dossier": "Headline: Software developer\n\nProfessional profile:\nBuilds integrations.\n\nSeniority: mid | Years of experience: 7.7 years (calculado das datas)\n\nProfessional experience (all roles):\n- [CURRENT ROLE] Systems Analyst — Alpha Company (2021-01 – present)\n  - REST APIs in C# and .NET\n- Operations Intern — Delta Corp (2016-06 – 2018-02)\n  - Weekly reports\n\nTechnical skills:\n- C#\n- SQL\n\nTools and platforms:\n- Kubernetes\n\nLanguages:\n- English advanced\n\nExtraction coverage:\n6 facts verified against the PDF text; 0 discarded for lacking a quote."
+  },
+  {
+   "profile_key": "merged",
+   "language": "pt",
+   "analysis": {
+    "headline": "Desenvolvedora de software com foco em automação",
+    "professional_profile": "Atua com sistemas internos. Também tem experiência administrativa.",
+    "seniority": "pleno",
+    "technical_skills": [
+     "C#",
+     "Node.js",
+     "PostgreSQL",
+     "Docker",
+     "SQL",
+     "Avalonia"
+    ],
+    "tools": [
+     "Kubernetes"
+    ],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [
+     {
+      "role": "Analista de Sistemas",
+      "employer": "Empresa Alfa",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "APIs REST em C# e .NET",
+       "Suporte a usuários"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Assistente Administrativo",
+      "employer": "Comércio Beta",
+      "period": "2018-01 – 2020-12",
+      "is_current": false,
+      "responsibilities": [
+       "Atendimento"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Systems Analyst",
+      "employer": "Alpha Company",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "REST APIs in C# and .NET"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Operations Intern",
+      "employer": "Delta Corp",
+      "period": "2016-06 – 2018-02",
+      "is_current": false,
+      "responsibilities": [
+       "Weekly reports"
+      ],
+      "highlights": []
+     }
+    ],
+    "projects": [
+     "Painel de vagas com C# e Avalonia"
+    ],
+    "achievements": [],
+    "education": [
+     "Bacharelado em Sistemas de Informação"
+    ],
+    "certifications": [],
+    "languages": [
+     "Inglês avançado",
+     "English advanced"
+    ],
+    "work_authorization_notes": "",
+    "location_notes": "Belo Horizonte, MG",
+    "years_of_experience": "10.5 anos (calculado das datas)",
+    "current_employer": "Empresa Alfa",
+    "coverage_notes": "16 fatos verificados no texto do PDF; 7 descartados por falta de citação."
+   },
+   "dossier": "Headline: Desenvolvedora de software com foco em automação\n\nPerfil profissional:\nAtua com sistemas internos. Também tem experiência administrativa.\n\nSenioridade: pleno | Anos de experiência: 10.5 anos (calculado das datas)\n\nExperiência profissional (todas as funções):\n- [CURRENT ROLE] Analista de Sistemas — Empresa Alfa (2021-01 – present)\n  - APIs REST em C# e .NET\n  - Suporte a usuários\n- Assistente Administrativo — Comércio Beta (2018-01 – 2020-12)\n  - Atendimento\n- [CURRENT ROLE] Systems Analyst — Alpha Company (2021-01 – present)\n  - REST APIs in C# and .NET\n- Operations Intern — Delta Corp (2016-06 – 2018-02)\n  - Weekly reports\n\nCompetências técnicas:\n- C#\n- Node.js\n- PostgreSQL\n- Docker\n- SQL\n- Avalonia\n\nFerramentas e plataformas:\n- Kubernetes\n\nProjetos e automações relevantes:\n- Painel de vagas com C# e Avalonia\n\nFormação:\n- Bacharelado em Sistemas de Informação\n\nIdiomas:\n- Inglês avançado\n- English advanced\n\nLocalidade / mobilidade:\nBelo Horizonte, MG\n\nCobertura da extração:\n16 fatos verificados no texto do PDF; 7 descartados por falta de citação."
+  },
+  {
+   "profile_key": "merged",
+   "language": "en",
+   "analysis": {
+    "headline": "Desenvolvedora de software com foco em automação",
+    "professional_profile": "Atua com sistemas internos. Também tem experiência administrativa.",
+    "seniority": "pleno",
+    "technical_skills": [
+     "C#",
+     "Node.js",
+     "PostgreSQL",
+     "Docker",
+     "SQL",
+     "Avalonia"
+    ],
+    "tools": [
+     "Kubernetes"
+    ],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [
+     {
+      "role": "Analista de Sistemas",
+      "employer": "Empresa Alfa",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "APIs REST em C# e .NET",
+       "Suporte a usuários"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Assistente Administrativo",
+      "employer": "Comércio Beta",
+      "period": "2018-01 – 2020-12",
+      "is_current": false,
+      "responsibilities": [
+       "Atendimento"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Systems Analyst",
+      "employer": "Alpha Company",
+      "period": "2021-01 – present",
+      "is_current": true,
+      "responsibilities": [
+       "REST APIs in C# and .NET"
+      ],
+      "highlights": []
+     },
+     {
+      "role": "Operations Intern",
+      "employer": "Delta Corp",
+      "period": "2016-06 – 2018-02",
+      "is_current": false,
+      "responsibilities": [
+       "Weekly reports"
+      ],
+      "highlights": []
+     }
+    ],
+    "projects": [
+     "Painel de vagas com C# e Avalonia"
+    ],
+    "achievements": [],
+    "education": [
+     "Bacharelado em Sistemas de Informação"
+    ],
+    "certifications": [],
+    "languages": [
+     "Inglês avançado",
+     "English advanced"
+    ],
+    "work_authorization_notes": "",
+    "location_notes": "Belo Horizonte, MG",
+    "years_of_experience": "10.5 years (calculado das datas)",
+    "current_employer": "Empresa Alfa",
+    "coverage_notes": "16 facts verified against the PDF text; 7 discarded for lacking a quote."
+   },
+   "dossier": "Headline: Desenvolvedora de software com foco em automação\n\nProfessional profile:\nAtua com sistemas internos. Também tem experiência administrativa.\n\nSeniority: pleno | Years of experience: 10.5 years (calculado das datas)\n\nProfessional experience (all roles):\n- [CURRENT ROLE] Analista de Sistemas — Empresa Alfa (2021-01 – present)\n  - APIs REST em C# e .NET\n  - Suporte a usuários\n- Assistente Administrativo — Comércio Beta (2018-01 – 2020-12)\n  - Atendimento\n- [CURRENT ROLE] Systems Analyst — Alpha Company (2021-01 – present)\n  - REST APIs in C# and .NET\n- Operations Intern — Delta Corp (2016-06 – 2018-02)\n  - Weekly reports\n\nTechnical skills:\n- C#\n- Node.js\n- PostgreSQL\n- Docker\n- SQL\n- Avalonia\n\nTools and platforms:\n- Kubernetes\n\nRelevant projects and automations:\n- Painel de vagas com C# e Avalonia\n\nEducation:\n- Bacharelado em Sistemas de Informação\n\nLanguages:\n- Inglês avançado\n- English advanced\n\nLocation / mobility:\nBelo Horizonte, MG\n\nExtraction coverage:\n16 facts verified against the PDF text; 7 discarded for lacking a quote."
+  },
+  {
+   "profile_key": "empty",
+   "language": "pt",
+   "analysis": {
+    "headline": "",
+    "professional_profile": "",
+    "seniority": "",
+    "technical_skills": [],
+    "tools": [],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [],
+    "projects": [],
+    "achievements": [],
+    "education": [],
+    "certifications": [],
+    "languages": [],
+    "work_authorization_notes": "",
+    "location_notes": "",
+    "years_of_experience": "",
+    "coverage_notes": "0 fatos verificados no texto do PDF; 0 descartados por falta de citação."
+   },
+   "dossier": "Cobertura da extração:\n0 fatos verificados no texto do PDF; 0 descartados por falta de citação."
+  },
+  {
+   "profile_key": "empty",
+   "language": "en",
+   "analysis": {
+    "headline": "",
+    "professional_profile": "",
+    "seniority": "",
+    "technical_skills": [],
+    "tools": [],
+    "soft_skills": [],
+    "domains": [],
+    "experience": [],
+    "projects": [],
+    "achievements": [],
+    "education": [],
+    "certifications": [],
+    "languages": [],
+    "work_authorization_notes": "",
+    "location_notes": "",
+    "years_of_experience": "",
+    "coverage_notes": "0 facts verified against the PDF text; 0 discarded for lacking a quote."
+   },
+   "dossier": "Extraction coverage:\n0 facts verified against the PDF text; 0 discarded for lacking a quote."
+  }
+ ],
+ "odd_dossier": {
+  "analysis": {
+   "headline": "",
+   "summary": "resumo antigo",
+   "technical_skills": [],
+   "skills": [
+    "Go",
+    " ",
+    "Rust"
+   ],
+   "tools": "Docker, Git",
+   "experience": [
+    {
+     "role": "Dev",
+     "employer": "Acme",
+     "period": "2020 - Atual",
+     "responsibilities": [
+      "a",
+      "  ",
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+     ],
+     "highlights": "um destaque"
+    },
+    {
+     "role": "",
+     "employer": "",
+     "period": ""
+    },
+    "Texto solto Present",
+    "Outro texto",
+    {
+     "role": "QA",
+     "employer": "Beta",
+     "period": "2019 – hoje",
+     "is_current": true,
+     "responsibilities": "linha única"
+    }
+   ],
+   "soft_skills": null,
+   "education": [
+    "BSc"
+   ],
+   "coverage_notes": "cobertura"
+  },
+  "pt": "Headline: resumo antigo\n\nExperiência profissional (todas as funções):\n- [CURRENT ROLE] Dev — Acme (2020 - Atual)\n  - a\n  - bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n  - um destaque\n- {'role': '', 'employer': '', 'period': ''}\n- [CURRENT ROLE] Texto solto Present\n- Outro texto\n- [CURRENT ROLE] QA — Beta (2019 – hoje)\n  - linha única\n\nCompetências técnicas:\n- Go\n- Rust\n\nFerramentas e plataformas:\nDocker, Git\n\nFormação:\n- BSc\n\nCobertura da extração:\ncobertura",
+  "en": "Headline: resumo antigo\n\nProfessional experience (all roles):\n- [CURRENT ROLE] Dev — Acme (2020 - Atual)\n  - a\n  - bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n  - um destaque\n- {'role': '', 'employer': '', 'period': ''}\n- [CURRENT ROLE] Texto solto Present\n- Outro texto\n- [CURRENT ROLE] QA — Beta (2019 – hoje)\n  - linha única\n\nTechnical skills:\n- Go\n- Rust\n\nTools and platforms:\nDocker, Git\n\nEducation:\n- BSc\n\nExtraction coverage:\ncobertura"
+ },
+ "empty_dossier": {
+  "pt": "Análise sem conteúdo estruturado (Português).",
+  "en": "Headline: só título"
+ },
+ "is_current": [
+  {
+   "value": "2020 – Atual",
+   "result": true
+  },
+  {
+   "value": "present",
+   "result": true
+  },
+  {
+   "value": "Currently",
+   "result": false
+  },
+  {
+   "value": "currents",
+   "result": false
+  },
+  {
+   "value": "até o momento",
+   "result": true
+  },
+  {
+   "value": "until now",
+   "result": true
+  },
+  {
+   "value": "to  present",
+   "result": true
+  },
+  {
+   "value": "is_current: true",
+   "result": true
+  },
+  {
+   "value": "is_current = True",
+   "result": true
+  },
+  {
+   "value": "finished 2020",
+   "result": false
+  },
+  {
+   "value": "",
+   "result": false
+  }
+ ]
+}

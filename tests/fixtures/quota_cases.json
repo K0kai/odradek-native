@@ -1,0 +1,157 @@
+{
+ "apify": [
+  {
+   "payload": {
+    "data": {
+     "limits": {
+      "maxMonthlyUsageUsd": 39
+     },
+     "current": {
+      "monthlyUsageUsd": 1.2345
+     },
+     "monthlyUsageCycle": {
+      "startAt": "2026-05-10T00:00:00.000Z",
+      "endAt": "2026-06-09T23:59:59.999Z"
+     }
+    }
+   },
+   "local": 5.0,
+   "result": "{\"used_usd\": 1.2345, \"api_limit_usd\": 39.0, \"local_limit_usd\": 5.0, \"cycle_label\": \"10/05/2026 a 09/06/2026\", \"pct_of_local\": 24.689999999999998, \"pct_of_api\": 3.1653846153846152, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {
+    "limits": {
+     "maxMonthlyUsageUsd": 0
+    },
+    "current": {
+     "monthlyUsageUsd": 3
+    },
+    "usageCycle": {
+     "startAt": "2026-05-10",
+     "endAt": ""
+    }
+   },
+   "local": 2.5,
+   "result": "{\"used_usd\": 3.0, \"api_limit_usd\": 0.0, \"local_limit_usd\": 2.5, \"cycle_label\": \"10/05/2026\", \"pct_of_local\": 120.0, \"pct_of_api\": 0.0, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {
+    "data": {}
+   },
+   "local": 0.0,
+   "result": "{\"used_usd\": 0.0, \"api_limit_usd\": 0.0, \"local_limit_usd\": 0.0, \"cycle_label\": \"ciclo atual\", \"pct_of_local\": 0.0, \"pct_of_api\": 0.0, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {
+    "data": {
+     "current": {
+      "monthlyUsageUsd": "7.5"
+     },
+     "limits": {
+      "maxMonthlyUsageUsd": "10"
+     }
+    }
+   },
+   "local": 5.0,
+   "result": "{\"used_usd\": 7.5, \"api_limit_usd\": 10.0, \"local_limit_usd\": 5.0, \"cycle_label\": \"ciclo atual\", \"pct_of_local\": 150.0, \"pct_of_api\": 75.0, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {
+    "data": {
+     "current": {
+      "monthlyUsageUsd": 5000
+     },
+     "limits": {
+      "maxMonthlyUsageUsd": 1
+     }
+    }
+   },
+   "local": 1.0,
+   "result": "{\"used_usd\": 5000.0, \"api_limit_usd\": 1.0, \"local_limit_usd\": 1.0, \"cycle_label\": \"ciclo atual\", \"pct_of_local\": 999.0, \"pct_of_api\": 999.0, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {
+    "data": {
+     "current": {
+      "monthlyUsageUsd": 1e-05
+     },
+     "limits": {
+      "maxMonthlyUsageUsd": 39
+     }
+    }
+   },
+   "local": -3.0,
+   "result": "{\"used_usd\": 1e-05, \"api_limit_usd\": 39.0, \"local_limit_usd\": 0.0, \"cycle_label\": \"ciclo atual\", \"pct_of_local\": 0.0, \"pct_of_api\": 2.5641025641025643e-05, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {},
+   "local": 5.0,
+   "result": "{\"used_usd\": 0.0, \"api_limit_usd\": 0.0, \"local_limit_usd\": 5.0, \"cycle_label\": \"ciclo atual\", \"pct_of_local\": 0.0, \"pct_of_api\": 0.0, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  }
+ ],
+ "tokenharbor": [
+  {
+   "payload": {
+    "plan_name": "Free",
+    "on_plan": false,
+    "plan_used_pct": 0,
+    "used_pct": 12.7,
+    "exhausted": false,
+    "activated": true,
+    "period_started_at": "2026-05-01",
+    "reset_at": "2026-06-01",
+    "models": [
+     "a:free",
+     "b:free"
+    ],
+    "models_enabled": true
+   },
+   "result": "{\"configured\": true, \"plan_name\": \"Free\", \"on_plan\": false, \"plan_used_pct\": 0, \"plan_exhausted\": false, \"used_pct\": 12, \"exhausted\": false, \"activated\": true, \"period_started_at\": \"2026-05-01\", \"reset_at\": \"2026-06-01\", \"models\": [\"a:free\", \"b:free\"], \"models_enabled\": true, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {
+    "plan_name": "Pro",
+    "on_plan": true,
+    "plan_used_pct": "55",
+    "plan_exhausted": true,
+    "used_pct": 150,
+    "exhausted": true,
+    "period_ends_at": "2026-07-01",
+    "models": "nao-lista",
+    "models_enabled": false
+   },
+   "result": "{\"configured\": true, \"plan_name\": \"Pro\", \"on_plan\": true, \"plan_used_pct\": 55, \"plan_exhausted\": true, \"used_pct\": 100, \"exhausted\": true, \"activated\": false, \"period_started_at\": \"\", \"reset_at\": \"2026-07-01\", \"models\": [], \"models_enabled\": false, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {},
+   "result": "{\"configured\": true, \"plan_name\": \"\", \"on_plan\": false, \"plan_used_pct\": 0, \"plan_exhausted\": false, \"used_pct\": 0, \"exhausted\": false, \"activated\": false, \"period_started_at\": \"\", \"reset_at\": \"\", \"models\": [], \"models_enabled\": true, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {
+    "used_pct": "abc",
+    "plan_used_pct": null,
+    "models": [
+     1,
+     null,
+     "x"
+    ]
+   },
+   "result": "{\"configured\": true, \"plan_name\": \"\", \"on_plan\": false, \"plan_used_pct\": 0, \"plan_exhausted\": false, \"used_pct\": 0, \"exhausted\": false, \"activated\": false, \"period_started_at\": \"\", \"reset_at\": \"\", \"models\": [\"1\", \"None\", \"x\"], \"models_enabled\": true, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {
+    "used_pct": -5,
+    "reset_at": "",
+    "period_ends_at": "fim"
+   },
+   "result": "{\"configured\": true, \"plan_name\": \"\", \"on_plan\": false, \"plan_used_pct\": 0, \"plan_exhausted\": false, \"used_pct\": 0, \"exhausted\": false, \"activated\": false, \"period_started_at\": \"\", \"reset_at\": \"fim\", \"models\": [], \"models_enabled\": true, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  },
+  {
+   "payload": {
+    "used_pct": true,
+    "models_enabled": 0
+   },
+   "result": "{\"configured\": true, \"plan_name\": \"\", \"on_plan\": false, \"plan_used_pct\": 0, \"plan_exhausted\": false, \"used_pct\": 1, \"exhausted\": false, \"activated\": false, \"period_started_at\": \"\", \"reset_at\": \"\", \"models\": [], \"models_enabled\": false, \"fetched_at\": \"2026-06-01T12:00:00+00:00\", \"error\": \"\"}"
+  }
+ ]
+}

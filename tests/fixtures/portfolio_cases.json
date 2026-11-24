@@ -1,0 +1,893 @@
+{
+ "payload": {
+  "schema": 1,
+  "version": "2026-11-23T10:00:00Z",
+  "records": [
+   "texto solto",
+   {
+    "id": "x",
+    "kind": "profile",
+    "language": "pt",
+    "text": "sem facts"
+   },
+   {
+    "id": "",
+    "kind": "profile",
+    "language": "pt",
+    "text": "id vazio",
+    "facts": {}
+   },
+   {
+    "id": "y",
+    "kind": "profile",
+    "language": "pt",
+    "text": "facts não objeto",
+    "facts": [
+     1
+    ]
+   },
+   {
+    "id": "pt:profile",
+    "kind": "profile",
+    "language": "pt",
+    "text": "Desenvolvedora com   foco em integrações.\n\nGosta de   automação.",
+    "facts": {
+     "residence": "Belo Horizonte, MG, Brasil"
+    },
+    "url": "https://example.test/pt"
+   },
+   {
+    "id": "en:profile",
+    "kind": "profile",
+    "language": "en",
+    "text": "Developer focused on integrations.",
+    "facts": {
+     "residence": "Belo Horizonte"
+    }
+   },
+   {
+    "id": "pt:skills:code",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Linguagens: C#, Python, Rust, c#",
+    "facts": {
+     "kind": "language",
+     "items": [
+      "C#",
+      "Python",
+      "Rust",
+      "c#",
+      "  Node.js  ",
+      ""
+     ]
+    }
+   },
+   {
+    "id": "pt:skills:tools",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Ferramentas e práticas",
+    "facts": {
+     "kind": "practice",
+     "items": [
+      "Testes automatizados",
+      "Docker"
+     ]
+    }
+   },
+   {
+    "id": "pt:skills:ai",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Ferramentas de IA",
+    "facts": {
+     "kind": "ai_tool",
+     "items": [
+      "Claude",
+      42
+     ]
+    }
+   },
+   {
+    "id": "pt:skills:strange",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Algo estranho",
+    "facts": {
+     "kind": "weird",
+     "items": [
+      "Lua"
+     ]
+    }
+   },
+   {
+    "id": "pt:skills:spoken",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Idiomas falados",
+    "facts": {
+     "kind": "spoken",
+     "items": [
+      "Inglês (avançado)",
+      "Português (nativo)",
+      "Espanhol"
+     ]
+    },
+    "url": "https://example.test/l"
+   },
+   {
+    "id": "pt:exp:1",
+    "kind": "experience",
+    "language": "pt",
+    "text": "Analista de Sistemas na Empresa Alfa. Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade ",
+    "facts": {
+     "role": "Analista de Sistemas",
+     "company": "Empresa Alfa",
+     "start": "2021-01",
+     "end": null,
+     "stack": [
+      "C#",
+      ".NET",
+      "PostgreSQL",
+      "Avalonia"
+     ],
+     "bullets": [
+      "Criou APIs REST em C# para integração",
+      "  Automatizou   rotinas financeiras  ",
+      "",
+      "Suporte a usuários internos"
+     ]
+    },
+    "url": "https://example.test/e1"
+   },
+   {
+    "id": "pt:exp:2",
+    "kind": "experience",
+    "language": "pt",
+    "text": "Assistente na Comércio Beta",
+    "facts": {
+     "role": "Assistente",
+     "company": "Comércio Beta",
+     "start": "2018-03",
+     "end": "2020-12",
+     "stack": [],
+     "bullets": "não é lista"
+    }
+   },
+   {
+    "id": "pt:project:painel",
+    "kind": "project",
+    "language": "pt",
+    "text": "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.",
+    "facts": {
+     "title": "Painel de vagas",
+     "slug": "painel",
+     "headline": "Triagem de vagas",
+     "start": "2025-03",
+     "end": "2025-09",
+     "stack": [
+      "C#",
+      "Avalonia",
+      "SQLite"
+     ]
+    },
+    "url": "https://example.test/p"
+   },
+   {
+    "id": "pt:project:painel:bullet:1",
+    "kind": "project",
+    "language": "pt",
+    "text": "ignorado: bullet",
+    "facts": {
+     "title": "x",
+     "stack": [
+      "Zig"
+     ]
+    }
+   },
+   {
+    "id": "pt:project:sem-titulo",
+    "kind": "project",
+    "language": "pt",
+    "text": "Projeto sem título nos fatos",
+    "facts": {
+     "slug": "s",
+     "stack": []
+    },
+    "title": "Título do registro"
+   },
+   {
+    "id": "pt:education:1",
+    "kind": "education",
+    "language": "pt",
+    "text": "Bacharelado em Sistemas de Informação, Universidade Gama",
+    "facts": {
+     "start": "2017-02",
+     "end": "2021-12"
+    }
+   },
+   {
+    "id": "pt:education:2",
+    "kind": "education",
+    "language": "pt",
+    "text": "Curso em andamento",
+    "facts": {
+     "start": "2024-01"
+    }
+   },
+   {
+    "id": "en:exp:1",
+    "kind": "experience",
+    "language": "en",
+    "text": "Systems Analyst at Alpha Company",
+    "facts": {
+     "role": "Systems Analyst",
+     "company": "Alpha Company",
+     "start": "2021-01",
+     "stack": [
+      "C#"
+     ],
+     "bullets": [
+      "Built REST APIs"
+     ]
+    }
+   },
+   {
+    "id": "en:skills:code",
+    "kind": "skills",
+    "language": "en",
+    "text": "Languages",
+    "facts": {
+     "kind": "language",
+     "items": [
+      "C#",
+      "Go"
+     ]
+    }
+   },
+   {
+    "id": "en:skills:spoken",
+    "kind": "skills",
+    "language": "en",
+    "text": "Spoken",
+    "facts": {
+     "kind": "spoken",
+     "items": [
+      "English (advanced)"
+     ]
+    }
+   }
+  ],
+  "extra": "ignorado"
+ },
+ "valid": {
+  "schema": 1,
+  "version": "2026-11-23T10:00:00Z",
+  "records": [
+   {
+    "id": "pt:profile",
+    "kind": "profile",
+    "language": "pt",
+    "text": "Desenvolvedora com   foco em integrações.\n\nGosta de   automação.",
+    "facts": {
+     "residence": "Belo Horizonte, MG, Brasil"
+    },
+    "url": "https://example.test/pt"
+   },
+   {
+    "id": "en:profile",
+    "kind": "profile",
+    "language": "en",
+    "text": "Developer focused on integrations.",
+    "facts": {
+     "residence": "Belo Horizonte"
+    }
+   },
+   {
+    "id": "pt:skills:code",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Linguagens: C#, Python, Rust, c#",
+    "facts": {
+     "kind": "language",
+     "items": [
+      "C#",
+      "Python",
+      "Rust",
+      "c#",
+      "  Node.js  ",
+      ""
+     ]
+    }
+   },
+   {
+    "id": "pt:skills:tools",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Ferramentas e práticas",
+    "facts": {
+     "kind": "practice",
+     "items": [
+      "Testes automatizados",
+      "Docker"
+     ]
+    }
+   },
+   {
+    "id": "pt:skills:ai",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Ferramentas de IA",
+    "facts": {
+     "kind": "ai_tool",
+     "items": [
+      "Claude",
+      42
+     ]
+    }
+   },
+   {
+    "id": "pt:skills:strange",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Algo estranho",
+    "facts": {
+     "kind": "weird",
+     "items": [
+      "Lua"
+     ]
+    }
+   },
+   {
+    "id": "pt:skills:spoken",
+    "kind": "skills",
+    "language": "pt",
+    "text": "Idiomas falados",
+    "facts": {
+     "kind": "spoken",
+     "items": [
+      "Inglês (avançado)",
+      "Português (nativo)",
+      "Espanhol"
+     ]
+    },
+    "url": "https://example.test/l"
+   },
+   {
+    "id": "pt:exp:1",
+    "kind": "experience",
+    "language": "pt",
+    "text": "Analista de Sistemas na Empresa Alfa. Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade ",
+    "facts": {
+     "role": "Analista de Sistemas",
+     "company": "Empresa Alfa",
+     "start": "2021-01",
+     "end": null,
+     "stack": [
+      "C#",
+      ".NET",
+      "PostgreSQL",
+      "Avalonia"
+     ],
+     "bullets": [
+      "Criou APIs REST em C# para integração",
+      "  Automatizou   rotinas financeiras  ",
+      "",
+      "Suporte a usuários internos"
+     ]
+    },
+    "url": "https://example.test/e1"
+   },
+   {
+    "id": "pt:exp:2",
+    "kind": "experience",
+    "language": "pt",
+    "text": "Assistente na Comércio Beta",
+    "facts": {
+     "role": "Assistente",
+     "company": "Comércio Beta",
+     "start": "2018-03",
+     "end": "2020-12",
+     "stack": [],
+     "bullets": "não é lista"
+    }
+   },
+   {
+    "id": "pt:project:painel",
+    "kind": "project",
+    "language": "pt",
+    "text": "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.",
+    "facts": {
+     "title": "Painel de vagas",
+     "slug": "painel",
+     "headline": "Triagem de vagas",
+     "start": "2025-03",
+     "end": "2025-09",
+     "stack": [
+      "C#",
+      "Avalonia",
+      "SQLite"
+     ]
+    },
+    "url": "https://example.test/p"
+   },
+   {
+    "id": "pt:project:painel:bullet:1",
+    "kind": "project",
+    "language": "pt",
+    "text": "ignorado: bullet",
+    "facts": {
+     "title": "x",
+     "stack": [
+      "Zig"
+     ]
+    }
+   },
+   {
+    "id": "pt:project:sem-titulo",
+    "kind": "project",
+    "language": "pt",
+    "text": "Projeto sem título nos fatos",
+    "facts": {
+     "slug": "s",
+     "stack": []
+    },
+    "title": "Título do registro"
+   },
+   {
+    "id": "pt:education:1",
+    "kind": "education",
+    "language": "pt",
+    "text": "Bacharelado em Sistemas de Informação, Universidade Gama",
+    "facts": {
+     "start": "2017-02",
+     "end": "2021-12"
+    }
+   },
+   {
+    "id": "pt:education:2",
+    "kind": "education",
+    "language": "pt",
+    "text": "Curso em andamento",
+    "facts": {
+     "start": "2024-01"
+    }
+   },
+   {
+    "id": "en:exp:1",
+    "kind": "experience",
+    "language": "en",
+    "text": "Systems Analyst at Alpha Company",
+    "facts": {
+     "role": "Systems Analyst",
+     "company": "Alpha Company",
+     "start": "2021-01",
+     "stack": [
+      "C#"
+     ],
+     "bullets": [
+      "Built REST APIs"
+     ]
+    }
+   },
+   {
+    "id": "en:skills:code",
+    "kind": "skills",
+    "language": "en",
+    "text": "Languages",
+    "facts": {
+     "kind": "language",
+     "items": [
+      "C#",
+      "Go"
+     ]
+    }
+   },
+   {
+    "id": "en:skills:spoken",
+    "kind": "skills",
+    "language": "en",
+    "text": "Spoken",
+    "facts": {
+     "kind": "spoken",
+     "items": [
+      "English (advanced)"
+     ]
+    }
+   }
+  ]
+ },
+ "profile_pt": {
+  "version": "2",
+  "source": "portfolio",
+  "headline": "",
+  "professional_profile": "Desenvolvedora com foco em integrações. Gosta de automação.",
+  "seniority": "",
+  "location_notes": "Belo Horizonte, MG, Brasil",
+  "work_authorization_notes": "",
+  "roles": [
+   {
+    "id": "R1",
+    "title": "Analista de Sistemas",
+    "employer": "Empresa Alfa",
+    "start": "2021-01",
+    "end": "present",
+    "quote": "Analista de Sistemas na Empresa Alfa. Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre",
+    "responsibilities": [
+     {
+      "id": "R1.1",
+      "text": "Criou APIs REST em C# para integração",
+      "quote": "Criou APIs REST em C# para integração"
+     },
+     {
+      "id": "R1.2",
+      "text": "Automatizou rotinas financeiras",
+      "quote": "Automatizou rotinas financeiras"
+     },
+     {
+      "id": "R1.3",
+      "text": "Suporte a usuários internos",
+      "quote": "Suporte a usuários internos"
+     }
+    ],
+    "skills_used": [
+     "C#",
+     ".NET",
+     "PostgreSQL",
+     "Avalonia"
+    ],
+    "source": "portfolio",
+    "url": "https://example.test/e1"
+   },
+   {
+    "id": "R2",
+    "title": "Assistente",
+    "employer": "Comércio Beta",
+    "start": "2018-03",
+    "end": "2020-12",
+    "quote": "Assistente na Comércio Beta",
+    "responsibilities": [],
+    "skills_used": [],
+    "source": "portfolio",
+    "url": ""
+   }
+  ],
+  "skills": [
+   {
+    "id": "S1",
+    "name": "C#",
+    "canonical": "c#",
+    "category": "language",
+    "quotes": [
+     "Linguagens: C#, Python, Rust, c#"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S2",
+    "name": "Python",
+    "canonical": "python",
+    "category": "language",
+    "quotes": [
+     "Linguagens: C#, Python, Rust, c#"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S3",
+    "name": "Rust",
+    "canonical": "rust",
+    "category": "language",
+    "quotes": [
+     "Linguagens: C#, Python, Rust, c#"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S4",
+    "name": "Node.js",
+    "canonical": "node js",
+    "category": "language",
+    "quotes": [
+     "Linguagens: C#, Python, Rust, c#"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S5",
+    "name": "Testes automatizados",
+    "canonical": "testes automatizados",
+    "category": "domain",
+    "quotes": [
+     "Ferramentas e práticas"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S6",
+    "name": "Docker",
+    "canonical": "docker",
+    "category": "domain",
+    "quotes": [
+     "Ferramentas e práticas"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S7",
+    "name": "Claude",
+    "canonical": "claude",
+    "category": "tool",
+    "quotes": [
+     "Ferramentas de IA"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S8",
+    "name": "42",
+    "canonical": "42",
+    "category": "tool",
+    "quotes": [
+     "Ferramentas de IA"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S9",
+    "name": "Lua",
+    "canonical": "lua",
+    "category": "other",
+    "quotes": [
+     "Algo estranho"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S10",
+    "name": ".NET",
+    "canonical": "net",
+    "category": "other",
+    "quotes": [
+     "Analista de Sistemas na Empresa Alfa. Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S11",
+    "name": "PostgreSQL",
+    "canonical": "postgresql",
+    "category": "other",
+    "quotes": [
+     "Analista de Sistemas na Empresa Alfa. Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S12",
+    "name": "Avalonia",
+    "canonical": "avalonia",
+    "category": "other",
+    "quotes": [
+     "Analista de Sistemas na Empresa Alfa. Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S13",
+    "name": "SQLite",
+    "canonical": "sqlite",
+    "category": "other",
+    "quotes": [
+     "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia."
+    ],
+    "source": "portfolio"
+   }
+  ],
+  "transferable_skills": [],
+  "education": [
+   {
+    "id": "E1",
+    "text": "Bacharelado em Sistemas de Informação, Universidade Gama",
+    "quote": "Bacharelado em Sistemas de Informação, Universidade Gama",
+    "start": "2017-02",
+    "end": "2021-12",
+    "source": "portfolio",
+    "url": ""
+   },
+   {
+    "id": "E2",
+    "text": "Curso em andamento",
+    "quote": "Curso em andamento",
+    "start": "2024-01",
+    "end": "present",
+    "source": "portfolio",
+    "url": ""
+   }
+  ],
+  "certifications": [],
+  "projects": [
+   {
+    "id": "P1",
+    "text": "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.",
+    "quote": "Painel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.",
+    "title": "Painel de vagas",
+    "slug": "painel",
+    "headline": "Triagem de vagas",
+    "start": "2025-03",
+    "end": "2025-09",
+    "stack": [
+     "C#",
+     "Avalonia",
+     "SQLite"
+    ],
+    "source": "portfolio",
+    "url": "https://example.test/p"
+   },
+   {
+    "id": "P2",
+    "text": "Projeto sem título nos fatos",
+    "quote": "Projeto sem título nos fatos",
+    "title": "Título do registro",
+    "slug": "s",
+    "headline": "",
+    "start": "",
+    "end": "present",
+    "stack": [],
+    "source": "portfolio",
+    "url": ""
+   }
+  ],
+  "achievements": [],
+  "languages": [
+   {
+    "id": "L1",
+    "language": "Inglês",
+    "level": "avançado",
+    "quote": "Inglês (avançado)",
+    "source": "portfolio",
+    "url": "https://example.test/l"
+   },
+   {
+    "id": "L2",
+    "language": "Português",
+    "level": "nativo",
+    "quote": "Português (nativo)",
+    "source": "portfolio",
+    "url": "https://example.test/l"
+   },
+   {
+    "id": "L3",
+    "language": "Espanhol",
+    "level": "",
+    "quote": "Espanhol",
+    "source": "portfolio",
+    "url": "https://example.test/l"
+   }
+  ]
+ },
+ "profile_en": {
+  "version": "2",
+  "source": "portfolio",
+  "headline": "",
+  "professional_profile": "Developer focused on integrations.",
+  "seniority": "",
+  "location_notes": "Belo Horizonte",
+  "work_authorization_notes": "",
+  "roles": [
+   {
+    "id": "R1",
+    "title": "Systems Analyst",
+    "employer": "Alpha Company",
+    "start": "2021-01",
+    "end": "present",
+    "quote": "Systems Analyst at Alpha Company",
+    "responsibilities": [
+     {
+      "id": "R1.1",
+      "text": "Built REST APIs",
+      "quote": "Built REST APIs"
+     }
+    ],
+    "skills_used": [
+     "C#"
+    ],
+    "source": "portfolio",
+    "url": ""
+   }
+  ],
+  "skills": [
+   {
+    "id": "S1",
+    "name": "C#",
+    "canonical": "c#",
+    "category": "language",
+    "quotes": [
+     "Languages"
+    ],
+    "source": "portfolio"
+   },
+   {
+    "id": "S2",
+    "name": "Go",
+    "canonical": "go",
+    "category": "language",
+    "quotes": [
+     "Languages"
+    ],
+    "source": "portfolio"
+   }
+  ],
+  "transferable_skills": [],
+  "education": [],
+  "certifications": [],
+  "projects": [],
+  "achievements": [],
+  "languages": [
+   {
+    "id": "L1",
+    "language": "English",
+    "level": "advanced",
+    "quote": "English (advanced)",
+    "source": "portfolio",
+    "url": ""
+   }
+  ]
+ },
+ "profile_xx": {
+  "version": "2",
+  "source": "portfolio",
+  "headline": "",
+  "professional_profile": "",
+  "seniority": "",
+  "location_notes": "",
+  "work_authorization_notes": "",
+  "roles": [],
+  "skills": [],
+  "transferable_skills": [],
+  "education": [],
+  "certifications": [],
+  "projects": [],
+  "achievements": [],
+  "languages": []
+ },
+ "text": "Desenvolvedora com foco em integrações. Gosta de automação.\nDeveloper focused on integrations.\nLinguagens: C#, Python, Rust, c#\nFerramentas e práticas\nFerramentas de IA\nAlgo estranho\nIdiomas falados\nAnalista de Sistemas na Empresa Alfa. Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade Construiu integrações entre sistemas internos e painéis de acompanhamento para equipes de operação, com foco em confiabilidade\nAssistente na Comércio Beta\nPainel de vagas: aplicativo desktop para triagem de vagas com C# e Avalonia.\nignorado: bullet\nProjeto sem título nos fatos\nBacharelado em Sistemas de Informação, Universidade Gama\nCurso em andamento\nSystems Analyst at Alpha Company\nLanguages\nSpoken",
+ "validation_errors": [
+  {
+   "name": "not_object",
+   "message": "Resposta do portfólio não é um objeto JSON."
+  },
+  {
+   "name": "no_schema",
+   "message": "Resposta do portfólio sem `schema` válido."
+  },
+  {
+   "name": "schema_zero",
+   "message": "Resposta do portfólio sem `schema` válido."
+  },
+  {
+   "name": "schema_bool",
+   "message": "O portfólio não traz `facts` estruturados nos registros: atualize o endpoint /ai/profile.json."
+  },
+  {
+   "name": "schema_float",
+   "message": "Resposta do portfólio sem `schema` válido."
+  },
+  {
+   "name": "no_version",
+   "message": "Resposta do portfólio sem `version`."
+  },
+  {
+   "name": "empty_version",
+   "message": "Resposta do portfólio sem `version`."
+  },
+  {
+   "name": "no_records",
+   "message": "Resposta do portfólio sem registros."
+  },
+  {
+   "name": "no_facts",
+   "message": "O portfólio não traz `facts` estruturados nos registros: atualize o endpoint /ai/profile.json."
+  }
+ ]
+}

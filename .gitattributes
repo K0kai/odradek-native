@@ -1,0 +1,3 @@
+*.cs text eol=lf
+*.axaml text eol=lf
+*.json text eol=lf
