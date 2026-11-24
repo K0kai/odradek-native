@@ -137,6 +137,45 @@ public class JobActionsTests
     }
 
     [Fact]
+    public void PurgeIgnored_empties_content_keeps_the_row_and_spares_unreviewed_ai_discards()
+    {
+        using var t = new TempDb();
+        long Decision(long job, int shouldApply)
+        {
+            using var c = t.Db.Open();
+            c.Execute("INSERT INTO ai_decisions(job_id,decided_at,match_score,should_apply,letter_required,reason,assessment_json) VALUES(@job,@now,60,@shouldApply,0,'motivo','{\"a\":1}')",
+                new { job, now = Clock.NowIso(), shouldApply });
+            c.Execute("INSERT INTO cover_letters(job_id,language,provider,model,body,created_at,updated_at) VALUES(@job,'pt','p','m','carta',@now,@now)", new { job, now = Clock.NowIso() });
+            return job;
+        }
+        var byHand = Decision(t.AddJob(status: "ignored", description: "texto longo", title: "Manual"), 1); // ignorada à mão (decisão aprovava)
+        var discarded = Decision(t.AddJob(status: "ignored", description: "texto da IA"), 0);              // descartada pela IA, não conferida
+        var reviewed = Decision(t.AddJob(status: "ignored", description: "texto conferido"), 0);
+        var worth = Decision(t.AddJob(description: "vale"), 1);
+        t.Scalar<int>("UPDATE jobs SET reviewed_at='2026-11-21T00:00:00+00:00' WHERE id=@reviewed RETURNING 1", new { reviewed });
+        var actions = new JobActions(t.Db);
+
+        Assert.Equal(2, actions.PurgeIgnoredPreview());
+        Assert.Equal("2 vaga(s) ignorada(s) limpa(s) e banco compactado.", actions.PurgeIgnored());
+        foreach (var id in new[] { byHand, reviewed })
+        {
+            Assert.Equal("", t.Scalar<string>("SELECT description FROM jobs WHERE id=@id", new { id }));
+            Assert.Equal(0, t.Scalar<int>("SELECT COUNT(*) FROM cover_letters WHERE job_id=@id", new { id }));
+            Assert.Equal("", t.Scalar<string>("SELECT assessment_json FROM ai_decisions WHERE job_id=@id", new { id }));
+            Assert.Equal("motivo", t.Scalar<string>("SELECT reason FROM ai_decisions WHERE job_id=@id", new { id })); // nota e motivo ficam
+            Assert.Equal("ignored", t.Scalar<string>("SELECT status FROM jobs WHERE id=@id", new { id }));          // a linha fica: o fingerprint segue ocupado
+        }
+        foreach (var id in new[] { discarded, worth }) // fora do escopo
+        {
+            Assert.NotEqual("", t.Scalar<string>("SELECT description FROM jobs WHERE id=@id", new { id }));
+            Assert.Equal(1, t.Scalar<int>("SELECT COUNT(*) FROM cover_letters WHERE job_id=@id", new { id }));
+        }
+        Assert.Contains(t.Changes, c => c is JobsChanged);
+        Assert.Equal(0, actions.PurgeIgnoredPreview());
+        Assert.Equal("Nenhuma vaga ignorada para limpar.", actions.PurgeIgnored()); // idempotente
+    }
+
+    [Fact]
     public void MarkReviewed_only_touches_ignored_unreviewed_jobs_and_limits_ids()
     {
         using var t = new TempDb();

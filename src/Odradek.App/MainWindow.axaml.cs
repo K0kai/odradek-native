@@ -92,6 +92,8 @@ public partial class MainWindow : Window
     {
         BulkExpander.IsVisible = _status == "worth";
         ReviewedButton.IsVisible = _status == "triage:discarded";
+        PurgeIgnoredButton.IsVisible = _status == "ignored";
+        ResetConfirmations(); // uma confirmação armada não sobrevive à troca de aba
         // A busca por texto só existe nas abas de triagem (o filtro das outras listas não a usa): nas demais o campo fica apagado.
         var searchable = _status.StartsWith("triage:", StringComparison.Ordinal);
         SearchField.Opacity = searchable ? 1 : 0.45;
