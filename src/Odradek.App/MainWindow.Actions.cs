@@ -14,7 +14,7 @@ public partial class MainWindow
 {
     private DispatcherTimer? _noticeTimer;
     private JobRecord? _detailJob;
-    private bool _confirmingEmail, _confirmingQueueClear, _confirmingLogsClear;
+    private bool _confirmingEmail;
     private int _bulkPreview = -1;
     private BulkIgnoreCriteria _bulkCriteria = BulkIgnoreCriteria.Empty;
     private readonly Dictionary<string, IStorageFile> _resumeFiles = [];
@@ -137,10 +137,43 @@ public partial class MainWindow
     private BulkIgnoreCriteria ReadBulk() => new("", BulkCountry.Text ?? "", BulkFoundFrom.Text ?? "", BulkFoundTo.Text ?? "", BulkPostedFrom.Text ?? "",
         BulkPostedTo.Text ?? "", BulkMatchMin.Text ?? "", BulkMatchMax.Text ?? "", BulkAll.IsChecked == true);
 
+    // Ações destrutivas em dois cliques (ação → confirmar, com Cancelar). Só uma fica armada por vez.
+    private readonly Dictionary<Button, (Button Cancel, string Idle)> _confirmables = [];
+    private Button? _armed;
+
     private void ResetConfirmations()
     {
-        _confirmingQueueClear = false; QueueClearButton.Content = "Limpar concluídos"; QueueClearCancel.IsVisible = false;
-        _confirmingLogsClear = false; LogsClearButton.Content = "Limpar logs"; LogsClearCancel.IsVisible = false;
+        foreach (var (button, (cancel, idle)) in _confirmables) { button.Content = idle; cancel.IsVisible = false; }
+        _armed = null;
+    }
+
+    /// <summary>
+    /// Liga um botão destrutivo ao padrão "clicar, confirmar". Com <paramref name="count"/>, o 1º clique conta o que será afetado
+    /// (fora da tela), mostra o número no botão e não arma se não houver nada a fazer.
+    /// </summary>
+    private void WireConfirm(Button button, Button cancel, Func<string> work, Func<int>? count = null)
+    {
+        var idle = button.Content?.ToString() ?? "";
+        _confirmables[button] = (cancel, idle);
+        button.Click += async (_, _) =>
+        {
+            if (_armed != button)
+            {
+                ResetConfirmations();
+                var n = -1;
+                if (count is not null)
+                {
+                    try { n = await Task.Run(count); }
+                    catch (Exception ex) { Notify($"Não foi possível contar: {ex.Message}", true); return; }
+                    if (n == 0) { Notify("Nada para limpar aqui.", false); return; }
+                }
+                _armed = button; button.Content = n > 0 ? $"Confirmar limpeza de {n}" : "Confirmar limpeza"; cancel.IsVisible = true;
+                return;
+            }
+            ResetConfirmations();
+            _ = RunAsync(work);
+        };
+        cancel.Click += (_, _) => ResetConfirmations();
     }
 
     private void WireActions()
@@ -214,26 +247,18 @@ public partial class MainWindow
         // fila
         QueueEvaluateButton.Click += (_, _) => { ResetConfirmations(); _ = RunAsync(() => new QueueActions(_database).EvaluateNew()); };
         QueueRetryAllButton.Click += (_, _) => { ResetConfirmations(); _ = RunAsync(() => $"{new QueueActions(_database).RetryAll()} job(s) reenfileirado(s)."); };
-        QueueClearButton.Click += (_, _) =>
-        {
-            if (!_confirmingQueueClear) { ResetConfirmations(); _confirmingQueueClear = true; QueueClearButton.Content = "Confirmar limpeza"; QueueClearCancel.IsVisible = true; return; }
-            ResetConfirmations();
-            _ = RunAsync(() => $"{new QueueActions(_database).ClearTerminal()} job(s) removido(s).");
-        };
-        QueueClearCancel.Click += (_, _) => ResetConfirmations();
+        WireConfirm(QueueClearButton, QueueClearCancel, () => $"{new QueueActions(_database).ClearTerminal()} job(s) removido(s).");
         QueueOpenButton.Click += (_, _) => Format.OpenInBrowser((QueueList.SelectedItem as QueueRow) is { } r ? Sub(r.Item, "url") : null);
         QueueCancelButton.Click += (_, _) => QueueItemAction(id => new QueueActions(_database).Cancel(id));
         QueueRetryButton.Click += (_, _) => QueueItemAction(id => new QueueActions(_database).RetryNow(id));
 
         // logs
         LogsRefreshButton.Click += (_, _) => _ = LoadLogsAsync();
-        LogsClearButton.Click += (_, _) =>
-        {
-            if (!_confirmingLogsClear) { ResetConfirmations(); _confirmingLogsClear = true; LogsClearButton.Content = "Confirmar limpeza"; LogsClearCancel.IsVisible = true; return; }
-            ResetConfirmations();
-            _ = RunAsync(() => $"{new EventLogStore(_database).Clear()} log(s) removido(s).");
-        };
-        LogsClearCancel.Click += (_, _) => ResetConfirmations();
+        WireConfirm(LogsClearButton, LogsClearCancel, () => $"{new EventLogStore(_database).Clear()} log(s) removido(s).");
+
+        // vagas ignoradas: esvazia descrição, carta e auditoria (a vaga fica, para a coleta não trazê-la de volta)
+        WireConfirm(PurgeIgnoredButton, PurgeIgnoredCancel, () => new JobActions(_database).PurgeIgnored(), () => new JobActions(_database).PurgeIgnoredPreview());
+        ToolTip.SetTip(PurgeIgnoredButton, "Esvazia a descrição, a carta e a análise das vagas ignoradas. A vaga, a nota e as anotações ficam, e o banco é compactado no fim. As descartadas pela IA ainda não conferidas não são tocadas.");
 
         // regras de formulário
         RulesAddButton.Click += (_, _) => _rulesEditor?.Add();

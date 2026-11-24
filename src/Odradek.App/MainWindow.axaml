@@ -123,6 +123,8 @@
           </Border>
           <Button x:Name="ClearFiltersButton" Classes="quiet icon" Tag="&#xE894;" Content="Limpar filtros" IsVisible="False" Margin="0,0,8,8" VerticalAlignment="Top" Height="36" />
           <Button x:Name="ReviewedButton" Content="Marcar esta página como conferida" IsVisible="False" Margin="0,0,8,8"  Classes="icon" Tag="&#xE73E;"/>
+          <Button x:Name="PurgeIgnoredButton" Content="Limpar ignoradas" IsVisible="False" Margin="0,0,8,8" Classes="icon danger" Tag="&#xE74D;" />
+          <Button x:Name="PurgeIgnoredCancel" Content="Cancelar" IsVisible="False" Margin="0,0,8,8" />
         </WrapPanel>
         <Expander x:Name="BulkExpander" Header="Ignorar vagas em revisão por critérios" IsVisible="False" HorizontalAlignment="Stretch">
           <StackPanel Spacing="8">

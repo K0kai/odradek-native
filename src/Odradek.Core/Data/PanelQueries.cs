@@ -93,14 +93,15 @@ public sealed partial class PanelQueries(Database db)
         return new JobPage(rows.Select(ToRecord).ToList(), total, page, pages, pageSize, new JobFilters(status, minMatch, sort, dateFrom, dateTo));
     }
 
+    /// <summary>Descartadas pela IA e ainda não conferidas: a decisão mais recente reprovou a vaga. Vagas ignoradas à mão não entram.</summary>
+    public const string DiscardedWhere =
+        "jobs.status = 'ignored' AND COALESCE(jobs.reviewed_at, '') = '' AND " +
+        "(SELECT should_apply FROM ai_decisions WHERE ai_decisions.job_id = jobs.id ORDER BY id DESC LIMIT 1) = 0";
+
     // Abas de "Não selecionadas": (filtro SQL, ordem padrão).
     private static readonly Dictionary<string, (string Where, string Order)> TriageTabs = new()
     {
-        // Descartadas pela IA e ainda não conferidas: a decisão mais recente reprovou a vaga. Vagas ignoradas à mão não entram.
-        ["discarded"] = (
-            "jobs.status = 'ignored' AND COALESCE(jobs.reviewed_at, '') = '' AND " +
-            "(SELECT should_apply FROM ai_decisions WHERE ai_decisions.job_id = jobs.id ORDER BY id DESC LIMIT 1) = 0",
-            "COALESCE(" + JobSort.MatchExpr + ", 0) DESC, jobs.id DESC"),
+        ["discarded"] = (DiscardedWhere, "COALESCE(" + JobSort.MatchExpr + ", 0) DESC, jobs.id DESC"),
         // Ainda sem decisão da IA: coletadas ou na fila de triagem.
         ["pending"] = ("jobs.status IN ('new', 'review')", "jobs.first_seen_at DESC, jobs.id DESC"),
     };

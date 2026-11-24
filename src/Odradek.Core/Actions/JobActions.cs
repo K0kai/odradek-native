@@ -125,4 +125,52 @@ public sealed class JobActions(Database db)
         db.Bus.Publish(new JobsChanged([]));
         return $"{count} vaga(s) ignorada(s).";
     }
+
+    // ---- limpeza das ignoradas -------------------------------------------------------------------------------------
+    // Esvazia o que pesa (descrição, carta e auditoria da IA) e mantém a linha: o fingerprint segue ocupado, então a coleta
+    // não traz a vaga de volta. Título, empresa, URL, nota, motivo e anotações ficam. As descartadas pela IA que o usuário
+    // ainda não conferiu ficam de fora, para a aba "Descartadas pela IA" não perder o que ele ainda vai ler.
+
+    private const string PurgeScope = $"jobs.status = 'ignored' AND NOT ({PanelQueries.DiscardedWhere})";
+
+    private const string PurgeHasContent = $"""
+        {PurgeScope} AND (jobs.description <> ''
+            OR EXISTS (SELECT 1 FROM cover_letters c WHERE c.job_id = jobs.id)
+            OR EXISTS (SELECT 1 FROM ai_decisions d WHERE d.job_id = jobs.id AND d.assessment_json <> ''))
+        """;
+
+    /// <summary>Quantas vagas ignoradas ainda têm conteúdo a esvaziar.</summary>
+    public int PurgeIgnoredPreview()
+    {
+        using var connection = db.Open();
+        return connection.ExecuteScalar<int>($"SELECT COUNT(*) FROM jobs WHERE {PurgeHasContent}");
+    }
+
+    /// <summary>Esvazia as vagas ignoradas; a mensagem diz quantas foram limpas.</summary>
+    public string PurgeIgnored()
+    {
+        int count;
+        using (var connection = db.Open())
+        using (var tx = connection.BeginTransaction())
+        {
+            count = connection.ExecuteScalar<int>($"SELECT COUNT(*) FROM jobs WHERE {PurgeHasContent}", transaction: tx);
+            connection.Execute($"DELETE FROM cover_letters WHERE job_id IN (SELECT jobs.id FROM jobs WHERE {PurgeScope})", transaction: tx);
+            connection.Execute($"UPDATE ai_decisions SET assessment_json = '' WHERE assessment_json <> '' AND job_id IN (SELECT jobs.id FROM jobs WHERE {PurgeScope})", transaction: tx);
+            connection.Execute($"UPDATE jobs SET description = '' WHERE description <> '' AND {PurgeScope}", transaction: tx);
+            tx.Commit();
+        }
+        if (count == 0) return "Nenhuma vaga ignorada para limpar.";
+        db.Bus.Publish(new JobsChanged([]));
+        // O SQLite só devolve o espaço ao disco com VACUUM, que não roda dentro de transação. A limpeza já foi gravada: se o VACUUM falhar, vira aviso.
+        try
+        {
+            using var connection = db.Open();
+            connection.Execute("VACUUM");
+        }
+        catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or InvalidOperationException)
+        {
+            return $"{count} vaga(s) ignorada(s) limpa(s), mas não foi possível compactar o banco: {ex.Message}";
+        }
+        return $"{count} vaga(s) ignorada(s) limpa(s) e banco compactado.";
+    }
 }
