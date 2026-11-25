@@ -1,5 +1,6 @@
 <#
-  Instala o Odradek nativo (C# + Avalonia) no seu usuário e cria os atalhos. Troca o app Python pelo nativo sem perder dados:
+  Caminho de desenvolvimento (quem só quer usar o app baixa o Odradek-Setup.exe das Releases; ver README).
+  Instala o Odradek nativo (C# + Avalonia) no seu usuário e cria os atalhos.Troca o app Python pelo nativo sem perder dados:
   o jobs.db é o mesmo (%LOCALAPPDATA%\Odradek) e o app novo migra o esquema sozinho na primeira abertura.
 
   .\build.ps1                         # gera dist\Odradek
@@ -54,14 +55,6 @@ if ($Uninstall) {
 }
 
 if (-not (Test-Path (Join-Path $Source "Odradek.exe"))) { throw "Não achei $Source\Odradek.exe. Rode .\build.ps1 primeiro." }
-
-# O app precisa do .NET 10 e do ASP.NET Core 10 (a pasta publicada não os leva junto).
-$runtimes = (& dotnet --list-runtimes 2>$null) -join "`n"
-foreach ($needed in "Microsoft.NETCore.App 10.", "Microsoft.AspNetCore.App 10.") {
-    if ($runtimes -notmatch [regex]::Escape($needed)) {
-        throw "Falta o runtime '$needed' do .NET. Instale o .NET 10 Desktop Runtime e o ASP.NET Core Runtime 10 (versão x64) em https://dotnet.microsoft.com/download/dotnet/10.0"
-    }
-}
 
 # Cópia de segurança do banco antes de o app novo mexer no esquema.
 $db = Join-Path $dataDir "jobs.db"

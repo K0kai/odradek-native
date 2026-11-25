@@ -4,8 +4,9 @@
   .\build.ps1               # testa e publica
   .\build.ps1 -SkipTests    # só publica
 
-  A pasta publicada precisa do .NET 10 Desktop Runtime e do ASP.NET Core 10 Runtime instalados no Windows (versão "x64").
-  Não há instalador: o app é uma pasta. Copie-a para onde quiser e crie o atalho para Odradek.exe.
+  A pasta publicada é self-contained (win-x64): leva o .NET junto e roda num Windows sem nada instalado.
+  O instalador é gerado a partir dela por installer\Odradek.iss; quem publica as versões para os usuários é o
+  workflow .github\workflows\release.yml (GitHub Releases).
   Dados do usuário: %LOCALAPPDATA%\Odradek (o mesmo jobs.db do app Python; ODRADEK_DATA_DIR muda a pasta).
 
   Atualização automática: além de dist\, o build publica a versão no FEED (pasta local ou de rede): Odradek-<versão>-win-x64.zip e latest.json.
@@ -39,7 +40,7 @@ if (-not $SkipTests) {
 
 $out = Join-Path $PSScriptRoot "dist\Odradek"
 if (Test-Path $out) { Remove-Item $out -Recurse -Force }
-dotnet publish src\Odradek.App\Odradek.App.csproj --configuration Release --runtime win-x64 --self-contained false --output $out "-p:Version=$Version"
+dotnet publish src\Odradek.App\Odradek.App.csproj --configuration Release --runtime win-x64 --self-contained true --output $out "-p:Version=$Version"
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish falhou" }
 
 # Os símbolos de depuração só pesam: ficam de fora do pacote.

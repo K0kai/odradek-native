@@ -69,7 +69,7 @@ internal sealed class UpdateCoordinator
             var staged = await _updater.CheckAndStageAsync(ct);
             Set(staged);
             if (staged is not null) return UpdateCheck.Ready;
-            var manifest = _updater.ReadManifest();
+            var manifest = await _updater.ReadManifestAsync(ct);
             if (manifest is null) return UpdateCheck.FeedUnavailable;
             return manifest.Version > _updater.Current ? UpdateCheck.Failed : UpdateCheck.UpToDate; // há versão nova que não pôde ser preparada
         }
@@ -80,7 +80,7 @@ internal sealed class UpdateCoordinator
     {
         UpdateCheck.UpToDate => "Você já está na versão mais recente.",
         UpdateCheck.Ready => "Há uma versão nova pronta: use Atualizar agora.",
-        UpdateCheck.FeedUnavailable => "Não consegui acessar a pasta de atualizações.",
+        UpdateCheck.FeedUnavailable => "Não consegui acessar o servidor de atualizações.",
         _ => "Não foi possível preparar a atualização. Veja desktop.log na pasta de dados.",
     };
 
@@ -105,6 +105,7 @@ internal sealed class UpdateCoordinator
                 var message = $"Odradek atualizado de {from} para {_updater.Current}.";
                 Program.Log("Update: " + message);
                 new EventLogStore(Program.Database).Add("info", "update", message);
+                InstalledApp.SetDisplayVersion(_updater.InstallDir, _updater.Current);
             }
 
             await Task.Delay(_first, ct);

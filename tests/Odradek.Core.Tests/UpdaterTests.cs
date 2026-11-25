@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
 using Odradek.Core.Update;
@@ -108,6 +109,115 @@ public sealed class UpdaterTests : IDisposable
         Publish("1.0.1", manifestFile: file);
         Assert.Null(await Make().CheckAndStageAsync());
         Assert.False(Directory.Exists(Make().StagingDir));
+    }
+
+    private const string UrlFeed = "https://exemplo.test/releases/latest/download/";
+
+    /// <summary>Responde pela rede com os arquivos da pasta-feed (404 no que não existe) e guarda o que foi pedido.</summary>
+    private sealed class FolderHandler(string folder) : HttpMessageHandler
+    {
+        public List<string> Requests { get; } = [];
+        public Func<string, Exception?> Fail { get; set; } = _ => null;
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Requests.Add(request.RequestUri!.AbsoluteUri);
+            var name = Path.GetFileName(request.RequestUri.LocalPath);
+            if (Fail(name) is { } error) return Task.FromException<HttpResponseMessage>(error);
+            var path = Path.Combine(folder, name);
+            return Task.FromResult(File.Exists(path)
+                ? new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(File.ReadAllBytes(path)) }
+                : new HttpResponseMessage(HttpStatusCode.NotFound));
+        }
+    }
+
+    private Updater MakeRemote(HttpMessageHandler handler, string feed = UrlFeed) => new(Install, Data, feed, new Version(1, 0, 0), _log.Add, handler);
+
+    [Theory]
+    [InlineData(UrlFeed)]
+    [InlineData("https://exemplo.test/releases/latest/download")] // sem a barra final
+    public async Task An_https_feed_is_downloaded_checked_and_extracted(string feed)
+    {
+        Publish("1.0.1");
+        var handler = new FolderHandler(Feed);
+        var staged = await MakeRemote(handler, feed).CheckAndStageAsync();
+
+        Assert.Equal(new Version(1, 0, 1, 0), staged!.Version);
+        Assert.Equal("conteudo 1.0.1", File.ReadAllText(Path.Combine(staged.Dir, "Odradek.exe")));
+        Assert.Equal([UrlFeed + "latest.json", UrlFeed + "Odradek-1.0.1-win-x64.zip"], handler.Requests);
+    }
+
+    [Theory]
+    [InlineData("http://exemplo.test/releases/")]
+    [InlineData("ftp://exemplo.test/releases/")]
+    public async Task A_feed_address_that_is_not_https_is_never_requested(string feed)
+    {
+        Publish("1.0.1");
+        var handler = new FolderHandler(Feed);
+        Assert.Null(await MakeRemote(handler, feed).CheckAndStageAsync());
+        Assert.Empty(handler.Requests);
+        Assert.Contains(_log, line => line.Contains("https://"));
+    }
+
+    [Fact]
+    public async Task A_missing_remote_manifest_means_the_feed_is_unavailable()
+    {
+        Assert.Null(await MakeRemote(new FolderHandler(Feed)).ReadManifestAsync());
+    }
+
+    [Fact]
+    public async Task A_missing_remote_zip_stages_nothing()
+    {
+        File.Delete(Publish("1.0.1"));
+        var updater = MakeRemote(new FolderHandler(Feed));
+        Assert.Null(await updater.CheckAndStageAsync());
+        Assert.False(Directory.Exists(updater.StagingDir));
+        Assert.Empty(Directory.GetFiles(updater.UpdatesDir, "*.zip"));
+    }
+
+    [Fact]
+    public async Task A_remote_package_with_a_wrong_sha256_is_never_staged()
+    {
+        Publish("1.0.1", sha: new string('a', 64));
+        var updater = MakeRemote(new FolderHandler(Feed));
+        Assert.Null(await updater.CheckAndStageAsync());
+        Assert.False(Directory.Exists(updater.StagingDir));
+    }
+
+    [Fact]
+    public async Task A_network_timeout_is_a_failure_and_not_a_cancellation()
+    {
+        var handler = new FolderHandler(Feed) { Fail = _ => new TaskCanceledException("tempo esgotado") };
+        Assert.Null(await MakeRemote(handler).CheckAndStageAsync()); // se saísse como exceção, o coordenador pararia de procurar
+
+        Publish("1.0.1");
+        handler.Fail = name => name.EndsWith(".zip") ? new TaskCanceledException("tempo esgotado") : null;
+        Assert.Null(await MakeRemote(handler).CheckAndStageAsync());
+    }
+
+    [Fact]
+    public async Task A_failed_download_keeps_the_version_already_staged()
+    {
+        Publish("1.0.1");
+        var handler = new FolderHandler(Feed);
+        var updater = MakeRemote(handler);
+        await updater.CheckAndStageAsync();
+
+        Publish("1.0.2");
+        handler.Fail = name => name.EndsWith(".zip") ? new HttpRequestException("rede caiu") : null;
+        var staged = await updater.CheckAndStageAsync();
+
+        Assert.Equal(new Version(1, 0, 1, 0), staged!.Version);
+        Assert.Equal(staged, updater.Staged());
+    }
+
+    [Fact]
+    public async Task A_requested_cancellation_still_comes_out_as_one()
+    {
+        Publish("1.0.1");
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => MakeRemote(new FolderHandler(Feed)).CheckAndStageAsync(cts.Token));
     }
 
     [Fact]

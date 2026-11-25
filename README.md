@@ -4,6 +4,21 @@ App de desktop do Odradek em **C# / .NET 10 + Avalonia 12**, só Windows: coleta
 
 Veio do repositório `job-scraper` (app Python + React em pywebview). Usa o **mesmo `jobs.db`** (`%LOCALAPPDATA%\Odradek`, ou `ODRADEK_DATA_DIR`) e a **mesma porta 127.0.0.1:8765** (`PORT` muda), então a extensão e o Qpid continuam como estão. O app migra o esquema do banco sozinho ao abrir.
 
+## Instalar
+
+Baixe o **[Odradek-Setup.exe](https://github.com/K0kai/odradek-native/releases/latest/download/Odradek-Setup.exe)** e execute. Precisa de Windows 10 (1809) ou 11 de 64 bits; o .NET vai junto, e não pede administrador. O app vai para `%LOCALAPPDATA%\Programs\Odradek` e daí em diante se atualiza sozinho. Desinstalar (em "Adicionar ou remover programas") mantém os seus dados.
+
+O instalador ainda não tem assinatura digital, então o Windows pode mostrar **"O Windows protegeu o computador"**: clique em **Mais informações → Executar assim mesmo**.
+
+## Publicar uma versão
+
+1. Faça push do que vai na versão para a `main`.
+2. No GitHub: **Actions → release → Run workflow** (ou `gh workflow run release`).
+
+O workflow roda os testes, gera o pacote e o instalador e cria a release `v<aaaa.MMdd.HHmm>` com `latest.json`, o zip e o `Odradek-Setup.exe`. Os apps instalados a recebem sozinhos. **Não marque como "latest" uma release sem o `latest.json`**: é a release mais recente que os apps consultam. Para voltar atrás numa versão ruim, publique uma nova com a correção (o app nunca instala uma versão menor que a em uso).
+
+Quem pode publicar releases no repositório controla o que os apps instalados executam: ative a verificação em duas etapas na conta do GitHub.
+
 ## Estrutura
 
 ```
@@ -12,22 +27,24 @@ src/Odradek.LocalApi/  Kestrel em 127.0.0.1: /health, extensão e Qpid
 src/Odradek.App/       Avalonia: janela, telas, bandeja, aviso, instância única
 tests/Odradek.Core.Tests/   xunit
 tools/Odradek.Probe/   paridade com o app Python (precisa de bancos e referências geradas por ele)
+installer/             o instalador (Inno Setup 6)
 ```
 
 ## Comandos
 
 ```powershell
 dotnet test Odradek.sln          # testes
-.\build.ps1                      # testa e publica dist\Odradek\Odradek.exe (+ zip); precisa do .NET 10 Desktop e ASP.NET Core 10 (x64)
-.\install.ps1                    # instala em %LOCALAPPDATA%\Programs\Odradek, cria atalhos e guarda uma cópia do banco (-Uninstall remove)
+.\build.ps1                      # testa e publica dist\Odradek\Odradek.exe (+ zip), self-contained win-x64
+.\install.ps1                    # desenvolvimento: instala dist\ com feed local, cria atalhos e guarda uma cópia do banco (-Uninstall remove)
+iscc /DAppVersion=1.2.3 installer\Odradek.iss   # gera out\Odradek-Setup.exe a partir de dist\Odradek
 ```
 
 ## Atualização automática
 
-O app instalado por `install.ps1` se atualiza sozinho, sem perguntar nada:
+O app instalado (pelo `Odradek-Setup.exe` ou por `install.ps1`) se atualiza sozinho, sem perguntar nada. O **feed** é um endereço `https://` (no instalador: as Releases do GitHub) ou uma pasta local/de rede (no `install.ps1`); `http://` é recusado.
 
-1. `.\build.ps1` publica cada build no **feed** (pasta local ou de rede): `Odradek-<versão>-win-x64.zip` + `latest.json` (versão, arquivo, SHA-256). A versão padrão é `aaaa.MMdd.HHmm` da hora do build (`-Version` fixa uma; `-Feed` troca a pasta; `-NoFeed` não publica). O feed padrão é `$env:ODRADEK_UPDATE_FEED` ou `releases\` (ignorada pelo git).
-2. `.\install.ps1` grava o feed em `update-source.txt` ao lado do `Odradek.exe`. **Só uma cópia com esse arquivo se atualiza**: rodar de `bin\` ou `dist\` nunca troca nada.
+1. `.\build.ps1` publica cada build num feed em pasta: `Odradek-<versão>-win-x64.zip` + `latest.json` (versão, arquivo, SHA-256). A versão padrão é `aaaa.MMdd.HHmm` da hora do build (`-Version` fixa uma; `-Feed` troca a pasta; `-NoFeed` não publica). O feed padrão é `$env:ODRADEK_UPDATE_FEED` ou `releases\` (ignorada pelo git).
+2. O instalador (ou o `.\install.ps1`) grava o feed em `update-source.txt` ao lado do `Odradek.exe`. **Só uma cópia com esse arquivo se atualiza**: rodar de `bin\` ou `dist\` nunca troca nada.
 3. O app consulta o feed 2 min depois de abrir e a cada 30 min. Achando versão mais nova, baixa, confere o SHA-256 e extrai ao lado da instalação (`Odradek.staging`).
 4. A troca acontece quando o app está **ocioso**: janela escondida na bandeja, nada em execução (fila de IA, coleta, backup) e a extensão/Qpid sem requisições há 5 min. O app sai pelo caminho normal (para os motores, backup ao sair), um script oculto troca as pastas e reabre o app **na bandeja**; o log do painel registra "Odradek atualizado de X para Y". Se nunca ficar ocioso, a versão preparada é aplicada ao **Sair** (sem reabrir) ou, no máximo, na próxima abertura.
 5. Se o app novo não responder em `/health` em 60 s, o script volta para a versão anterior, reabre-a e marca a versão em `updates\failed.txt` (nunca mais tentada). Tudo fica em `update.log`, na pasta de dados.

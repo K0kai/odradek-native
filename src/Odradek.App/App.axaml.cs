@@ -68,7 +68,7 @@ public partial class App : Application
     private void StartUpdates()
     {
         if (Program.AutoUpdater is not { } updater) return;
-        Program.Log($"Atualização automática ligada (versão {updater.Current}, feed {updater.FeedDir}).");
+        Program.Log($"Atualização automática ligada (versão {updater.Current}, feed {updater.Feed}).");
         _updates = new UpdateCoordinator(updater,
             () => Dispatcher.UIThread.Invoke(() => _window?.IsVisible == true),
             async () => { await Dispatcher.UIThread.InvokeAsync(() => QuitAsync(restartForUpdate: true)); return Quitting; });

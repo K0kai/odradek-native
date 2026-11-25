@@ -1,0 +1,65 @@
+# Publica uma versão no GitHub Releases: é de lá que o instalador é baixado e que os apps instalados se atualizam.
+# Rodar: aba Actions > release > Run workflow (ou: gh workflow run release).
+name: release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Uma publicação por vez, na ordem pedida.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      # aaaa.MMdd.HHmm (UTC), sempre crescente: o app só aceita versão maior que a em uso.
+      - name: Versão
+        shell: pwsh
+        run: |
+          $now = [DateTime]::UtcNow
+          $version = "{0}.{1}.{2}" -f $now.Year, ($now.Month * 100 + $now.Day), ($now.Hour * 100 + $now.Minute)
+          "VERSION=$version" >> $env:GITHUB_ENV
+
+      - name: Testar e publicar
+        shell: pwsh
+        run: ./build.ps1 -Version $env:VERSION -Feed out/release
+
+      - name: Instalar o Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup --yes --no-progress
+          if ($LASTEXITCODE -ne 0) { throw "Não consegui instalar o Inno Setup." }
+
+      - name: Gerar o instalador
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$env:VERSION" installer\Odradek.iss
+          if ($LASTEXITCODE -ne 0) { throw "O iscc falhou." }
+
+      # Assinatura de código (ainda não há certificado): assinar aqui o Odradek-Setup.exe com signtool ou Azure Trusted Signing.
+      # Para o Odradek.exe de dentro do pacote, a assinatura precisa acontecer no build.ps1, antes do zip e do SHA-256.
+
+      # Com os arquivos na própria chamada, o gh cria um rascunho, envia tudo e só então publica: o latest.json nunca aparece sem o zip.
+      - name: Criar a release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$env:VERSION" `
+            "out/release/latest.json" "out/release/Odradek-$env:VERSION-win-x64.zip" "out/Odradek-Setup.exe" `
+            --title "Odradek $env:VERSION" --generate-notes --target $env:GITHUB_SHA --latest
+          if ($LASTEXITCODE -ne 0) { throw "gh release create falhou." }
