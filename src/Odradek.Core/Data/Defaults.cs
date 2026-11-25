@@ -29,7 +29,7 @@ public static class Defaults
         // Dois filtros: Principal (TI/programação) e Secundário (área de reserva resiliente). Cada slot guarda UM objeto JSON (ou vazio).
         ("linkedin_main_filter_json", ""), ("linkedin_secondary_filter_json", ""),
         ("linkedin_main_share", "70"), ("linkedin_max_age_days", "7"), ("linkedin_preferred_countries", ""),
-        ("secondary_area_hint", ""), ("geo_eligibility_enabled", "1"),
+        ("secondary_area_hint", ""), ("geo_eligibility_enabled", "1"), ("linkedin_search_worldwide", "0"),
         // Portfólio público (schema 2 de /ai/profile.json) como segunda fonte do perfil; vazio = desligado.
         ("portfolio_profile_url", ""), ("portfolio_version", ""), ("portfolio_profile_json", ""),
         ("portfolio_text", ""), ("portfolio_synced_at", ""), ("portfolio_error", ""),

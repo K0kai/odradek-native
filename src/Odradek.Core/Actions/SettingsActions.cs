@@ -16,7 +16,7 @@ public sealed partial class SettingsActions(Database db)
     private static readonly Dictionary<string, string[]> Groups = new()
     {
         ["search"] = ["keywords", "locations", "sources", "adzuna_countries", "apify_monthly_credit_limit_usd", "apify_job_count", "apify_actors_json",
-            "geo_eligibility_enabled", "linkedin_main_share", "linkedin_max_age_days", "linkedin_preferred_countries", "linkedin_filter_prompt",
+            "geo_eligibility_enabled", "linkedin_search_worldwide", "linkedin_main_share", "linkedin_max_age_days", "linkedin_preferred_countries", "linkedin_filter_prompt",
             "linkedin_main_filter_json", "transferable_prompt", "secondary_area_hint", "linkedin_secondary_filter_json"],
         ["profile"] = ["candidate_name", "candidate_email", "candidate_phone", "candidate_phone_country_code", "candidate_linkedin", "candidate_city", "candidate_street",
             "candidate_postal_code", "candidate_state", "candidate_country", "candidate_current_company", "candidate_cpf", "salary_expectation_brl",
@@ -159,6 +159,7 @@ public sealed partial class SettingsActions(Database db)
             form["linkedin_preferred_countries"] = string.Join(", ", places.Select(p => p.City.Length > 0 ? $"{p.Name} ({p.City})" : p.Name));
         }
         if (form.ContainsKey("geo_eligibility_enabled")) form["geo_eligibility_enabled"] = form["geo_eligibility_enabled"] == "1" ? "1" : "0";
+        if (form.ContainsKey("linkedin_search_worldwide")) form["linkedin_search_worldwide"] = form["linkedin_search_worldwide"] == "1" ? "1" : "0";
         // O prompt igual ao padrão não é guardado: assim o painel acompanha o padrão quando ele mudar.
         if (form.TryGetValue("linkedin_filter_prompt", out var mainPrompt) && mainPrompt.Trim() == FilterPrompts.DefaultMain.Trim()) form["linkedin_filter_prompt"] = "";
         if (form.TryGetValue("transferable_prompt", out var secondaryPrompt) && secondaryPrompt.Trim() == FilterPrompts.DefaultSecondary.Trim()) form["transferable_prompt"] = "";

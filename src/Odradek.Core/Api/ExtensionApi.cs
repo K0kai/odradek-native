@@ -3,15 +3,22 @@ using System.Text.RegularExpressions;
 using Dapper;
 using Odradek.Core.Actions;
 using Odradek.Core.Ai;
+using Odradek.Core.Collector;
 using Odradek.Core.Data;
 using Odradek.Core.Engines;
 
 namespace Odradek.Core.Api;
 
 /// <summary>Rotas que a extensão do navegador chama com o token de pareamento (<c>web/extension_token.py:EXTENSION_PATHS</c>).</summary>
-public sealed partial class ExtensionApi(Database db, Func<Assistant> assistant)
+public sealed partial class ExtensionApi(Database db, Func<Assistant> assistant, Func<HttpClient>? http = null, LinkedInQueue? queue = null)
 {
-    public static readonly IReadOnlyList<string> Paths = ["/api/assistant", "/api/autofill-profile", "/api/autofill-rules", "/api/autofill-resume"];
+    public static readonly IReadOnlyList<string> Paths = ["/api/assistant", "/api/autofill-profile", "/api/autofill-rules", "/api/autofill-resume", "/api/linkedin-import"];
+
+    /// <summary>
+    /// Recebe da extensão as vagas da página do LinkedIn do usuário (ex.: "Recomendadas para você"), busca os detalhes no endpoint público
+    /// e as grava como vagas novas. Corpo: <c>{"jobs":[{"id","title","company","location"}]}</c>.
+    /// </summary>
+    public Task<ApiResult> ImportLinkedInAsync(JsonObject body, CancellationToken ct = default) => LinkedInImport.HandleAsync(db, body, http, ct, queue);
 
     private static readonly (string Rule, string Field)[] ExtensionKeys =
     [

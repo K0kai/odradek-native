@@ -43,6 +43,13 @@ public partial class MainWindow
                     AssistantHost.Children.Add(Bubble("assistant", "Tenho cerca de 2 anos de experiência prática com Python, em automações e integrações com APIs.")); await Task.Delay(300);
                 }
                 Save(Path.Combine(folder, $"{(int)page}-{page}.png"));
+                if (page == Page.Queue)
+                {
+                    QueueTabs.SelectedIndex = LinkedInTabIndex; await Task.Delay(600);
+                    LinkedInList.SelectedIndex = _linkedInRows.Count > 0 ? 0 : -1; await Task.Delay(500);
+                    Save(Path.Combine(folder, $"{(int)page}-{page}-linkedin.png"));
+                    QueueTabs.SelectedIndex = 0;
+                }
                 if (page == Page.Settings)
                     for (var tab = 1; tab < SettingsTabs.ItemCount; tab++)
                     {

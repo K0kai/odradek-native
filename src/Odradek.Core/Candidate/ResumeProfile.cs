@@ -566,10 +566,12 @@ public static partial class ResumeProfile
         return years > 0 ? $"{years}y" : $"{rest}m";
     }
 
-    private static long Num(JsonNode? node) => node is JsonValue v && v.TryGetValue<double>(out var d) ? (long)d : 0;
+    /// <summary>Número JSON como inteiro, venha ele do disco (JsonElement) ou criado em C# (int): <c>TryGetValue&lt;double&gt;</c> não converte int e devolvia 0.</summary>
+    private static long Num(JsonNode? node) =>
+        node is JsonValue v && double.TryParse(v.ToJsonString(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var d) ? (long)d : 0;
 
     /// <summary>Resumo com IDs para a triagem. Ordem: papéis → skills → transferíveis → resto.</summary>
-    public static string CompactProfileText(JsonObject profile, int maxChars = 6000)
+    public static string CompactProfileText(JsonObject profile, int maxChars = 6000, bool projectLinks = false)
     {
         var derived = profile["derived"] as JsonObject ?? [];
         var skillStats = derived["skills"] as JsonObject ?? [];
@@ -619,7 +621,8 @@ public static partial class ResumeProfile
                     var span = $"{S(item["start"])} → {(Core.Text.Truthy(item["end"]) ? S(item["end"]) : "?")}";
                     var stack = string.Join(", ", Arr(item["stack"]).Take(8).Select(S));
                     var headline = Core.Text.Truthy(item["headline"]) ? S(item["headline"]) : S(item["text"]);
-                    lines.Add($"[{S(item["id"])}] {(Core.Text.Truthy(item["title"]) ? S(item["title"]) : "Project")} ({span}; {stack}) — {Core.Text.Take(headline, 200)}");
+                    var link = projectLinks && Core.Text.Truthy(item["url"]) ? $" <{S(item["url"])}>" : ""; // projeto publicado: a triagem vê que há link para conferir
+                    lines.Add($"[{S(item["id"])}] {(Core.Text.Truthy(item["title"]) ? S(item["title"]) : "Project")} ({span}; {stack}) — {Core.Text.Take(headline, 200)}{link}");
                 }
                 else if (key == "education" && Core.Text.Truthy(item["start"]) && Core.Text.Truthy(item["end"]))
                     lines.Add($"[{S(item["id"])}] {Core.Text.Take(S(item["text"]), 200)} ({S(item["start"])} → {S(item["end"])})");

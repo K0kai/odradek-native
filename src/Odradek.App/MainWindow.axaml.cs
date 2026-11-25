@@ -24,7 +24,7 @@ public partial class MainWindow : Window
 
     private static readonly (Page Page, string Label)[] Pages =
     [
-        (Page.Overview, "Visão geral"), (Page.Jobs, "Vagas"), (Page.Triage, "Não selecionadas"), (Page.Queue, "Filas de IA"), (Page.Assistant, "Assistente"),
+        (Page.Overview, "Visão geral"), (Page.Jobs, "Vagas"), (Page.Triage, "Não selecionadas"), (Page.Queue, "Filas"), (Page.Assistant, "Assistente"),
         (Page.Logs, "Logs"), (Page.Usage, "Uso e cotas"), (Page.Resumes, "Currículos"), (Page.Settings, "Configurações"), (Page.Rules, "Regras de formulário"),
     ];
 
@@ -44,7 +44,7 @@ public partial class MainWindow : Window
     private bool _jobsLoaded;
     private DateTime _jobsUpdatedAt = DateTime.Now;
     private string _loadedKey = ""; // chave da consulta da última leitura: igual → só reconcilia a lista; diferente → troca inteira
-    private NavItem? _jobsNav;
+    private NavItem? _jobsNav, _queueNav;
     // "Vagas" lista os status das vagas; "Não selecionadas" as duas abas de triagem (consulta própria). Cada página lembra a visão escolhida.
     private static readonly (string Key, string Label)[] JobViews = [.. Defaults.Statuses, (PanelQueries.AllStatuses, "Todas as vagas")];
     private static readonly (string Key, string Label)[] TriageViews = [("triage:discarded", "Descartadas pela IA"), ("triage:pending", "Aguardando triagem")];
@@ -68,7 +68,9 @@ public partial class MainWindow : Window
         var onJobs = page is Page.Jobs or Page.Triage;
         JobsPane.IsVisible = onJobs; JobsControls.IsVisible = onJobs; FilterHost.IsVisible = onJobs;
         OverviewPane.IsVisible = page == Page.Overview;
-        QueuePane.IsVisible = page == Page.Queue;
+        QueueTabs.IsVisible = page == Page.Queue;
+        ResetConfirmations(); // uma confirmação armada não sobrevive à troca de tela
+        UpdateLinkedInTimer();
         LogsPane.IsVisible = page == Page.Logs;
         UsagePane.IsVisible = page == Page.Usage;
         AssistantPane.IsVisible = page == Page.Assistant;
@@ -81,14 +83,14 @@ public partial class MainWindow : Window
         if (onJobs) ShowViews(page);
         FadeIn(page switch
         {
-            Page.Overview => OverviewPane, Page.Jobs or Page.Triage => JobsPane, Page.Queue => QueuePane, Page.Logs => LogsPane, Page.Usage => UsagePane, Page.Assistant => AssistantPane,
+            Page.Overview => OverviewPane, Page.Jobs or Page.Triage => JobsPane, Page.Queue => QueueTabs, Page.Logs => LogsPane, Page.Usage => UsagePane, Page.Assistant => AssistantPane,
             Page.Resumes => ResumesPane, Page.Settings => SettingsTabs, _ => RulesPane,
         });
         switch (page)
         {
             case Page.Overview: JobsTitle.Text = "Visão geral"; _ = LoadOverviewAsync(); break;
             case Page.Jobs or Page.Triage: UpdateJobControls(); RenderJobsHeader(); _ = ReloadJobsAsync(); break;
-            case Page.Queue: _ = LoadQueueAsync(); break;
+            case Page.Queue: ShowQueueTab(); _ = LoadQueueAsync(); break;
             case Page.Logs: _ = LoadLogsAsync(); break;
             case Page.Usage: _ = LoadUsageAsync(); break;
             case Page.Resumes: _ = LoadResumesAsync(); break;
@@ -161,6 +163,7 @@ public partial class MainWindow : Window
                     if (added.Count > 0) Dispatcher.UIThread.Post(() => FlashJobs(added), DispatcherPriority.Background);
                 }
                 JobsList.SelectedItem = selectedId is null ? null : _jobs.FirstOrDefault(j => j.Id == selectedId); // a seleção sobrevive às ações
+                FocusRequestedJob();
                 _jobsLoaded = true;
                 _jobsTotal = page.Total;
                 _jobsTitle = Views.First(v => v.Key == _status).Label;
@@ -256,7 +259,33 @@ public partial class MainWindow : Window
         }
     }
 
-    // ---------- filas de IA ----------
+    // ---------- filas › processamento de IA ----------
+
+    private int _queueBadgeBusy;
+
+    private void SetQueueBadge(long aiActive) { _aiActive = aiActive; RenderQueueBadge(); }
+
+    /// <summary>Atualiza só o número do menu quando a fila muda com outra tela aberta (uma consulta de contagem, sem carregar a lista). Mudanças em rajada se juntam.</summary>
+    private async Task RefreshQueueBadgeAsync()
+    {
+        // 0 = parado, 1 = consultando, 2 = consultando e chegou outra mudança no meio. Quem encontra 1 ou 2 só marca 2 e sai; quem consulta repete até sair com 1 → 0.
+        if (Interlocked.Exchange(ref _queueBadgeBusy, 1) != 0) { Volatile.Write(ref _queueBadgeBusy, 2); return; }
+        try
+        {
+            while (true)
+            {
+                var active = await Task.Run(() => { _ = Program.LinkedIn; return new PanelQueries(_database).QueueActiveCount(); }); // a 1ª vez lê o arquivo da fila do LinkedIn
+                Dispatcher.UIThread.Post(() => SetQueueBadge(active));
+                if (Interlocked.CompareExchange(ref _queueBadgeBusy, 0, 1) == 1) return; // nada novo chegou: terminou, e o estado já voltou a 0
+                Volatile.Write(ref _queueBadgeBusy, 1); // chegou outra mudança: consulta de novo
+            }
+        }
+        catch (Exception ex)
+        {
+            Program.Log("Selo da fila: " + ex.Message);
+            Volatile.Write(ref _queueBadgeBusy, 0);
+        }
+    }
 
     private async Task LoadQueueAsync()
     {
@@ -268,7 +297,9 @@ public partial class MainWindow : Window
             Dispatcher.UIThread.Post(() =>
             {
                 var selected = (QueueList.SelectedItem as QueueRow)?.Item.Id;
-                if (_page == Page.Queue) { JobsTitle.Text = "Filas de IA"; JobsSubtitle.Text = summary; JobsSubtitle.IsVisible = true; }
+                SetQueueBadge(new[] { "pending", "running", "retry_wait" }.Sum(k => page.Counts.TryGetValue(k, out var active) ? active : 0));
+                _aiSummary = summary;
+                RenderQueueSubtitle();
                 QueueEmpty.Text = "Nenhum item na fila."; QueueEmpty.IsVisible = page.Items.Count == 0;
                 _queueRows.Clear();
                 foreach (var item in page.Items)
@@ -373,6 +404,12 @@ public partial class MainWindow : Window
         }
         else { ApifyText.Text = "Sem consulta registrada ainda. A cota é atualizada durante a coleta."; ApifyBar.Value = 0; }
         if (string.IsNullOrEmpty(TokenHarborText.Text)) TokenHarborText.Text = "Consultando…";
+        StorageText.Text = usage.Storage is { } s
+            ? $"jobs.db: {Format.Bytes(s.DbBytes)}" + (s.WalBytes > 0 ? $" (+ {Format.Bytes(s.WalBytes)} nos arquivos de registro WAL)" : "")
+              + nl + (s.FreeBytes > 0 ? $"{Format.Bytes(s.FreeBytes)} livres dentro do banco, que a compactação devolve ao disco." : "Sem espaço livre para compactar.")
+              + nl + $"{Format.Number(s.Jobs)} vaga(s), {Format.Number(s.JobsWithDescription)} com descrição, {Format.Number(s.CoverLetters)} carta(s)."
+              + nl + $"Pasta: {Path.GetDirectoryName(_database.Path)}"
+            : "jobs.db ainda não existe.";
         BackupText.Text = usage.Backup is { } b
             ? (b.Ok ? $"Backup feito em {Format.Date(b.At, true)}: {b.Rows} linha(s) em {b.Seconds:0.##}s." : $"Com falha em {Format.Date(b.At, true)}: {b.Error}")
             : "Nenhum backup feito ainda. Ele roda uma vez por dia e ao sair do app.";
@@ -402,6 +439,9 @@ public partial class MainWindow : Window
         _settingsEditor = new SettingsEditor(_database, Notify);
         _rulesEditor = new RulesEditor(_database, RulesHost, RulesState, RulesSaveButton, Notify);
         JobsList.ItemsSource = _jobs;
+        // Linhas são contêineres reaproveitados: nenhum deles pode voltar à lista com a opacidade da saída esmaecida (vaga invisível, mas selecionável).
+        JobsList.ContainerClearing += (_, e) => e.Container.ClearValue(Avalonia.Visual.OpacityProperty);
+        JobsList.ContainerPrepared += (_, e) => e.Container.ClearValue(Avalonia.Visual.OpacityProperty);
         ShowViews(Page.Jobs); // abre em "Vagas › Vale a pena olhar"
         StatusBox.SelectionChanged += (_, _) =>
         {
@@ -438,10 +478,12 @@ public partial class MainWindow : Window
         QueueList.ItemsSource = _queueRows;
         QueueList.SelectionChanged += (_, _) => _ = ShowQueueDetailAsync(QueueList.SelectedItem as QueueRow);
         WireActions();
+        WireQueueTabs();
         WireEngines();
 
         var navItems = Pages.Select((p, i) => new NavItem(NavGlyphs[p.Page], p.Label, $"{p.Label} (Ctrl+{(i + 1) % 10})")).ToList();
         _jobsNav = navItems[Array.FindIndex(Pages, p => p.Page == Page.Jobs)];
+        _queueNav = navItems[Array.FindIndex(Pages, p => p.Page == Page.Queue)];
         NavList.ItemsSource = navItems;
         NavList.SelectedIndex = Array.FindIndex(Pages, p => p.Page == Page.Jobs);
         NavList.SelectionChanged += (_, _) => { if (NavList.SelectedIndex >= 0) Navigate(Pages[NavList.SelectedIndex].Page); };
@@ -455,7 +497,8 @@ public partial class MainWindow : Window
         {
             switch (change)
             {
-                case QueueChanged when _page == Page.Queue: _ = LoadQueueAsync(); break;
+                case QueueChanged: if (_page == Page.Queue) _ = LoadQueueAsync(); else _ = RefreshQueueBadgeAsync(); break;
+                case LinkedInQueueChanged: RenderQueueBadge(); if (_page == Page.Queue) RenderLinkedInQueue(); break;
                 case LogAppended appended: _logs.Insert(0, appended.Entry); if (_logs.Count > 500) _logs.RemoveAt(_logs.Count - 1); break;
                 case LogsCleared: _logs.Clear(); break;
                 case JobsChanged: _ = ReloadJobsAsync(); if (_page == Page.Overview) _ = LoadOverviewAsync(); break;
@@ -466,6 +509,7 @@ public partial class MainWindow : Window
             }
         });
         _ = ReloadJobsAsync();
+        _ = RefreshQueueBadgeAsync();
         DataText.Text = $"Dados: {Paths.DataDir}"; ToolTip.SetTip(DataText, Paths.DataDir);
         Opened += (_, _) =>
         {
@@ -499,8 +543,13 @@ public partial class MainWindow : Window
                         Program.Log($"SMOKE {label}: {_jobs.Count} vagas, título='{JobsTitle.Text}', detalhe {DetailBody.Text?.Length ?? 0} caracteres, botões={JobButtons.IsVisible}, lote={BulkExpander.IsVisible}");
                         break;
                     case Page.Queue:
+                        QueueTabs.SelectedIndex = 0; await Task.Delay(300);
                         QueueList.SelectedIndex = _queueRows.Count > 0 ? 0 : -1; await Task.Delay(900);
-                        Program.Log($"SMOKE {label}: {_queueRows.Count} itens, título='{JobsTitle.Text}', detalhe {QueueDetailBody.Text?.Length ?? 0} caracteres");
+                        Program.Log($"SMOKE {label} › IA: {_queueRows.Count} itens, título='{JobsTitle.Text}', detalhe {QueueDetailBody.Text?.Length ?? 0} caracteres");
+                        QueueTabs.SelectedIndex = 1; await Task.Delay(500);
+                        LinkedInList.SelectedIndex = _linkedInRows.Count > 0 ? 0 : -1; await Task.Delay(300);
+                        Program.Log($"SMOKE {label} › LinkedIn: {_linkedInRows.Count} itens, subtítulo='{JobsSubtitle.Text}', cabeçalho='{QueueLinkedInTab.Header}', detalhe {LinkedInDetailBody.Text?.Length ?? 0} caracteres");
+                        QueueTabs.SelectedIndex = 0;
                         break;
                     case Page.Overview: Program.Log($"SMOKE {label}: {OverviewHost.Children.Count} blocos"); break;
                     case Page.Triage: Program.Log($"SMOKE {label}: {_jobs.Count} vagas, título='{JobsTitle.Text}', subtítulo='{JobsSubtitle.Text}'"); break;
@@ -530,7 +579,8 @@ public partial class MainWindow : Window
                 using var db = Db.Open(readOnly: true);
                 var jobs = db.ExecuteScalar<long>("SELECT COUNT(*) FROM jobs");
                 var worth = db.ExecuteScalar<long>("SELECT COUNT(*) FROM jobs WHERE status='worth'");
-                return $"Banco: {jobs} vagas, {worth} para revisar.";
+                var (main, wal) = UsageReader.FileSizes(Paths.DbPath);
+                return $"Banco: {jobs} vagas, {worth} para revisar · {Format.Bytes(main + wal)}";
             });
             DbText.Text = text;
         }

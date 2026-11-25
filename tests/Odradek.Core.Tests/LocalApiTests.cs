@@ -23,6 +23,9 @@ public sealed class ApiHarness : IDisposable
     public TempDb Temp { get; } = new();
     public JobCollector Collector { get; }
     public FakeAiHandler Ai { get; } = new();
+    public RouteHandler LinkedIn { get; } = new();
+    /// <summary>Fila do LinkedIn do servidor: arquivo temporário e pausas que nunca terminam, para o trabalho em segundo plano não correr atrás do teste.</summary>
+    public LinkedInQueue Queue { get; }
     public string AiKey { get; set; } = "K";
     public HttpClient Client { get; }
     private readonly LocalServer _server;
@@ -32,11 +35,13 @@ public sealed class ApiHarness : IDisposable
         Collector = new JobCollector(Temp.Db, new Dictionary<string, JobSources.Provider>());
         var ai = new AiClient(new HttpClient(Ai), null, null, new AiClientOptions { FallbackModels = [], RetryDelays = [], Pause = (_, _) => Task.CompletedTask });
         var assistant = new Assistant(Temp.Db, ai, _ => AiKey);
+        Queue = new LinkedInQueue(Temp.Db, () => new HttpClient(LinkedIn), Path.Combine(Path.GetTempPath(), "odradek-queue-" + Guid.NewGuid().ToString("N") + ".json"),
+            delay: (_, ct) => Task.Delay(Timeout.Infinite, ct));
         var listener = new TcpListener(IPAddress.Loopback, 0);
         listener.Start();
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
-        _server = new LocalServer(new ApiServices(Temp.Db, () => Collector, () => assistant, () => qpidToken), port);
+        _server = new LocalServer(new ApiServices(Temp.Db, () => Collector, () => assistant, () => qpidToken, () => new HttpClient(LinkedIn), Queue), port);
         _server.StartAsync().GetAwaiter().GetResult();
         Client = new HttpClient { BaseAddress = new Uri($"http://127.0.0.1:{port}/") };
     }
@@ -64,6 +69,7 @@ public sealed class ApiHarness : IDisposable
 
     public void Dispose()
     {
+        Queue.Dispose();
         Collector.Stop();
         Collector.WhenIdle().Wait(TimeSpan.FromSeconds(10));
         Client.Dispose();

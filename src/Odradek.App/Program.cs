@@ -26,6 +26,9 @@ internal static class Program
     public static string QpidApiToken => QpidTokenValue.Value;
     public static bool EnginesCreated => LazyEngines.IsValueCreated;
     public static Task ServerStart { get; private set; } = Task.CompletedTask;
+    private static ApiServices? _api;
+    /// <summary>A fila das vagas do LinkedIn que as rotas da extensão alimentam; a janela mostra e controla a mesma instância.</summary>
+    public static Odradek.Core.Collector.LinkedInQueue? LinkedIn => _api?.LinkedIn();
     /// <summary><c>null</c> quando a atualização automática está desligada (o app não foi instalado por <c>install.ps1</c>).</summary>
     public static Odradek.Core.Update.Updater? AutoUpdater { get; private set; }
 
@@ -74,12 +77,15 @@ internal static class Program
         // O servidor local sobe em paralelo com a janela, em outra thread: construir o Kestrel (JIT) na thread da tela atrasava a janela.
         // Subir já aqui também fecha a corrida em que uma segunda execução, logo depois, ainda enxergaria a porta livre.
         // As rotas da extensão e do Qpid usam o banco e os motores já montados (só criados quando uma rota os pede) e o token do Qpid (cofre).
-        Server = new LocalServer(new ApiServices(Database, () => Engines.Collector, () => Engines.Assistant, () => QpidTokenValue.Value));
+        var services = new ApiServices(Database, () => Engines.Collector, () => Engines.Assistant, () => QpidTokenValue.Value, () => Engines.Http);
+        _api = services;
+        Server = new LocalServer(services);
         ServerStart = Task.Run(async () =>
         {
             var timer = Stopwatch.StartNew();
             await Server.StartAsync();
             Log($"Servidor local no ar em {timer.ElapsedMilliseconds} ms ({ProcessAgeMs():F0} ms do início do processo).");
+            services.ResumeLinkedIn(); // vagas do LinkedIn que ficaram na fila da última vez continuam sendo lidas
         });
         try
         {

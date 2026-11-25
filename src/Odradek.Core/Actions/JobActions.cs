@@ -161,16 +161,28 @@ public sealed class JobActions(Database db)
         }
         if (count == 0) return "Nenhuma vaga ignorada para limpar.";
         db.Bus.Publish(new JobsChanged([]));
-        // O SQLite só devolve o espaço ao disco com VACUUM, que não roda dentro de transação. A limpeza já foi gravada: se o VACUUM falhar, vira aviso.
+        // A limpeza já foi gravada: se a compactação falhar, vira aviso.
+        return Vacuum() is { } error
+            ? $"{count} vaga(s) ignorada(s) limpa(s), mas não foi possível compactar o banco: {error}"
+            : $"{count} vaga(s) ignorada(s) limpa(s) e banco compactado.";
+    }
+
+    /// <summary>Compacta o banco, devolvendo ao disco o espaço das páginas vazias.</summary>
+    public string Compact() => Vacuum() is { } error ? throw new ActionException($"Não foi possível compactar o banco: {error}") : "Banco compactado.";
+
+    /// <summary>
+    /// O SQLite só devolve o espaço ao disco com VACUUM, que não roda dentro de transação. No modo WAL o resultado vai primeiro para o <c>-wal</c>:
+    /// o checkpoint o leva ao <c>jobs.db</c> e esvazia o arquivo. Devolve o motivo da falha, ou <c>null</c>.
+    /// </summary>
+    private string? Vacuum()
+    {
         try
         {
             using var connection = db.Open();
             connection.Execute("VACUUM");
+            connection.Execute("PRAGMA wal_checkpoint(TRUNCATE)");
+            return null;
         }
-        catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or InvalidOperationException)
-        {
-            return $"{count} vaga(s) ignorada(s) limpa(s), mas não foi possível compactar o banco: {ex.Message}";
-        }
-        return $"{count} vaga(s) ignorada(s) limpa(s) e banco compactado.";
+        catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or InvalidOperationException) { return ex.Message; }
     }
 }

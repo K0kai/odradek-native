@@ -311,7 +311,8 @@
      "profile-facts-v1",
      "application-reservation-v1",
      "application-result-v1",
-     "collector-apply-limit-v1"
+     "collector-apply-limit-v1",
+     "linkedin-import-v1"
     ]
    }
   },

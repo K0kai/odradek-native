@@ -176,6 +176,28 @@ public class JobActionsTests
     }
 
     [Fact]
+    public void Storage_reports_the_database_size_and_compacting_returns_the_free_space()
+    {
+        using var t = new TempDb();
+        var big = new string('x', 20_000);
+        for (var i = 0; i < 60; i++) t.AddJob(description: big);
+        t.AddJob(description: "");
+        var before = UsageReader.Read(t.Db).Storage!;
+        Assert.Equal((61L, 60L, 0L), (before.Jobs, before.JobsWithDescription, before.CoverLetters));
+        Assert.True(before.TotalBytes > 1_000_000);
+
+        using (var c = t.Db.Open()) c.Execute("DELETE FROM jobs WHERE description <> ''");
+        var deleted = UsageReader.Storage(t.Db)!;
+        Assert.True(deleted.FreeBytes > 1_000_000, $"livres: {deleted.FreeBytes}"); // apagar não devolve o espaço sozinho
+
+        Assert.Equal("Banco compactado.", new JobActions(t.Db).Compact());
+        var after = UsageReader.Storage(t.Db)!;
+        Assert.Equal(0, after.FreeBytes);
+        Assert.Equal(new FileInfo(t.Db.Path).Length, after.DbBytes);
+        Assert.True(after.TotalBytes < deleted.TotalBytes - 1_000_000, $"antes {deleted.TotalBytes}, depois {after.TotalBytes}");
+    }
+
+    [Fact]
     public void MarkReviewed_only_touches_ignored_unreviewed_jobs_and_limits_ids()
     {
         using var t = new TempDb();
@@ -192,6 +214,27 @@ public class JobActionsTests
 public class QueueActionsTests
 {
     private static readonly KeyValuePair<string, object?>[] Payload = [new("job_id", 7L)];
+
+    [Fact]
+    public void The_menu_badge_counts_only_work_that_is_waiting_or_running()
+    {
+        using var t = new TempDb();
+        var queue = new QueueActions(t.Db);
+        var counts = new PanelQueries(t.Db);
+        Assert.Equal(0, counts.QueueActiveCount());
+        var ids = Enumerable.Range(1, 5).Select(i => queue.Enqueue("job_apply", [new("job_id", (long)i)])).ToList();
+        Assert.Equal(5, counts.QueueActiveCount()); // todos pendentes
+        using (var c = t.Db.Open())
+        {
+            c.Execute("UPDATE queue_jobs SET status='running' WHERE id=@id", new { id = ids[0] });
+            c.Execute("UPDATE queue_jobs SET status='retry_wait' WHERE id=@id", new { id = ids[1] });
+            c.Execute("UPDATE queue_jobs SET status='succeeded' WHERE id=@id", new { id = ids[2] });
+            c.Execute("UPDATE queue_jobs SET status='failed' WHERE id=@id", new { id = ids[3] });
+        }
+        Assert.Equal(3, counts.QueueActiveCount()); // rodando + esperando nova tentativa + o pendente; concluído e falho não contam
+        Assert.True(queue.Cancel(ids[4]));
+        Assert.Equal(2, counts.QueueActiveCount());
+    }
 
     [Fact]
     public void Enqueue_writes_a_pending_item_with_python_style_json_and_limits_from_settings()

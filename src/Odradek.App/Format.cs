@@ -25,6 +25,21 @@ public static class Format
     public static string? LogTime(string? value) =>
         Clock.TryParse(value, out var utc) ? TimeZoneInfo.ConvertTimeFromUtc(utc, Brasilia).ToString("dd/MM HH:mm:ss", CultureInfo.InvariantCulture) : value;
 
+    /// <summary>"14:05:10" no fuso de Brasília.</summary>
+    public static string Time(DateTime utc) => TimeZoneInfo.ConvertTimeFromUtc(utc, Brasilia).ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+
+    /// <summary>"512 KB", "1,5 MB", "2,25 GB" (1 KB = 1024 bytes, como o Explorer do Windows).</summary>
+    public static string Bytes(long bytes) => bytes switch
+    {
+        >= 1L << 30 => (bytes / (double)(1L << 30)).ToString("0.##", PtBr) + " GB",
+        >= 1L << 20 => (bytes / (double)(1L << 20)).ToString("0.#", PtBr) + " MB",
+        >= 1L << 10 => (bytes / (double)(1L << 10)).ToString("0", PtBr) + " KB",
+        _ => $"{bytes} B",
+    };
+
+    /// <summary>"8.432"</summary>
+    public static string Number(long value) => value.ToString("N0", PtBr);
+
     /// <summary>"23 de nov. de 2026, 14:05" (como o <c>formatDate</c> do painel); sem data devolve "Sem data".</summary>
     public static string Date(string? value, bool full = false)
     {

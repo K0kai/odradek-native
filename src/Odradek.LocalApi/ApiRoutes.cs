@@ -15,11 +15,20 @@ using Odradek.Core.Engines;
 namespace Odradek.LocalApi;
 
 /// <summary>O que as rotas precisam do app. Funções, não instâncias: os motores só são montados quando uma rota os usa.</summary>
-public sealed class ApiServices(Database db, Func<JobCollector> collector, Func<Assistant> assistant, Func<string> qpidToken)
+public sealed class ApiServices(Database db, Func<JobCollector> collector, Func<Assistant> assistant, Func<string> qpidToken, Func<HttpClient>? http = null, LinkedInQueue? linkedIn = null)
 {
     public Database Db { get; } = db;
-    public QpidApi Qpid() => new(Db, collector());
-    public ExtensionApi Extension() => new(Db, assistant);
+    public QpidApi Qpid() => new(Db, collector(), http);
+    public ExtensionApi Extension() => new(Db, assistant, http, LinkedIn());
+
+    private LinkedInQueue? _linkedIn;
+    private readonly object _linkedInGate = new();
+
+    /// <summary>A fila das vagas do LinkedIn é uma só para o app inteiro (cada rota cria um <see cref="ExtensionApi"/> novo, a fila não pode ser recriada).</summary>
+    public LinkedInQueue LinkedIn() { lock (_linkedInGate) return _linkedIn ??= linkedIn ?? new LinkedInQueue(Db, http); }
+
+    /// <summary>Retoma, ao abrir o app, o que ficou na fila da última vez. Não monta nada quando não há trabalho guardado.</summary>
+    public void ResumeLinkedIn() { if (linkedIn is not null || LinkedInQueue.HasSavedWork()) LinkedIn().Resume(); }
     public string QpidToken() => qpidToken();
 }
 
@@ -219,6 +228,12 @@ public static partial class ApiRoutes
             return Reply(await services.Extension().AssistantAsync(form["message"].ToString(), form["history"].ToString(), context.RequestAborted));
         });
 
+        app.MapPost("/api/linkedin-import", async (HttpContext context) =>
+        {
+            var (body, error) = await ReadObject(context.Request);
+            return body is null ? error! : Reply(await services.Extension().ImportLinkedInAsync(body, context.RequestAborted));
+        });
+
         // ---------------------------------------------------------------- Qpid
         app.MapGet("/api/qpid/status", () => Reply(services.Qpid().Status()));
         app.MapGet("/api/qpid/capabilities", () => Reply(QpidApi.Capabilities()));
@@ -236,6 +251,11 @@ public static partial class ApiRoutes
                 raw = text;
             }
             return Reply(services.Qpid().CollectorAction(action, raw));
+        });
+        app.MapPost("/api/qpid/jobs/import-linkedin", async (HttpContext context) =>
+        {
+            var (body, error) = await ReadObject(context.Request);
+            return body is null ? error! : Reply(await services.Qpid().ImportLinkedInAsync(body, context.RequestAborted));
         });
         app.MapPost("/api/qpid/jobs/bulk-ignore/preview", async (HttpRequest request) =>
         {

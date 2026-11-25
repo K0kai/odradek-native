@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Dapper;
 
 namespace Odradek.Core.Data;
 
@@ -18,7 +19,16 @@ public sealed record ApifyQuota(double UsedUsd, double ApiLimitUsd, double Local
 
 public sealed record BackupInfo(bool Ok, string At, long Rows, double Seconds, string Error);
 
-public sealed record UsageData(AiUsage Ai, ApifyQuota? Apify, BackupInfo? Backup);
+/// <summary>
+/// Quanto o banco local ocupa. <see cref="WalBytes"/> são os arquivos <c>-wal</c> e <c>-shm</c>; <see cref="FreeBytes"/> são as páginas vazias
+/// dentro do <c>jobs.db</c>, que a compactação devolve ao disco.
+/// </summary>
+public sealed record StorageInfo(long DbBytes, long WalBytes, long FreeBytes, long Jobs, long JobsWithDescription, long CoverLetters)
+{
+    public long TotalBytes => DbBytes + WalBytes;
+}
+
+public sealed record UsageData(AiUsage Ai, ApifyQuota? Apify, BackupInfo? Backup, StorageInfo? Storage);
 
 /// <summary>Leitura da tela "Uso e cotas" (porte de <c>usage_api_payload</c> e <c>summarize_ai_usage</c>, só o que está no banco).</summary>
 public static class UsageReader
@@ -35,7 +45,27 @@ public static class UsageReader
         var month = Bucket(store, "months", $"{provider}|{when:yyyy-MM}");
         var ai = new AiUsage(provider, Get("ai_model"), when.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
             when.ToString("MM/yyyy", CultureInfo.InvariantCulture), day, month);
-        return new UsageData(ai, Apify(Parse(Get("apify_quota_snapshot_json"))), Backup(Parse(Get("standby_last_sync_json"))));
+        return new UsageData(ai, Apify(Parse(Get("apify_quota_snapshot_json"))), Backup(Parse(Get("standby_last_sync_json"))), Storage(db));
+    }
+
+    /// <summary>Tamanho em disco do banco e dos arquivos auxiliares do SQLite (0 para o que não existe). Só olha o sistema de arquivos.</summary>
+    public static (long Db, long Wal) FileSizes(string path)
+    {
+        static long Size(string file) { var info = new FileInfo(file); return info.Exists ? info.Length : 0; }
+        return (Size(path), Size(path + "-wal") + Size(path + "-shm"));
+    }
+
+    public static StorageInfo? Storage(Database db)
+    {
+        if (!File.Exists(db.Path)) return null;
+        using var connection = db.Open();
+        long Count(string sql) => connection.ExecuteScalar<long>(sql);
+        var free = Count("PRAGMA freelist_count") * Count("PRAGMA page_size");
+        var jobs = Count("SELECT COUNT(*) FROM jobs");
+        var described = Count("SELECT COUNT(*) FROM jobs WHERE description <> ''");
+        var letters = Count("SELECT COUNT(*) FROM cover_letters");
+        var (main, wal) = FileSizes(db.Path);
+        return new StorageInfo(main, wal, free, jobs, described, letters);
     }
 
     // (value or "gemini").casefold(): vazio cai em gemini.

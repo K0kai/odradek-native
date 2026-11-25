@@ -76,6 +76,8 @@ public static class LinkedInSearch
         return list.Count == 0 ? fallback : list.Min(StringComparer.Ordinal)!;
     }
 
+    public static bool WorldwideEnabled(IReadOnlyDictionary<string, string>? cfg) => Cfg(cfg, "linkedin_search_worldwide").Trim() == "1";
+
     /// <summary>Pares (local, modelo) das buscas, derivados do Perfil; a IA não escolhe local nem modelo. Países com viés primeiro.</summary>
     public static List<ScopeItem> SearchScope(IReadOnlyDictionary<string, string> cfg)
     {
@@ -93,9 +95,11 @@ public static class LinkedInSearch
         if (enabled && city.Length > 0 && country.Length > 0
             && places.Any(p => p.City.Length == 0 && Geo.CountryNames(country).Overlaps(Geo.CountryNames(p.Name))))
             pairs.Add((city, "")); // o país de casa tem viés sem cidade própria: a sua cidade vem logo depois
-        pairs.Add(("Worldwide", remote));
+        // "Worldwide" + remoto traz vagas abertas só a quem mora nos EUA e afins; só entra se o usuário ligar, ou se não houver mais nenhum local.
+        if (WorldwideEnabled(cfg)) pairs.Add(("Worldwide", remote));
         if (country.Length > 0 && country.ToLowerInvariant() != "worldwide") pairs.Add((country, remote));
         if (enabled && city.Length > 0) pairs.Add((city, ""));
+        if (pairs.Count == 0) pairs.Add(("Worldwide", remote));
         var scope = new List<ScopeItem>();
         var seen = new HashSet<(string, string)>();
         foreach (var (location, fWt) in pairs)
@@ -121,7 +125,10 @@ public static class LinkedInSearch
             foreach (var item in scope) // dentro da janela, o escopo na ordem dada
                 foreach (var keyword in keywords)
                 {
-                    var url = $"https://www.linkedin.com/jobs/search/?keywords={QuotePlus(keyword)}&location={QuotePlus(item.Location)}&position=1&pageNum=0&f_TPR={Tpr(days)}&sortBy=DD";
+                    var geoId = Geo.LinkedInGeoId(item.Location);
+                    var geo = geoId.Length > 0 ? $"&geoId={geoId}" : "";
+                    // sortBy=R (relevância): dentro de cada janela f_TPR o LinkedIn põe antes o que mais combina com a busca, não só o mais novo.
+                    var url = $"https://www.linkedin.com/jobs/search/?keywords={QuotePlus(keyword)}&location={QuotePlus(item.Location)}{geo}&position=1&pageNum=0&f_TPR={Tpr(days)}&sortBy=R";
                     if (fE.Length > 0) url += $"&f_E={fE}";
                     if (item.FWt.Length > 0) url += $"&f_WT={item.FWt}";
                     ordered.Add(url);

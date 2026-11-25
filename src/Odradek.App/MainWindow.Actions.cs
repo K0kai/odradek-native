@@ -117,7 +117,8 @@ public partial class MainWindow
             var leaves = inTriage || (_status != PanelQueries.AllStatuses && status != _status);
             if (leaves)
             {
-                if (JobsList.ContainerFromIndex(index) is { } row) row.Opacity = 0; // sai com um esmaecer curto
+                var fading = JobsList.ContainerFromIndex(index);
+                if (fading is not null) fading.Opacity = 0; // sai com um esmaecer curto
                 _jobsTotal = Math.Max(0, _jobsTotal - 1);
                 var id = job.Id;
                 DispatcherTimer.RunOnce(() =>
@@ -125,6 +126,9 @@ public partial class MainWindow
                     var at = _jobs.ToList().FindIndex(j => j.Id == id);
                     if (at >= 0) _jobs.RemoveAt(at);
                     JobsEmpty.IsVisible = _jobs.Count == 0;
+                    // O contêiner esmaecido volta para a lista de reaproveitamento (ou, se a lista foi recarregada nesse meio tempo, já mostra outra vaga):
+                    // sem devolver a opacidade, a vaga seguinte que o usar fica invisível, embora dê para selecioná-la.
+                    fading?.ClearValue(Avalonia.Visual.OpacityProperty);
                 }, TimeSpan.FromMilliseconds(150));
             }
             else
@@ -188,9 +192,11 @@ public partial class MainWindow
 
     /// <summary>
     /// Liga um botão destrutivo ao padrão "clicar, confirmar". Com <paramref name="count"/>, o 1º clique conta o que será afetado
-    /// (fora da tela), mostra o número no botão e não arma se não houver nada a fazer.
+    /// (fora da tela), mostra o número no botão e não arma se não houver nada a fazer. <paramref name="ask"/> e <paramref name="nothing"/> trocam
+    /// os textos quando a ação não é uma limpeza.
     /// </summary>
-    private void WireConfirm(Button button, Button cancel, Func<string> work, Func<int>? count = null)
+    private void WireConfirm(Button button, Button cancel, Func<string> work, Func<int>? count = null, Func<int, string>? ask = null,
+        string nothing = "Nada para limpar aqui.", Action? after = null)
     {
         var idle = button.Content?.ToString() ?? "";
         _confirmables[button] = (cancel, idle);
@@ -204,13 +210,13 @@ public partial class MainWindow
                 {
                     try { n = await Task.Run(count); }
                     catch (Exception ex) { Notify($"Não foi possível contar: {ex.Message}", true); return; }
-                    if (n == 0) { Notify("Nada para limpar aqui.", false); return; }
+                    if (n == 0) { Notify(nothing, false); return; }
                 }
-                _armed = button; button.Content = n > 0 ? $"Confirmar limpeza de {n}" : "Confirmar limpeza"; cancel.IsVisible = true;
+                _armed = button; button.Content = ask?.Invoke(n) ?? (n > 0 ? $"Confirmar limpeza de {n}" : "Confirmar limpeza"); cancel.IsVisible = true;
                 return;
             }
             ResetConfirmations();
-            _ = RunAsync(work);
+            _ = RunAsync(work, after);
         };
         cancel.Click += (_, _) => ResetConfirmations();
     }
@@ -298,6 +304,11 @@ public partial class MainWindow
         QueueOpenButton.Click += (_, _) => Format.OpenInBrowser((QueueList.SelectedItem as QueueRow) is { } r ? Sub(r.Item, "url") : null);
         QueueCancelButton.Click += (_, _) => QueueItemAction(id => new QueueActions(_database).Cancel(id));
         QueueRetryButton.Click += (_, _) => QueueItemAction(id => new QueueActions(_database).RetryNow(id));
+
+        // banco local (Uso e cotas): a compactação é a mesma que a limpeza de ignoradas faz no fim
+        WireConfirm(CompactButton, CompactCancel, () => new JobActions(_database).Compact(),
+            () => UsageReader.Storage(_database) is { FreeBytes: > 0 } ? 1 : 0, ask: _ => "Confirmar compactação", nothing: "Não há espaço livre para recuperar.",
+            after: () => { _ = RenderUsageAsync(); _ = LoadDbSummaryAsync(); });
 
         // logs
         LogsRefreshButton.Click += (_, _) => _ = LoadLogsAsync();
@@ -397,7 +408,7 @@ public partial class MainWindow
             card.Children.Add(buttons); card.Children.Add(actions);
             ResumesHost.Children.Add(Ui.Card(card));
         }
-        ResumesHost.Children.Add(new TextBlock { Text = "Depois do envio, a análise pela IA roda na fila (Filas de IA); enquanto isso o currículo fica como pendente.", Classes = { "muted" }, TextWrapping = TextWrapping.Wrap });
+        ResumesHost.Children.Add(new TextBlock { Text = "Depois do envio, a análise pela IA roda na fila (Filas › Processamento de IA); enquanto isso o currículo fica como pendente.", Classes = { "muted" }, TextWrapping = TextWrapping.Wrap });
     }
 }
 

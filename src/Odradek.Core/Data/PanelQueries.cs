@@ -93,6 +93,13 @@ public sealed partial class PanelQueries(Database db)
         return new JobPage(rows.Select(ToRecord).ToList(), total, page, pages, pageSize, new JobFilters(status, minMatch, sort, dateFrom, dateTo));
     }
 
+    /// <summary>Uma vaga só, no mesmo formato das listas (a lista é paginada: quem vem de outra tela pode não estar na página aberta).</summary>
+    public JobRecord? Job(long id)
+    {
+        using var connection = db.Open();
+        return connection.Query<JobRow>(JobSelect + "WHERE jobs.id = @id LIMIT 1", new { id }).Select(ToRecord).FirstOrDefault();
+    }
+
     /// <summary>Descartadas pela IA e ainda não conferidas: a decisão mais recente reprovou a vaga. Vagas ignoradas à mão não entram.</summary>
     public const string DiscardedWhere =
         "jobs.status = 'ignored' AND COALESCE(jobs.reviewed_at, '') = '' AND " +
@@ -227,6 +234,13 @@ public sealed partial class PanelQueries(Database db)
         var slash = (label ?? "").IndexOf('/');
         if (slash >= 0 && label![..slash] == "tokenharbor" && slash + 1 < label.Length) return ("tokenharbor", label[(slash + 1)..]);
         return (provider, label ?? "");
+    }
+
+    /// <summary>Itens da fila de IA que ainda vão rodar ou estão rodando (pendente, em execução, esperando nova tentativa): o número do selo do menu.</summary>
+    public long QueueActiveCount()
+    {
+        using var connection = db.Open();
+        return connection.ExecuteScalar<long>("SELECT COUNT(*) FROM queue_jobs WHERE status IN ('pending', 'running', 'retry_wait')");
     }
 
     public QueuePage Queue()

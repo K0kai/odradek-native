@@ -14,7 +14,7 @@ namespace Odradek.Core.Api;
 /// Rotas <c>/api/qpid/*</c> (contrato de candidatura v2, <c>web/qpid_applications.py</c> e <c>api_asgi.py</c>). Cada método devolve o que o
 /// FastAPI devolvia: mesmo status, mesmas chaves na mesma ordem e as mesmas mensagens em português.
 /// </summary>
-public sealed partial class QpidApi(Database db, JobCollector collector)
+public sealed partial class QpidApi(Database db, JobCollector collector, Func<HttpClient>? http = null)
 {
     private const string Tables = """
         CREATE TABLE IF NOT EXISTS qpid_application_attempts (
@@ -44,8 +44,11 @@ public sealed partial class QpidApi(Database db, JobCollector collector)
     public static ApiResult Capabilities() => ApiResult.Ok(new JsonObject
     {
         ["version"] = 2, ["application_contract"] = 2,
-        ["features"] = new JsonArray("profile-facts-v1", "application-reservation-v1", "application-result-v1", "collector-apply-limit-v1"),
+        ["features"] = new JsonArray("profile-facts-v1", "application-reservation-v1", "application-result-v1", "collector-apply-limit-v1", "linkedin-import-v1"),
     });
+
+    /// <summary>Vagas lidas pelo Qpid numa sessão logada do LinkedIn (com descrição): entram como novas e seguem para a triagem.</summary>
+    public Task<ApiResult> ImportLinkedInAsync(JsonObject body, CancellationToken ct = default) => LinkedInImport.HandleAsync(db, body, http, ct);
 
     public ApiResult Queue(int limit, bool fromStart)
     {

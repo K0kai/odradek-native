@@ -65,6 +65,27 @@ public static partial class Geo
         return "";
     }
 
+    /// <summary>geoId do LinkedIn para "Worldwide".</summary>
+    public const string LinkedInWorldwideGeoId = "92000000";
+
+    // Conferidos na busca pública do LinkedIn (jobs-guest): cada id devolve vagas do próprio país.
+    private static readonly Dictionary<string, string> LinkedInGeoIds = new(StringComparer.Ordinal)
+    {
+        ["BR"] = "106057199", ["PT"] = "100364837", ["US"] = "103644278", ["GB"] = "101165590", ["CA"] = "101174742",
+        ["DE"] = "101282230", ["ES"] = "105646813", ["NL"] = "102890719", ["IE"] = "104738515",
+    };
+
+    /// <summary>
+    /// geoId do LinkedIn para um local de busca: o país (nome em português ou inglês) ou "Worldwide". Vazio para cidades e países sem id
+    /// conhecido: nesses casos a busca continua só com o texto do local. Com o geoId o LinkedIn filtra pelo local de verdade, em vez de
+    /// adivinhar o que o texto livre quer dizer.
+    /// </summary>
+    public static string LinkedInGeoId(string? location)
+    {
+        if (Text.NormalizeText(location) == "worldwide") return LinkedInWorldwideGeoId;
+        return LinkedInGeoIds.GetValueOrDefault(CountryCode(location), "");
+    }
+
     public static bool LocationInCountries(string? location, IReadOnlyList<string> countries)
     {
         var haystack = $" {Text.NormalizeText(location)} ";

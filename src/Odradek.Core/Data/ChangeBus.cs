@@ -31,6 +31,9 @@ public sealed record JobsChanged(IReadOnlyList<long> Ids) : Change;
 /// <summary>Item da fila criado ou alterado; <c>null</c> = a fila inteira mudou.</summary>
 public sealed record QueueChanged(long? Id) : Change;
 
+/// <summary>A fila em segundo plano das vagas do LinkedIn mudou (entrou ou saiu vaga, começou ou acabou uma espera).</summary>
+public sealed record LinkedInQueueChanged : Change;
+
 public sealed record LogAppended(LogEntry Entry) : Change;
 
 public sealed record LogsCleared : Change;

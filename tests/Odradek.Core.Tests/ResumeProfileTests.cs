@@ -67,6 +67,29 @@ public class ResumeProfileTests
     }
 
     [Fact]
+    public void CompactProfileText_reads_numbers_computed_in_csharp_after_a_merge()
+    {
+        // O fundido nasce em memória (inteiros criados em C#); lido do disco, os mesmos números são JsonElement. O texto tem de ser o mesmo:
+        // antes, a leitura de inteiros em memória devolvia 0 e o prompt dizia "0m de experiência" e todas as skills sem uso datado.
+        var merged = ResumeProfile.MergeProfiles([Obj("profile_pt"), Obj("profile_en"), Obj("portfolio")], Today)!;
+        var reloaded = (JsonObject)JsonNode.Parse(merged.ToJsonString())!;
+        var text = ResumeProfile.CompactProfileText(merged, 9500);
+        Assert.Equal(ResumeProfile.CompactProfileText(reloaded, 9500), text);
+        var total = merged["derived"]!["total_months"]!.GetValue<int>();
+        Assert.True(total > 0);
+        Assert.Contains($"(computed from dated roles): {ResumeProfile.FormatMonths(total)}", text);
+        Assert.DoesNotContain("(computed from dated roles): 0m", text);
+    }
+
+    [Fact]
+    public void CompactProfileText_shows_project_links_only_when_asked()
+    {
+        var merged = Obj("merged");
+        Assert.DoesNotContain("<https://", ResumeProfile.CompactProfileText(merged, 9500));
+        Assert.Contains("<https://", ResumeProfile.CompactProfileText(merged, 9500, projectLinks: true));
+    }
+
+    [Fact]
     public void EvidenceIndex_matches_python()
     {
         var index = ResumeProfile.EvidenceIndex(Obj("merged"));

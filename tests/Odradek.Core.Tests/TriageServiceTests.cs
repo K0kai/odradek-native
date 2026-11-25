@@ -78,7 +78,7 @@ public class TriageServiceTests : IDisposable
         Assert.Equal("manual", Scalar("SELECT apply_channel FROM ai_decisions WHERE job_id=@id", new { id }));
         Assert.Equal("0", Scalar("SELECT COUNT(*) FROM applications"));
         Assert.Equal("85", Scalar("SELECT match_score FROM ai_decisions WHERE job_id=@id", new { id }));
-        Assert.Equal("v2.1", Scalar("SELECT scoring_version FROM ai_decisions WHERE job_id=@id", new { id }));
+        Assert.Equal("v2.2", Scalar("SELECT scoring_version FROM ai_decisions WHERE job_id=@id", new { id }));
         Assert.Equal("pt", Scalar("SELECT resume_language FROM ai_decisions WHERE job_id=@id", new { id }));
         Assert.Contains(progress, p => p.StartsWith("Decisão: APROVADA · score 85/100 · trilha core · CV pt · modelo gemini/"));
         Assert.Contains(_temp.Changes, c => c is JobsChanged j && j.Ids.Contains(id));
@@ -86,7 +86,7 @@ public class TriageServiceTests : IDisposable
         // O assessment gravado é o que o Python calcula para as mesmas respostas da IA.
         var stored = JsonNode.Parse(Scalar("SELECT assessment_json FROM ai_decisions WHERE job_id=@id", new { id }))!;
         Assert.Equal(Case("main_approved_no_objection")["expected"]!["assessment"]!["decision"]!["score"]!.GetValue<int>(), stored["decision"]!["score"]!.GetValue<int>());
-        Assert.Equal("v2.1", stored["version"]!.GetValue<string>());
+        Assert.Equal("v2.2", stored["version"]!.GetValue<string>());
     }
 
     [Fact]

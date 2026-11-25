@@ -48,13 +48,24 @@ public class AssistantTests : IDisposable
     }
 
     [Fact]
-    public void Prompt_matches_python()
+    public void Prompt_answers_scenario_questions_and_keeps_candidate_facts_grounded()
+    {
+        var prompt = Assistant.BuildPrompt("How would you verify that an AI report only uses authorized company data?", "name: Ana Exemplo");
+        Assert.Contains("use ONLY the candidate context below", prompt);
+        Assert.Contains("how the candidate WOULD", prompt);
+        Assert.Contains("is NEVER a reason to reply FALTA or MISSING", prompt);
+        Assert.Contains("never be presented as something the candidate has already done", prompt);
+    }
+
+    // As instruções mudaram em relação ao app Python (descontinuado): o fixture agora é o retrato do prompt do app nativo.
+    [Fact]
+    public void Prompt_matches_the_recorded_cases()
     {
         foreach (var item in Cases["prompts"]!.AsArray().OfType<JsonObject>())
         {
             var history = item["history"] is JsonArray turns ? turns.Select(t => new Assistant.Turn(t!["role"]!.GetValue<string>(), t["content"]!.GetValue<string>())).ToList() : null;
             var actual = Assistant.BuildPrompt(item["question"]!.GetValue<string>(), item["context"]!.GetValue<string>(), history);
-            Assert.True(item["prompt"]!.GetValue<string>() == actual, "prompt do assistente difere do Python");
+            Assert.True(item["prompt"]!.GetValue<string>() == actual, "prompt do assistente difere do registrado");
         }
     }
 

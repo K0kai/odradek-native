@@ -10,7 +10,11 @@ public class LinkedInSearchTests
     private static readonly JsonObject FilterMain = JsonNode.Parse("""{"id":"main-abc","name":"Software Engineer","slot":"main","enabled":true,"keywords":["Software Engineer","Engenheiro de Software"],"experience_levels":[3,4],"reason":"r","source":"ai"}""")!.AsObject();
     private static readonly JsonObject FilterSec = JsonNode.Parse("""{"id":"sec-def","name":"Analista de Suporte","slot":"secondary","enabled":true,"keywords":["IT Support & Helpdesk"],"experience_levels":[],"reason":"r","source":"ai","track":"transferable"}""")!.AsObject();
 
-    private static Dictionary<string, string> Cfg(string name) => Cases["cfgs"]![name]!.AsObject().ToDictionary(kv => kv.Key, kv => kv.Value!.GetValue<string>());
+    /// <summary>Config dos cenários do Python, que sempre buscavam em "Worldwide": o toggle entra ligado para o escopo continuar igual.</summary>
+    private static Dictionary<string, string> Cfg(string name) => DefaultCfg(name).Concat([KeyValuePair.Create("linkedin_search_worldwide", "1")]).ToDictionary();
+
+    /// <summary>Config do cenário como está, sem o toggle "Worldwide": o padrão do app.</summary>
+    private static Dictionary<string, string> DefaultCfg(string name) => Cases["cfgs"]![name]!.AsObject().ToDictionary(kv => kv.Key, kv => kv.Value!.GetValue<string>());
 
     private static JsonArray ActorsFromFixture()
     {
@@ -64,6 +68,44 @@ public class LinkedInSearchTests
             Assert.Equal(item["main"]!.AsArray().Select(u => u!.GetValue<string>()), LinkedInSearch.BuildSearchUrls(FilterMain, scope, days));
             Assert.Equal(item["sec"]!.AsArray().Select(u => u!.GetValue<string>()), LinkedInSearch.BuildSearchUrls(FilterSec, scope, days));
         }
+    }
+
+    [Fact]
+    public void Worldwide_is_only_searched_when_the_toggle_is_on_and_never_leaves_the_scope_empty()
+    {
+        var off = LinkedInSearch.SearchScope(DefaultCfg("br_bh"));
+        Assert.Equal(["Brazil", "Belo Horizonte", "Portugal"], off.Select(s => s.Location));
+        Assert.DoesNotContain(off, s => s.Location == "Worldwide");
+        var on = LinkedInSearch.SearchScope(Cfg("br_bh"));
+        Assert.Equal("Worldwide", on[^1].Location);
+        Assert.Equal(off.Select(s => s.Location), on.Where(s => s.Location != "Worldwide").Select(s => s.Location));
+
+        var bare = LinkedInSearch.SearchScope(new Dictionary<string, string>()); // nada configurado: ainda assim há uma busca
+        Assert.Equal(["Worldwide"], bare.Select(s => s.Location));
+        Assert.Equal([("Worldwide", "2")], LinkedInSearch.SearchScope(new Dictionary<string, string>
+            { ["linkedin_search_worldwide"] = "0" }).Select(s => (s.Location, s.FWt)));
+        Assert.False(LinkedInSearch.WorldwideEnabled(new Dictionary<string, string>()));
+        Assert.True(LinkedInSearch.WorldwideEnabled(new Dictionary<string, string> { ["linkedin_search_worldwide"] = " 1 " }));
+    }
+
+    [Fact]
+    public void Search_urls_carry_the_country_geoId_and_sort_by_relevance()
+    {
+        var scope = LinkedInSearch.SearchScope(Cfg("br_bh"));
+        var urls = LinkedInSearch.BuildSearchUrls(FilterSec, scope, 1);
+        Assert.All(urls, url => Assert.Contains("&sortBy=R", url));
+        Assert.DoesNotContain(urls, url => url.Contains("sortBy=DD"));
+        string For(string location) => urls.First(url => url.Contains($"&location={location}&", StringComparison.Ordinal));
+        Assert.Contains("&location=Brazil&geoId=106057199&position=1", For("Brazil"));
+        Assert.Contains("&location=Portugal&geoId=100364837&position=1", For("Portugal"));
+        Assert.Contains("&location=Worldwide&geoId=92000000&position=1", For("Worldwide"));
+        Assert.DoesNotContain("geoId", For("Belo+Horizonte")); // cidade: só o texto do local
+        Assert.Contains("&f_WT=2", For("Brazil"));
+
+        foreach (var (name, id) in new[] { ("Brasil", "106057199"), ("UK", "101165590"), ("United States", "103644278"), ("alemanha", "101282230"), ("Reino Unido", "101165590") })
+            Assert.Equal(id, Geo.LinkedInGeoId(name));
+        foreach (var name in new[] { "Belo Horizonte", "remote", "India", "", null })
+            Assert.Equal("", Geo.LinkedInGeoId(name));
     }
 
     [Fact]

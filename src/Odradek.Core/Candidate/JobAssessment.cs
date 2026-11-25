@@ -16,7 +16,13 @@ public delegate Task<JsonObject> CallJson(string prompt, JsonObject schema, int 
 /// </summary>
 public static partial class JobAssessment
 {
-    public const string ScoringVersion = "v2.1";
+    public const string ScoringVersion = "v2.2";
+
+    /// <summary>
+    /// Tamanho máximo do perfil nos prompts da triagem e do cético. Com PT + EN + portfólio o perfil real passa de 14 mil caracteres e a seção de
+    /// projetos (a prova de Next.js, React…) vem por último: com 9500 ela era cortada inteira e a IA concluía "sem comprovação".
+    /// </summary>
+    public const int ProfileBudget = 20000;
 
     private const double WeightMust = 0.70, WeightNice = 0.15, WeightFit = 0.15;
     private const double DifferentWithStrongTransfer = 0.5, YearsTolerance = 1.0, InflatedMajority = 0.5;
@@ -135,6 +141,7 @@ QUOTES: every `job_quote`, `realism_basis_quote`, `level_quote`, `*_quote` must 
 4. matches[]: one per requirement id (Q*) AND per responsibility id (J*). status:
    - met: the profile directly shows it. transferable: not done exactly, but the profile shows an equivalent capability (explain in `bridge`, one sentence). partial: related but incomplete. unmet: no evidence. unknown: cannot tell.
    - `evidence_ids`: ids from the profile ([R1], [R1.2], [S3], [T1]...). `resume_quote`: a SHORT fragment copied verbatim from the cited evidence's own text (a role line, a responsibility, a project, a certification...). For a SKILL id ([S*]) quote ONLY the skill name (e.g. "PostgreSQL", "React"): NEVER the usage statistics after the colon ("5m, last 2026-11", "portfolio projects 3m (P1)") and never a paraphrase, because those are not in the resume. met/transferable/partial WITHOUT valid evidence ids will be downgraded to unmet; a quote that cannot be found downgrades met/transferable to partial.
+   - Cite the evidence that proves THIS requirement (the one naming the technology or capability asked for) and quote from it. Never quote a fragment about a different technology just because it is a real line of the resume.
    - Credit transferable capabilities generously but only when truly equivalent and evidenced (e.g. internal user support -> helpdesk, spreadsheet reporting -> data analysis).
    - Portfolio projects ([P*] items, or a skill line saying "portfolio projects") are real evidence the candidate can use that skill: they may support met/partial for a SKILL requirement. They do NOT count as professional experience: never use them to satisfy "X years of experience" requirements.
    - For an experience_years requirement, cite as `evidence_ids` the skill ([S*]) or role ([R*]) the duration must be measured on; the program checks the dated months against `years_required` and downgrades the status when the dates do not support it. With no skill or role cited, total professional experience is used.
@@ -148,7 +155,7 @@ CANDIDATE PREFERENCES (judgement guidance, never overrides the rules above):
 CANDIDATE FACTS: {(facts.Length > 0 ? facts : "[none]")}
 
 CANDIDATE PROFILE (evidence ids in brackets):
-{ResumeProfile.CompactProfileText(profile, 9500)}
+{ResumeProfile.CompactProfileText(profile, ProfileBudget, projectLinks: true)}
 
 JOB
 Title: {job.Title}
@@ -160,21 +167,84 @@ JOB TEXT:
 """;
     }
 
+    /// <summary>Uma linha do resultado da triagem para o cético: o status e também a evidência citada, para ele contestar a evidência e não a sua ausência.</summary>
+    private static string ScreeningLine(JsonObject item, string label)
+    {
+        var line = $"- {S(item["id"])} {label}{S(item["text"])} => {S(item["status"])}";
+        var evidence = Arr(item["evidence_ids"]).Select(S).Where(e => e.Length > 0).ToList();
+        if (evidence.Count > 0) line += $" | evidence: {string.Join(",", evidence)}";
+        if (S(item["resume_quote"]).Length > 0) line += $" | quote: \"{Core.Text.Take(S(item["resume_quote"]), 160)}\"";
+        if (S(item["bridge"]).Length > 0) line += $" | bridge: {Core.Text.Take(S(item["bridge"]), 160)}";
+        if (S(item["note"]).Length > 0) line += $" | note: {S(item["note"])}";
+        return line;
+    }
+
+    /// <summary>Palavras de exigência que aparecem em quase toda vaga e currículo: não provam que uma evidência trata daquele requisito.</summary>
+    private static readonly HashSet<string> GenericTokens = new("experiencia experience conhecimento knowledge conhecimentos desenvolvimento development solida solido solid comprovada comprovado proven sistemas systems aplicacoes applications projetos projects ferramentas tools tecnologias technologies praticas practices anos years profissional professional trabalho work equipe team area areas nivel level".Split(' '));
+
+    private static HashSet<string> RelevantTokens(string text)
+    {
+        var tokens = SignificantTokens(text);
+        tokens.ExceptWith(GenericTokens);
+        return tokens;
+    }
+
+    /// <summary>Textos da evidência citada (citações e o próprio texto): o que o programa já verificou no perfil.</summary>
+    private static IEnumerable<string> EvidenceTexts(JsonNode? evidenceIds, Dictionary<string, ResumeProfile.Evidence> index)
+    {
+        foreach (var id in Arr(evidenceIds).Select(S))
+        {
+            if (!index.TryGetValue(id, out var evidence)) continue;
+            if (evidence.Kind == "skill") yield return evidence.Text; // skill: só o nome vale como citação
+            foreach (var quote in evidence.Quotes) if (quote.Length > 0) yield return quote;
+            if (evidence.Kind != "skill" && evidence.Text.Length > 0) yield return evidence.Text;
+        }
+    }
+
+    /// <summary>
+    /// A citação mostrada tem de tratar do requisito. Se a do modelo é um trecho real do currículo mas de outro assunto (um upgrade de Laravel para
+    /// um requisito de React/Next.js), troca pela evidência citada que mais se liga ao requisito. O status não muda.
+    /// </summary>
+    private static void RelinkQuote(JsonObject item, Dictionary<string, ResumeProfile.Evidence> index)
+    {
+        if (S(item["status"]) is not ("met" or "transferable" or "partial")) return;
+        var wanted = RelevantTokens(S(item["text"]));
+        if (wanted.Count == 0) return;
+        var quote = S(item["resume_quote"]);
+        if (quote.Length > 0 && RelevantTokens(quote).Overlaps(wanted)) return;
+        string? best = null;
+        var bestScore = 0;
+        foreach (var candidate in EvidenceTexts(item["evidence_ids"], index))
+        {
+            var score = RelevantTokens(candidate).Count(wanted.Contains);
+            if (score > bestScore) { best = candidate; bestScore = score; }
+        }
+        if (best is not null) item["resume_quote"] = Core.Text.Take(best, 300);
+    }
+
     public static string BuildSkepticPrompt(string jobText, JsonObject profile, Verified verified)
     {
-        var lines = verified.Requirements.Select(r => $"- {S(r["id"])} [{S(r["kind"])}/{S(r["realism"])}] {S(r["text"])} => {S(r["status"])}");
+        var lines = verified.Requirements.Select(r => ScreeningLine(r, $"[{S(r["kind"])}/{S(r["realism"])}] "))
+            .Concat(verified.Responsibilities.Select(r => ScreeningLine(r, "[duty] ")));
         return $"""
 You are a SKEPTICAL reviewer. A screening already APPROVED this application. Find concrete, CITED reasons it should NOT go ahead. Do not invent problems; no quote, no objection.
 
-Rules: `job_quote` must be copied VERBATIM from the JOB TEXT. severity: blocker = the candidate clearly cannot do/qualify for the job; major = a significant uncovered core requirement; minor = small gap.
-kind: requirement_unmet (a requirement id the screening marked met/transferable/partial that the profile does not really support), new_issue (a problem the screening missed), inflated_is_core (a requirement the screening called inflated that is actually central to the duties - cite the duty).
+Rules: `job_quote` must be copied VERBATIM from the JOB TEXT. severity: blocker = the job states a restriction the profile contradicts (a required degree, licence, language, location or work authorization the candidate lacks) or the field has no related evidence at all; major = a significant core requirement the cited evidence does not actually cover; minor = small gap.
+kind: requirement_unmet (a requirement id the screening marked met/transferable/partial whose CITED evidence does not cover it: say which part is missing), new_issue (a problem the screening missed), inflated_is_core (a requirement the screening called inflated that is actually central to the duties - cite the duty).
 Never use a requirement marked `inflated` as a blocker unless kind is inflated_is_core with proof.
 
-SCREENING RESULT
+Fair-review rules (the screening applied them; so must you):
+- Portfolio projects ([P*]) are real evidence of skill with that technology; an internship is professional experience. Do not discard them for being "undated skills" or "not professional".
+- Time of experience (total, or per skill) is measured by the program from the dated roles and is shown in the profile. Do NOT object about years, seniority or "insufficient experience". "Solid" or "proven" experience in a SKILL requirement is not a number of years.
+- Judge the evidence the screening CITED (ids and quote below). "There is not enough proof" without naming what is missing from that evidence is not an objection.
+- Do not repeat as new_issue something already in the list below (requirement or duty): use requirement_unmet with its id instead.
+- Do not complain that the profile lacks something the profile lists (check the CANDIDATE PROFILE, including PROJECTS and their links, before saying it is missing).
+
+SCREENING RESULT (id [kind/realism] text => status | evidence | quote | bridge | note)
 {string.Join("\n", lines)}
 
 CANDIDATE PROFILE
-{ResumeProfile.CompactProfileText(profile, 6000)}
+{ResumeProfile.CompactProfileText(profile, ProfileBudget, projectLinks: true)}
 
 JOB TEXT
 {Core.Text.Take(jobText, 12000)}
@@ -391,6 +461,7 @@ JOB TEXT
             item["bridge"] = match["bridge"]!.DeepClone();
             item["note"] = match["note"]!.DeepClone();
             item["resume_quote"] = match["resume_quote"]!.DeepClone();
+            RelinkQuote(item, index);
         }
         CheckDurations(requirements, profile, () => Bump("matches_downgraded"));
 
@@ -646,9 +717,39 @@ JOB TEXT
             && decision["score"]!.GetValue<int>() >= decision["min_score"]!.GetValue<int>();
     }
 
-    public static List<JsonObject> VerifySkeptic(JsonObject raw, NormalizedText jobNorm, Verified verified)
+    /// <summary>O item (requisito ou responsabilidade) cuja citação da vaga é a mesma da objeção, ou está contida nela; vence a mais específica.</summary>
+    private static JsonObject? ItemByJobQuote(IEnumerable<JsonObject> items, string quote)
+    {
+        var wanted = Core.Text.NormalizeText(quote);
+        if (wanted.Length < 12) return null;
+        return items
+            .Select(i => (Item: i, Text: Core.Text.NormalizeText(S(i["job_quote"]))))
+            .Where(p => p.Text.Length >= 12 && (p.Text.Contains(wanted, StringComparison.Ordinal) || wanted.Contains(p.Text, StringComparison.Ordinal)))
+            .OrderByDescending(p => p.Text.Length)
+            .Select(p => p.Item)
+            .FirstOrDefault();
+    }
+
+    /// <summary>A evidência citada trata do requisito: algum trecho dela divide uma palavra relevante com o texto do requisito.</summary>
+    private static bool EvidenceCovers(JsonObject item, Dictionary<string, ResumeProfile.Evidence> index)
+    {
+        var wanted = RelevantTokens(S(item["text"]));
+        return wanted.Count > 0 && EvidenceTexts(item["evidence_ids"], index).Any(text => RelevantTokens(text).Overlaps(wanted));
+    }
+
+    private static readonly HashSet<string> EliminatoryCategories = ["degree", "clearance", "authorization", "language", "location"];
+
+    /// <summary>
+    /// Objeções do cético que valem: com citação verificável da vaga, e limitadas pelo que o programa já verificou. O cético não derruba sozinho
+    /// um requisito com evidência verificada e relacionada (no máximo leve), só uma restrição explícita (diploma, licença, idioma, local,
+    /// autorização) pode ser bloqueante, e tempo de experiência é medido pelas datas, não por opinião.
+    /// </summary>
+    public static List<JsonObject> VerifySkeptic(JsonObject raw, NormalizedText jobNorm, Verified verified, JsonObject profile)
     {
         var inflated = verified.Requirements.Where(r => S(r["realism"]) == "inflated").Select(r => S(r["id"])).ToHashSet();
+        var items = verified.Requirements.Concat(verified.Responsibilities).ToList();
+        var byId = items.ToDictionary(i => S(i["id"]));
+        var index = ResumeProfile.EvidenceIndex(profile);
         var result = new List<JsonObject>();
         foreach (var item in Arr(raw["objections"]).OfType<JsonObject>())
         {
@@ -656,7 +757,28 @@ JOB TEXT
             var kind = S(item["kind"]) is "new_issue" or "requirement_unmet" or "inflated_is_core" ? S(item["kind"]) : "new_issue";
             var severity = S(item["severity"]) is "blocker" or "major" or "minor" ? S(item["severity"]) : "minor";
             var rid = S(item["requirement_id"]);
+            var target = byId.GetValueOrDefault(rid);
+            if (kind == "new_issue" && ItemByJobQuote(items, quote) is { } repeated)
+            {
+                // "problema novo" que cita uma exigência ou responsabilidade já avaliada é contestação dela: vale as mesmas travas
+                (kind, target, rid) = ("requirement_unmet", repeated, S(repeated["id"]));
+            }
+            else if (kind == "requirement_unmet" && target is null)
+            {
+                if (ItemByJobQuote(items, quote) is not { } found) continue; // id que não existe e citação que não é de nenhum item
+                (target, rid) = (found, S(found["id"]));
+            }
             if (inflated.Contains(rid) && kind != "inflated_is_core" && severity == "blocker") severity = "minor"; // exigência desconsiderada não reprova sozinha
+            if (kind == "requirement_unmet" && target is not null)
+            {
+                var category = S(target["category"]);
+                if (category == "experience_years") severity = "minor"; // CheckDurations e o bloqueio de anos mínimos já cuidam do tempo
+                else
+                {
+                    if (severity == "blocker" && !EliminatoryCategories.Contains(category)) severity = "major";
+                    if (S(target["status"]) is "met" or "transferable" or "partial" && S(target["note"]).Length == 0 && EvidenceCovers(target, index)) severity = "minor";
+                }
+            }
             result.Add(new JsonObject
             {
                 ["kind"] = kind, ["requirement_id"] = rid, ["severity"] = severity, ["job_quote"] = Core.Text.Take(quote, 300), ["reason"] = Cut(item["reason"], 300),
@@ -725,7 +847,7 @@ JOB TEXT
         {
             say("Passo A aprovou; rodando revisão cética (passo B)");
             var skeptic = await callJson(BuildSkepticPrompt(jobText, profile, verified), SkepticSchema(), 4096, 1024, ct);
-            objections = VerifySkeptic(skeptic, jobNorm, verified);
+            objections = VerifySkeptic(skeptic, jobNorm, verified, profile);
             var flipped = false;
             foreach (var objection in objections.Where(o => S(o["kind"]) == "inflated_is_core"))
                 foreach (var req in verified.Requirements.Where(r => S(r["id"]) == S(objection["requirement_id"]) && S(r["realism"]) == "inflated"))
