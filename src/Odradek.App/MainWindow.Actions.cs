@@ -560,6 +560,8 @@ public partial class MainWindow
 
         await Step("token", async () =>
         {
+            var manual = Descendants(SettingsTabs).OfType<Expander>().FirstOrDefault(e => e.Header?.ToString() == SettingsEditor.ManualPairingHeader);
+            if (manual is not null) { manual.IsExpanded = true; await Task.Delay(500); }
             var gen = Descendants(SettingsTabs).OfType<Button>().FirstOrDefault(b => b.IsVisible && b.Content?.ToString() == "Gerar novo token");
             if (gen is not null) Click(gen);
         }, () => $"hash gravado={Q<long>("SELECT COUNT(*) FROM settings WHERE key='__extension_token_hash__' AND value<>''")}, aviso='{NoticeText.Text}'");

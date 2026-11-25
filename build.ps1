@@ -43,6 +43,13 @@ if (Test-Path $out) { Remove-Item $out -Recurse -Force }
 dotnet publish src\Odradek.App\Odradek.App.csproj --configuration Release --runtime win-x64 --self-contained true --output $out "-p:Version=$Version"
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish falhou" }
 
+# A extensão do pacote leva a versão do app: é por ela que a extensão já carregada no navegador percebe que mudou e se recarrega.
+$manifestPath = Join-Path $out "extension\manifest.json"
+$manifestText = [System.IO.File]::ReadAllText($manifestPath)
+$versionPattern = [regex]'"version"\s*:\s*"[^"]*"'
+if (-not $versionPattern.IsMatch($manifestText)) { throw "Não achei a versão em $manifestPath." }
+[System.IO.File]::WriteAllText($manifestPath, $versionPattern.Replace($manifestText, "`"version`": `"$Version`"", 1), (New-Object System.Text.UTF8Encoding($false)))
+
 # Os símbolos de depuração só pesam: ficam de fora do pacote.
 Get-ChildItem $out -Filter *.pdb -Recurse | Remove-Item -Force
 $zip = Join-Path $PSScriptRoot "dist\Odradek-win-x64.zip"

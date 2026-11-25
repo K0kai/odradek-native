@@ -10,6 +10,15 @@ Baixe o **[Odradek-Setup.exe](https://github.com/K0kai/odradek-native/releases/l
 
 O instalador ainda não tem assinatura digital, então o Windows pode mostrar **"O Windows protegeu o computador"**: clique em **Mais informações → Executar assim mesmo**.
 
+## Extensão do navegador
+
+A extensão **Odradek Autofill** (pasta `extension/`) vem no pacote do app. No app: **Configurações → Contas e chaves → Extensão do navegador**, escolha o navegador e clique em **Instalar extensão** (o instalador também oferece abrir esse passo ao terminar). Navegadores não deixam um programa instalar uma extensão de fora da loja, nem abrir a página de extensões; por isso são alguns cliques: colar na barra o endereço que o app copia, ligar o **modo do desenvolvedor**, **Carregar sem compactação** e colar o caminho da pasta. Depois, no painel da extensão, **Connect to Odradek** e **Permitir** no app.
+
+- Precisa de um navegador baseado no Chromium 141 ou mais novo. São oferecidos Chrome, Edge, Brave e **Opera GX** (136 ou mais novo, a primeira versão com painel lateral para extensões; conferido no 140); Opera e Vivaldi aparecem com o aviso de que não foram testados. Versões antigas do Opera pedem atualização. Firefox não funciona.
+- Um navegador que não aparece na lista (instalado fora do lugar comum) pode ser escolhido em **Procurar outro…**.
+- O navegador carrega a cópia em `%LOCALAPPDATA%\Odradek\extension`. O app a atualiza ao abrir (inclusive depois de se atualizar sozinho) e a extensão se recarrega quando o painel é aberto. Desinstalar o app não remove a extensão do navegador.
+- O ID da extensão é fixo (`key` no `manifest.json`). O app só entrega token a pedidos com o `Origin` desse ID, e só depois do **Permitir**. Há um token por vez: conectar outro navegador desconecta o anterior.
+
 ## Publicar uma versão
 
 1. Faça push do que vai na versão para a `main`.
@@ -28,6 +37,7 @@ src/Odradek.App/       Avalonia: janela, telas, bandeja, aviso, instância únic
 tests/Odradek.Core.Tests/   xunit
 tools/Odradek.Probe/   paridade com o app Python (precisa de bancos e referências geradas por ele)
 installer/             o instalador (Inno Setup 6)
+extension/             a extensão do navegador (Chromium, MV3); ver extension/README.md
 ```
 
 ## Comandos

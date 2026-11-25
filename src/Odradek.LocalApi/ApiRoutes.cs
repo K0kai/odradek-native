@@ -11,6 +11,7 @@ using Odradek.Core.Api;
 using Odradek.Core.Collector;
 using Odradek.Core.Data;
 using Odradek.Core.Engines;
+using Odradek.Core.Extension;
 
 namespace Odradek.LocalApi;
 
@@ -30,6 +31,15 @@ public sealed class ApiServices(Database db, Func<JobCollector> collector, Func<
     /// <summary>Retoma, ao abrir o app, o que ficou na fila da última vez. Não monta nada quando não há trabalho guardado.</summary>
     public void ResumeLinkedIn() { if (linkedIn is not null || LinkedInQueue.HasSavedWork()) LinkedIn().Resume(); }
     public string QpidToken() => qpidToken();
+
+    /// <summary>Pergunta ao usuário se a extensão pode se conectar. Deve desistir (fechar a pergunta) quando o token cancelar. <c>null</c>: não há quem pergunte.</summary>
+    public Func<CancellationToken, Task<bool>>? ConfirmPairing { get; init; }
+    public TimeSpan PairingTimeout { get; init; } = TimeSpan.FromMinutes(2);
+    /// <summary>Uma pergunta de pareamento por vez.</summary>
+    internal SemaphoreSlim PairingGate { get; } = new(1, 1);
+
+    /// <summary>A versão da extensão que o app tem na pasta fixa; vai no <c>/health</c> para a extensão carregada saber que mudou.</summary>
+    public Func<string?>? ExtensionVersion { get; init; }
 }
 
 /// <summary>
@@ -141,6 +151,39 @@ public static partial class ApiRoutes
         }
     }
 
+    /// <summary>
+    /// "Conectar ao Odradek": a extensão pede um token sem ter nenhum. Só o <c>Origin</c> da nossa extensão é aceito (uma página não o forja) e,
+    /// ainda assim, o token só sai se o usuário permitir na tela do app. O token novo substitui o anterior.
+    /// </summary>
+    private static async Task<IResult> PairAsync(HttpContext context, ApiServices services)
+    {
+        if (!string.Equals(context.Request.Headers.Origin.ToString(), ExtensionIdentity.Origin, StringComparison.Ordinal))
+            return Reply(ApiResult.Error("Só a extensão Odradek Autofill pode pedir a conexão.", 403));
+        if (services.ConfirmPairing is not { } confirm)
+            return Reply(ApiResult.Error("Este Odradek não aceita conexão com um clique. Gere o token no app e cole na extensão.", 503));
+        if (!await services.PairingGate.WaitAsync(0))
+            return Reply(ApiResult.Error("Já há um pedido de conexão esperando a sua resposta no Odradek.", 409));
+        try
+        {
+            using var limit = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted);
+            limit.CancelAfter(services.PairingTimeout);
+            bool allowed;
+            try { allowed = await confirm(limit.Token).WaitAsync(limit.Token); }
+            catch (OperationCanceledException) when (limit.IsCancellationRequested)
+            {
+                return Reply(ApiResult.Error("O pedido de conexão expirou sem resposta no Odradek. Tente de novo.", 408));
+            }
+            if (!allowed)
+            {
+                new EventLogStore(services.Db).Add("info", "extension", "Pedido de conexão da extensão recusado.");
+                return Reply(ApiResult.Error("A conexão foi recusada no Odradek.", 403));
+            }
+            var token = new ExtensionTokenActions(services.Db).Issue();
+            return Reply(new ApiResult(200, new JsonObject { ["token"] = token }));
+        }
+        finally { services.PairingGate.Release(); }
+    }
+
     public static void Map(WebApplication app, ApiServices services)
     {
         app.Use(async (context, next) =>
@@ -190,7 +233,10 @@ public static partial class ApiRoutes
             await next();
         });
 
-        app.MapGet("/health", () => Results.Text("{\"ok\":true,\"service\":\"" + LocalServer.ServiceName + "\"}", "application/json"));
+        app.MapGet("/health", () => Results.Text("{\"ok\":true,\"service\":\"" + LocalServer.ServiceName + "\""
+            + (services.ExtensionVersion?.Invoke() is { Length: > 0 } version ? ",\"extensionVersion\":" + JsonSerializer.Serialize(version) : "") + "}", "application/json"));
+        // (Delegate): como RequestDelegate o resultado seria descartado e a extensão receberia uma resposta vazia.
+        app.MapPost("/api/extension/pair", (Delegate)((HttpContext context) => PairAsync(context, services)));
         app.MapGet("/health/db", () =>
         {
             try

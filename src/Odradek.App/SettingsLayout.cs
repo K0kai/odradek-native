@@ -85,7 +85,7 @@ public static class SettingsLayout
             new("E-mail (SMTP)", "Também é usado para enviar candidaturas por e-mail a vagas aprovadas que trazem um endereço de contato.",
                 [new("smtp_host", "Servidor"), new("smtp_port", "Porta"), new("smtp_user", "Usuário"), new("smtp_from", "Remetente"),
                  new("smtp_password", "Senha", FieldKind.Secret, Secret: "smtp_password"), new("smtp_use_tls", "Usar TLS", FieldKind.Toggle)]),
-            new("Extensão do navegador", "Pareamento com a extensão Odradek Autofill: gere o token aqui e cole-o na extensão.",
+            new("Extensão do navegador", "Instale a extensão Odradek Autofill no seu navegador; depois, no painel dela, clique em “Connect to Odradek”.",
                 [new("__extension_token_hash__", "Token da extensão", FieldKind.Secret, Secret: "")]),
         ]),
     ];

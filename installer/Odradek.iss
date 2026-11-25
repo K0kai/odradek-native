@@ -63,7 +63,9 @@ Name: "{userprograms}\Odradek"; Filename: "{app}\Odradek.exe"; WorkingDir: "{app
 Name: "{userdesktop}\Odradek"; Filename: "{app}\Odradek.exe"; WorkingDir: "{app}"; Comment: "Odradek: coleta, triagem e candidaturas"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\Odradek.exe"; Description: "{cm:LaunchProgram,Odradek}"; Flags: nowait postinstall skipifsilent
+; Marcada, abre o app direto no passo a passo da extensão; a segunda opção então não precisa abrir outra vez (o app é de instância única).
+Filename: "{app}\Odradek.exe"; Parameters: "--extensao"; Description: "Instalar a extensão do navegador"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Odradek.exe"; Description: "{cm:LaunchProgram,Odradek}"; Flags: nowait postinstall skipifsilent unchecked
 
 [Code]
 function DataDir(): String;

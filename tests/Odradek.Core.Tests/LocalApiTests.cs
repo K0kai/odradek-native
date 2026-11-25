@@ -30,7 +30,7 @@ public sealed class ApiHarness : IDisposable
     public HttpClient Client { get; }
     private readonly LocalServer _server;
 
-    private ApiHarness(string qpidToken)
+    private ApiHarness(string qpidToken, Func<CancellationToken, Task<bool>>? confirmPairing, TimeSpan? pairingTimeout, Func<string?>? extensionVersion)
     {
         Collector = new JobCollector(Temp.Db, new Dictionary<string, JobSources.Provider>());
         var ai = new AiClient(new HttpClient(Ai), null, null, new AiClientOptions { FallbackModels = [], RetryDelays = [], Pause = (_, _) => Task.CompletedTask });
@@ -41,12 +41,17 @@ public sealed class ApiHarness : IDisposable
         listener.Start();
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
-        _server = new LocalServer(new ApiServices(Temp.Db, () => Collector, () => assistant, () => qpidToken, () => new HttpClient(LinkedIn), Queue), port);
+        var services = new ApiServices(Temp.Db, () => Collector, () => assistant, () => qpidToken, () => new HttpClient(LinkedIn), Queue)
+        {
+            ConfirmPairing = confirmPairing, PairingTimeout = pairingTimeout ?? TimeSpan.FromSeconds(30), ExtensionVersion = extensionVersion,
+        };
+        _server = new LocalServer(services, port);
         _server.StartAsync().GetAwaiter().GetResult();
         Client = new HttpClient { BaseAddress = new Uri($"http://127.0.0.1:{port}/") };
     }
 
-    public static ApiHarness Start(string qpidToken = QpidToken) => new(qpidToken);
+    public static ApiHarness Start(string qpidToken = QpidToken, Func<CancellationToken, Task<bool>>? confirmPairing = null,
+        TimeSpan? pairingTimeout = null, Func<string?>? extensionVersion = null) => new(qpidToken, confirmPairing, pairingTimeout, extensionVersion);
 
     public HttpRequestMessage Request(string method, string url, string? token = QpidToken, HttpContent? content = null)
     {

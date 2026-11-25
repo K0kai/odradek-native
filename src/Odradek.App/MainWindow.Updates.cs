@@ -35,7 +35,7 @@ public partial class MainWindow
         }
         else
         {
-            UpdateText.Text = _updateNote?.Short ?? $"v{current}";
+            UpdateText.Text = _updateNote?.Short ?? ""; // a versão em uso tem a sua própria linha (VersionText)
             ToolTip.SetTip(UpdateText, _updateNote?.Full ?? $"Você usa a versão {current}.");
             UpdateButton.Content = "Buscar atualização";
             UpdateButton.Classes.Set("ready", false);

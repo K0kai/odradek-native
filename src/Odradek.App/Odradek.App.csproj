@@ -28,6 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- A extensão do navegador vai no pacote; o app a copia para a pasta de dados, de onde o navegador a carrega (ExtensionFolder.cs). -->
+    <None Include="..\..\extension\**\*" Exclude="..\..\extension\README.md" Link="extension\%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- ícone do app (o mesmo do app Python) -->
     <!-- odradek-icon.png (1024 px) é só a matriz: o app usa as versões já reduzidas (64/128/256), que ficam nítidas em tamanho pequeno -->
     <AvaloniaResource Include="Assets\odradek-64.png;Assets\odradek-128.png;Assets\odradek-256.png" />

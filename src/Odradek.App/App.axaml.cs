@@ -62,6 +62,8 @@ public partial class App : Application
         StartEngines();
         StartUpdates();
         if (_window is not null) await _window.LoadDbSummaryAsync();
+        if (_window is not null && ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { Args: { } args } && args.Contains("--extensao"))
+            await _window.OpenExtensionSettingsAsync();
     }
 
     /// <summary>Atualização automática (só no app instalado): procura versões novas e aplica quando o app está ocioso.</summary>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a0a0b;
+      --panel: #121214;
+      --panel2: #17171a;
+      --line: #26262b;
+      --line2: #33333a;
+      --ink: #ededf0;
+      --muted: #8a8a93;
+      --muted2: #5c5c66;
+      --accent: #e5484d;
+      --accent2: #ff6369;
+      --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); scrollbar-color: var(--line2) var(--bg); scrollbar-width: thin; }
+    body { width: 100%; min-width: 280px; min-height: 100vh; margin: 0; padding: 16px 16px 42px; overflow-x: hidden; overflow-y: auto; background: var(--bg); color: var(--ink); font: 500 13px/1.5 ui-sans-serif, Inter, "Segoe UI", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { border: 2px solid var(--bg); border-radius: 999px; background: var(--line2); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    label { display: block; margin-top: 9px; color: var(--muted); font-size: 12px; font-weight: 600; }
+    input { width: 100%; margin-top: 5px; padding: 8px 10px; border: 1px solid var(--line2); border-radius: 8px; background: #0e0e10; color: var(--ink); font: inherit; transition: border-color .12s, background .12s; }
+    input:focus { outline: none; border-color: var(--accent); background: #101012; }
+    select { width: 100%; margin-top: 5px; padding: 8px 10px; border: 1px solid var(--line2); border-radius: 8px; background: #0e0e10; color: var(--ink); font: inherit; }
+    select:focus { outline: none; border-color: var(--accent); }
+    .row { display: flex; gap: 8px; margin-top: 12px; }
+    .import-row { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .hint { margin: 6px 0 0; color: var(--muted2); font-size: 11px; font-weight: 500; line-height: 1.45; }
+    button { flex: 1; padding: 9px 10px; border: 1px solid transparent; border-radius: 8px; background: var(--white); color: #0a0a0a; font: inherit; font-weight: 700; cursor: pointer; transition: filter .12s, background .12s; }
+    button:hover { filter: brightness(.92); }
+    #import { width: 100%; background: var(--accent); color: var(--white); }
+    #import:hover { background: var(--accent2); }
+    button:disabled { opacity: .6; cursor: wait; }
+    #home-status, #fields-status, #whitelist-status, #settings-status, #assistant-status { min-height: 1.4em; margin-top: 9px; color: var(--accent2); font-size: 11px; }
+    .steps { margin: 10px 0 0; padding: 0; list-style: none; }
+    .steps li { display: flex; gap: 7px; align-items: flex-start; margin-top: 5px; color: var(--muted2); font-size: 11px; font-weight: 500; line-height: 1.35; }
+    .steps li::before { content: "○"; color: var(--muted2); }
+    .steps li.active { color: var(--ink); }
+    .steps li.active::before { content: "◌"; color: var(--accent2); }
+    .steps li.done { color: #a9d8b8; }
+    .steps li.done::before { content: "✓"; color: #70c48c; }
+    .steps li.error { color: #ff9298; }
+    .steps li.error::before { content: "!"; color: var(--accent2); }
+    .field-card { margin-top: 9px; padding: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); }
+    .field-top { display: flex; align-items: end; gap: 7px; }
+    .field-top label { flex: 1; margin: 0; }
+    .field-edit, .small-button { flex: 0 0 auto; padding: 7px 9px; background: transparent; color: var(--muted); border-color: var(--line2); font-size: 11px; }
+    .field-edit:hover, .small-button:hover { color: var(--ink); background: var(--panel2); }
+    .field-editor, .create-editor { margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--line); }
+    textarea { width: 100%; min-height: 74px; margin-top: 5px; padding: 8px 10px; border: 1px solid var(--line2); border-radius: 8px; background: #0e0e10; color: var(--ink); font: inherit; resize: vertical; }
+    textarea:focus { outline: none; border-color: var(--accent); }
+    .field-actions { display: flex; gap: 7px; margin-top: 8px; }
+    .section-action { width: 100%; margin-top: 10px; background: var(--panel2); color: var(--ink); border: 1px solid var(--line2); }
+    .section-action:hover { border-color: var(--accent); }
+    .create-editor { padding: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); }
+    .whitelist-list { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+    .whitelist-list:empty { display: none; }
+    .whitelist-entry { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; padding: 6px 8px; border-radius: 7px; background: var(--panel2); color: var(--ink); font-size: 11px; }
+    .whitelist-origin { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .whitelist-tag { flex: 0 0 auto; margin-left: auto; color: var(--muted); font-size: 10px; }
+    .wildcard-editor { display: grid; gap: 6px; margin-top: 10px; }
+    .whitelist-phone { flex: 0 0 auto; width: auto; max-width: 150px; margin: 0; padding: 2px 4px; font-size: 10px; }
+    .whitelist-remove { flex: 0 0 auto; width: 25px; height: 25px; padding: 0; border: 0; background: transparent; color: var(--muted); font-size: 16px; }
+    .whitelist-remove:hover { background: var(--line); color: var(--accent2); filter: none; }
+    .assistant-messages { display: flex; flex-direction: column; gap: 9px; min-height: 140px; max-height: min(42vh, 360px); overflow-y: auto; margin-top: 12px; padding: 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); }
+    .assistant-empty { margin: auto; padding: 16px 8px; color: var(--muted); text-align: center; font-size: 12px; }
+    .assistant-message { max-width: 92%; padding: 8px 10px; border: 1px solid var(--line2); border-radius: 10px; background: var(--panel2); color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .assistant-message.user { align-self: flex-end; border-color: #5a3034; background: #241719; }
+    .assistant-message.assistant { align-self: flex-start; }
+    .assistant-compose { display: grid; gap: 8px; margin-top: 10px; }
+    .assistant-compose textarea { min-height: 72px; }
+    .assistant-compose button, .assistant-select { width: 100%; }
+    .assistant-select { margin-top: 10px; background: var(--panel2); color: var(--ink); border: 1px solid var(--line2); }
+    .assistant-select:hover { border-color: var(--accent); }
+    #home-view { position: relative; display: flex; min-height: calc(100vh - 32px); flex-direction: column; justify-content: center; }
+    .home-brand { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .home-logo { width: 88px; height: 88px; overflow: visible; filter: drop-shadow(0 5px 12px #e5484d22); }
+    @media (prefers-reduced-motion: reduce) {
+      .animated-odradek animate, .animated-odradek animateMotion { display: none; }
+    }
+    .view-title { margin: 12px 0 4px; font-size: 18px; line-height: 1.25; }
+    .home-title-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .extension-mark { width: 16px; height: 16px; flex: none; color: var(--accent); }
+    .home-title-row .view-title { margin: 12px 0 4px; }
+    .view-subtitle { margin: 0 0 24px; color: var(--muted); font-size: 12px; }
+    .home-actions { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; width: 100%; margin: 0 auto; }
+    .home-action { position: relative; display: inline-flex; flex: 0 0 64px; align-items: center; justify-content: center; width: min(232px, calc(100vw - 32px)); height: 64px; overflow: hidden; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--ink); box-shadow: none; }
+    .home-action::before { position: absolute; z-index: 0; top: 50%; right: 6px; left: 6px; width: 58px; height: 58px; transform: translateY(-50%); margin-inline: auto; border: 1px solid #45454d; border-radius: 999px; background: radial-gradient(circle at 32% 24%, #303036 0, #19191d 48%, #101012 100%); box-shadow: inset 0 1px 1px #ffffff16, 0 5px 16px #0008; content: ""; transition: width .28s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+    .home-action:hover::before, .home-action:focus-visible::before { width: calc(100% - 12px); border-color: var(--accent); background: radial-gradient(circle at 24% 20%, #3a292c 0, #1c1719 48%, #101012 100%); box-shadow: inset 0 1px 1px #ffffff18, 0 6px 20px #e5484d24; }
+    .home-action.primary { color: var(--white); }
+    .home-action.primary::before { border-color: #aa373b; background: radial-gradient(circle at 32% 24%, #f1666b 0, #c93c41 48%, #792428 100%); }
+    .home-action.primary:hover::before, .home-action.primary:focus-visible::before { border-color: #ff7b80; background: radial-gradient(circle at 20% 15%, #ff777d 0, #d74449 52%, #922c31 100%); }
+    .home-action-content { position: absolute; z-index: 1; top: 50%; left: 50%; display: flex; align-items: center; gap: 0; width: max-content; max-width: calc(100% - 24px); transform: translate(-50%, -50%); transition: gap .28s ease; }
+    .home-action-icon { position: static; flex: 0 0 24px; width: 24px; height: 24px; }
+    .home-action-label { position: static; display: block; width: 0; max-width: calc(100vw - 100px); overflow: hidden; opacity: 0; white-space: nowrap; font-size: 11px; font-weight: 700; transition: width .28s ease, opacity .16s ease; }
+    #home-fill .home-action-label { --label-width: 112px; }
+    #open-fields .home-action-label { --label-width: 40px; }
+    #open-whitelist .home-action-label { --label-width: 96px; }
+    #open-assistant .home-action-label { --label-width: 56px; }
+    #open-settings .home-action-label { --label-width: 52px; }
+    .home-action:hover .home-action-content, .home-action:focus-visible .home-action-content { gap: 8px; }
+    .home-action:hover .home-action-label, .home-action:focus-visible .home-action-label { width: var(--label-width); opacity: 1; }
+    /* In the normal flow, under the buttons: long messages (LinkedIn import) can neither cover a button nor the fixed copyright line (the body's bottom padding clears it when scrolled). */
+    #home-view #home-status { margin-top: 14px; padding: 0 4px; text-align: center; overflow-wrap: anywhere; }
+    @media (prefers-reduced-motion: reduce) { .home-action, .home-action::before, .home-action-label { transition: none; } }
+    .back-button { width: auto; margin: -4px 0 12px; padding: 5px 0; background: transparent; color: var(--muted); text-align: left; }
+    .back-button:hover { color: var(--ink); filter: none; }
+    .close-panel { position: fixed; z-index: 10; top: 8px; right: 8px; display: grid; flex: none; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #fff; }
+    .close-panel:hover, .close-panel:focus-visible { border-color: var(--line2); background: var(--panel2); color: var(--ink); filter: none; }
+    .panel-copyright { position: fixed; z-index: 5; right: 0; bottom: 10px; left: 0; color: var(--muted2); text-align: center; font-size: 10px; font-weight: 500; line-height: 1.4; pointer-events: none; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <button class="close-panel" id="close-panel" type="button" aria-label="Close side panel" title="Close side panel">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+  </button>
+  <main>
+    <section id="home-view">
+      <header class="home-brand">
+        <svg class="home-logo animated-odradek" viewBox="0 0 180 180" role="img" aria-label="Odradek sensor animado">
+          <defs><clipPath id="odradek-pupil-clip"><circle cx="90" cy="90" r="22"/></clipPath></defs>
+          <path d="M105 91h42q7 0 7 7v20l14 14 6 21" fill="none" stroke="#080809" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M105 91h42q7 0 7 7v20l14 14 6 21" fill="none" stroke="#f4f1ec" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="148" cy="92" r="6" fill="#e5484d" stroke="#080809" stroke-width="3"/>
+          <circle cx="168" cy="132" r="5" fill="#f4f1ec" stroke="#080809" stroke-width="3"/>
+          <path d="m162 152 10 1 6 8v8h-16v-8Z" fill="#080809" stroke="#f4f1ec" stroke-width="2" stroke-linejoin="round"/>
+          <g class="odradek-left-blades">
+            <animateTransform attributeName="transform" type="translate" values="0 0;4.5 0;-3.5 0;2 0;0 0" dur="0.7s" begin="0s" repeatCount="2"/>
+          <g class="odradek-blade">
+            <path d="M72 76 58 64 39 47 31 41 26 25 42 31 49 38 66 55 80 71Z" fill="#f4f1ec" stroke="#080809" stroke-width="4" stroke-linejoin="round"/>
+            <path d="m26 25 16 6 7 7-13 7-5-4Z" fill="#e5484d" stroke="#080809" stroke-width="3" stroke-linejoin="round"/>
+            <path d="m49 38-10 9" fill="none" stroke="#080809" stroke-width="3"/>
+            <circle cx="59" cy="59" r="2.5" fill="#080809"/><circle cx="68" cy="68" r="4" fill="#080809"/>
+          </g>
+          </g>
+          <g class="odradek-right-blades">
+            <animateTransform attributeName="transform" type="translate" values="0 0;-4.5 0;3.5 0;-2 0;0 0" dur="0.7s" begin="0s" repeatCount="2"/>
+          <g class="odradek-blade" transform="rotate(90 90 90)">
+            <path d="M72 76 58 64 39 47 31 41 26 25 42 31 49 38 66 55 80 71Z" fill="#f4f1ec" stroke="#080809" stroke-width="4" stroke-linejoin="round"/>
+            <path d="m26 25 16 6 7 7-13 7-5-4Z" fill="#e5484d" stroke="#080809" stroke-width="3" stroke-linejoin="round"/>
+            <path d="m49 38-10 9" fill="none" stroke="#080809" stroke-width="3"/>
+            <circle cx="59" cy="59" r="2.5" fill="#080809"/><circle cx="68" cy="68" r="4" fill="#080809"/>
+          </g>
+          <g class="odradek-blade" transform="rotate(180 90 90)">
+            <path d="M72 76 58 64 39 47 31 41 26 25 42 31 49 38 66 55 80 71Z" fill="#f4f1ec" stroke="#080809" stroke-width="4" stroke-linejoin="round"/>
+            <path d="m26 25 16 6 7 7-13 7-5-4Z" fill="#e5484d" stroke="#080809" stroke-width="3" stroke-linejoin="round"/>
+            <path d="m49 38-10 9" fill="none" stroke="#080809" stroke-width="3"/>
+            <circle cx="59" cy="59" r="2.5" fill="#080809"/><circle cx="68" cy="68" r="4" fill="#080809"/>
+          </g>
+          </g>
+          <g class="odradek-left-blades">
+            <animateTransform attributeName="transform" type="translate" values="0 0;4.5 0;-3.5 0;2 0;0 0" dur="0.7s" begin="0s" repeatCount="2"/>
+          <g class="odradek-blade" transform="rotate(270 90 90)">
+            <path d="M72 76 58 64 39 47 31 41 26 25 42 31 49 38 66 55 80 71Z" fill="#f4f1ec" stroke="#080809" stroke-width="4" stroke-linejoin="round"/>
+            <path d="m26 25 16 6 7 7-13 7-5-4Z" fill="#e5484d" stroke="#080809" stroke-width="3" stroke-linejoin="round"/>
+            <path d="m49 38-10 9" fill="none" stroke="#080809" stroke-width="3"/>
+            <circle cx="59" cy="59" r="2.5" fill="#080809"/><circle cx="68" cy="68" r="4" fill="#080809"/>
+          </g>
+          </g>
+          <path d="M90 64v14" stroke="#080809" stroke-width="8" stroke-linecap="round"/>
+          <path d="M90 32v36" stroke="#e5484d" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="90" cy="90" r="25" fill="#080809" stroke="#f4f1ec" stroke-width="3"/>
+          <circle cx="90" cy="90" r="18" fill="none" stroke="#e5484d" stroke-width="2"/>
+          <g clip-path="url(#odradek-pupil-clip)">
+            <circle cx="90" cy="90" r="6" fill="#fff">
+              <animateMotion dur="1.4s" repeatCount="1" path="M0 0 C-3 0 -7 -2 -7 0 C-7 -4 -4 -7 0 -7 C4 -7 7 -4 7 0 C7 4 3 2 0 0"/>
+              <animate attributeName="r" values="6;6;1;6;1;6" keyTimes="0;0.82;0.86;0.91;0.95;1" dur="1.4s" begin="0s" repeatCount="1" fill="freeze"/>
+            </circle>
+          </g>
+        </svg>
+        <div class="home-title-row">
+          <h1 class="view-title">Odradek Autofill</h1>
+          <svg class="extension-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3H5a2 2 0 0 0-2 2v4h1a2 2 0 1 1 0 4H3v4a2 2 0 0 0 2 2h4v-1a2 2 0 1 1 4 0v1h4a2 2 0 0 0 2-2v-4h-1a2 2 0 1 1 0-4h1V5a2 2 0 0 0-2-2h-4v1a2 2 0 1 1-4 0V3Z"/></svg>
+        </div>
+        <p class="view-subtitle">What would you like to do?</p>
+      </header>
+      <div id="connect-offer" hidden>
+        <button class="section-action" type="button" data-connect>Connect to Odradek</button>
+        <p class="hint">The Odradek app is open on this computer. Connecting asks for your permission there.</p>
+      </div>
+      <div class="home-actions">
+        <button class="home-action primary" id="home-fill" type="button" aria-label="Assist application" title="Assist application">
+          <span class="home-action-content">
+            <img class="home-action-icon" src="icons/fill-page.svg" alt="" aria-hidden="true">
+            <span class="home-action-label">Assist application</span>
+          </span>
+        </button>
+        <button class="home-action" id="home-linkedin" type="button" aria-label="Send these LinkedIn jobs to Odradek" title="Send these LinkedIn jobs to Odradek" hidden>
+          <span class="home-action-content">
+            <svg class="home-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg>
+            <span class="home-action-label">Send LinkedIn jobs</span>
+          </span>
+        </button>
+        <button class="home-action" id="home-linkedin-debug" type="button" aria-label="Copy LinkedIn import diagnostics" title="Copy LinkedIn import diagnostics" hidden>
+          <span class="home-action-content">
+            <svg class="home-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+            <span class="home-action-label">LinkedIn diagnostics</span>
+          </span>
+        </button>
+        <button class="home-action" id="open-fields" type="button" aria-label="Fields" title="Fields">
+          <span class="home-action-content">
+            <img class="home-action-icon" src="icons/fields.svg" alt="" aria-hidden="true">
+            <span class="home-action-label">Fields</span>
+          </span>
+        </button>
+        <button class="home-action" id="open-whitelist" type="button" aria-label="Site settings" title="Site settings">
+          <span class="home-action-content">
+            <img class="home-action-icon" src="icons/whitelist.svg" alt="" aria-hidden="true">
+            <span class="home-action-label">Site settings</span>
+          </span>
+        </button>
+        <button class="home-action" id="open-assistant" type="button" aria-label="Assistant" title="Assistant">
+          <span class="home-action-content">
+            <img class="home-action-icon" src="icons/assistant.svg" alt="" aria-hidden="true">
+            <span class="home-action-label">Assistant</span>
+          </span>
+        </button>
+        <button class="home-action" id="open-settings" type="button" aria-label="Settings" title="Settings">
+          <span class="home-action-content">
+            <svg class="home-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3"/><path d="M2 14h4m4-6h4m4 8h4"/><circle cx="4" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="6" r="2" fill="currentColor"/><circle cx="20" cy="14" r="2" fill="currentColor"/></svg>
+            <span class="home-action-label">Settings</span>
+          </span>
+        </button>
+      </div>
+      <div id="home-status" role="status" aria-live="polite"></div>
+    </section>
+    <section id="fields-view" hidden>
+      <button class="back-button" id="back-home" type="button">← Home</button>
+      <h1 class="view-title">Fields</h1>
+      <div id="fields"></div>
+      <button class="section-action" id="add-field" type="button">+ Add a field</button>
+      <section class="create-editor" id="create-editor" hidden>
+        <label>Field label<input id="new-label" autocomplete="off" placeholder="e.g. Current company"></label>
+        <label>Value<input id="new-value" autocomplete="off" placeholder="Value to fill"></label>
+        <label>Website field names or IDs<textarea id="new-aliases" placeholder="One name or ID per line, e.g.&#10;company_name&#10;employer"></textarea></label>
+        <div class="field-actions">
+          <button class="small-button" id="create-field" type="button">Add field</button>
+          <button class="small-button" id="cancel-create" type="button">Cancel</button>
+        </div>
+      </section>
+      <div class="import-row">
+        <button id="import" type="button">Import from Odradek Scraper</button>
+        <p class="hint">Only fills blank fields. Existing extension values are kept.</p>
+        <ol class="steps" id="process-steps" aria-live="polite" hidden>
+          <li>Check panel availability</li>
+          <li>Check server and database health</li>
+          <li>Request profile data</li>
+          <li>Merge and save blank fields</li>
+        </ol>
+      </div>
+      <div class="row">
+        <button id="save" type="button">Save</button>
+      </div>
+      <div id="fields-status" role="status" aria-live="polite"></div>
+    </section>
+    <section id="whitelist-view" hidden>
+      <button class="back-button" id="back-home-whitelist" type="button">← Home</button>
+      <h1 class="view-title">Site settings</h1>
+      <p class="hint">Assist application works on any website. Add a site here only to change how it is filled (phone notation). A setting covers every page of the site. Use <em>Add all subdomains</em> (for example <code>*.inhire.app</code>) to cover every company on a platform.</p>
+      <button class="section-action" id="add-current-site" type="button">+ Add current website</button>
+      <button class="section-action" id="add-subdomains" type="button">+ Add all subdomains</button>
+      <div id="wildcard-editor" class="wildcard-editor" hidden>
+        <label for="wildcard-pattern">Domain rule</label>
+        <input id="wildcard-pattern" type="text" placeholder="*.inhire.app" autocomplete="off" spellcheck="false">
+        <div class="row">
+          <button id="add-wildcard" type="button">Add</button>
+          <button id="cancel-wildcard" class="small-button" type="button">Cancel</button>
+        </div>
+      </div>
+      <ul class="whitelist-list" id="whitelist-sites" aria-live="polite"></ul>
+      <div id="whitelist-status" role="status" aria-live="polite"></div>
+    </section>
+    <section id="settings-view" hidden>
+      <button class="back-button" id="back-home-settings" type="button">← Home</button>
+      <h1 class="view-title">Settings</h1>
+      <button class="section-action" type="button" data-connect>Connect to Odradek</button>
+      <p class="hint">Connects to the Odradek desktop app on this computer; you allow it in the app window. No token to copy. The fields below are only needed to connect manually.</p>
+      <p class="hint">Choose the Odradek Scraper server used to import your profile and answer assistant questions. This address is saved on this device.</p>
+      <label for="backend-url">Backend URL</label>
+      <input id="backend-url" type="url" inputmode="url" autocomplete="url" spellcheck="false" placeholder="https://your-odradek-server.example">
+      <p class="hint">Use an HTTPS address. HTTP is allowed only for localhost. Saving asks Chrome to grant this server access.</p>
+      <label for="backend-token">Access token</label>
+      <input id="backend-token" type="password" autocomplete="off" spellcheck="false" placeholder="odk_…">
+      <p class="hint">In the panel, open Settings → Accounts and keys → Browser extension, generate a token and paste it here. It is saved on this device and sent only to the backend above. Leave it empty to remove it.</p>
+      <label for="resume-language">Resume language</label>
+      <select id="resume-language">
+        <option value="auto">Automatic (page language)</option>
+        <option value="pt">Português</option>
+        <option value="en">English</option>
+      </select>
+      <p class="hint">The resume is downloaded from the panel and attached to upload fields when you press Assist application. This needs the access token above.</p>
+      <div class="row"><button id="save-backend" type="button">Save settings</button></div>
+      <div id="settings-status" role="status" aria-live="polite"></div>
+    </section>
+    <section id="assistant-view" hidden>
+      <button class="back-button" id="back-home-assistant" type="button">← Home</button>
+      <h1 class="view-title">Assistant</h1>
+      <p class="hint">Ask about an application question, or hover over it on the webpage and left-click to add its HTML to the chat. The panel health check runs while you select. Chrome may ask to allow access to this website. Right-click or press Escape to cancel. Review the question and send it when ready.</p>
+      <button class="assistant-select" id="select-question" type="button">Select a question from this page</button>
+      <div class="assistant-messages" id="assistant-messages" aria-live="polite">
+        <div class="assistant-empty" id="assistant-empty">Your conversation will appear here.</div>
+      </div>
+      <ol class="steps" id="assistant-steps" aria-live="polite" hidden>
+        <li>Check panel availability</li>
+        <li>Check server and database health</li>
+        <li>Send question to panel assistant</li>
+        <li>Receive answer</li>
+      </ol>
+      <form class="assistant-compose" id="assistant-compose">
+        <textarea id="assistant-input" maxlength="4000" placeholder="Type your question…" rows="3"></textarea>
+        <button id="assistant-send" type="submit">Send to assistant</button>
+      </form>
+      <div id="assistant-status" role="status" aria-live="polite"></div>
+    </section>
+  </main>
+  <footer class="panel-copyright">© Kokai — Todos os direitos reservados.</footer>
+  <script src="fill-runner.js"></script>
+  <script src="sidepanel.js"></script>
+  <script src="connect.js"></script>
+</body>
+</html>

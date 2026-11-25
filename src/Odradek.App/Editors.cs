@@ -380,10 +380,14 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
         revoke.Click += async (_, _) => { await Task.Run(actions.Revoke); token.IsVisible = false; ShowStatus(); notify("Token revogado.", false); };
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         buttons.Children.Add(generate); buttons.Children.Add(revoke);
-        panel.Children.Add(Ui.Labeled("URL do painel (cole em “Backend URL” na extensão)", new SelectableTextBlock { Text = "http://127.0.0.1:8765" }));
-        panel.Children.Add(status);
-        panel.Children.Add(buttons);
-        panel.Children.Add(token);
+        panel.Children.Add(ExtensionInstallPanel.Build(notify));
+        // O caminho de antes, para quando o "Conectar ao Odradek" da extensão não servir.
+        var manual = new StackPanel { Spacing = 6 };
+        manual.Children.Add(Ui.Labeled("URL do painel (cole em “Backend URL” na extensão)", new SelectableTextBlock { Text = "http://127.0.0.1:8765" }));
+        manual.Children.Add(status);
+        manual.Children.Add(buttons);
+        manual.Children.Add(token);
+        panel.Children.Add(new Expander { Header = ManualPairingHeader, Content = manual, HorizontalAlignment = HorizontalAlignment.Stretch });
 
         // O Qpid (assistente do desktop) usa as rotas /api/qpid/* com um token próprio, guardado no Cofre do Windows: aqui só se copia para colar lá.
         var qpid = new StackPanel { Spacing = 6, Margin = new Thickness(0, 12, 0, 0) };
@@ -408,8 +412,14 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
         };
         qpid.Children.Add(copyQpid);
         panel.Children.Add(qpid);
+        ExtensionCard = panel;
         return panel;
     }
+
+    public const string ManualPairingHeader = "Conectar manualmente (token)";
+
+    /// <summary>O cartão da extensão da última montagem das abas, para a tela rolar até ele.</summary>
+    public Control? ExtensionCard { get; private set; }
 }
 
 /// <summary>Regras de formulário editáveis (1 a 100, chaves únicas); só grava ao clicar em Salvar regras.</summary>

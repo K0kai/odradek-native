@@ -431,11 +431,23 @@ public partial class MainWindow : Window
         _settingsEditor.Build(SettingsTabs, values);
     }
 
+    /// <summary>Abre Configurações já no cartão da extensão (<c>--extensao</c>, a opção que o instalador oferece).</summary>
+    internal async Task OpenExtensionSettingsAsync()
+    {
+        NavList.SelectedIndex = Array.FindIndex(Pages, p => p.Page == Page.Settings);
+        await Task.Delay(600); // a troca de tela dispara a montagem das abas
+        await LoadSettingsAsync();
+        SettingsTabs.SelectedIndex = Array.FindIndex(SettingsLayout.Tabs, t => t.Sections.Any(s => s.Fields.Any(f => f.Key == "__extension_token_hash__")));
+        await Task.Delay(400);
+        _settingsEditor?.ExtensionCard?.BringIntoView();
+    }
+
     // ---------- janela ----------
 
     public MainWindow()
     {
         InitializeComponent();
+        VersionText.Text = "Versão " + (System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "desconhecida");
         _settingsEditor = new SettingsEditor(_database, Notify);
         _rulesEditor = new RulesEditor(_database, RulesHost, RulesState, RulesSaveButton, Notify);
         JobsList.ItemsSource = _jobs;

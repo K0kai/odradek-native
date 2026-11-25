@@ -32,6 +32,9 @@ internal static class Program
     /// <summary><c>null</c> quando a atualização automática está desligada (o app não foi instalado por <c>install.ps1</c>).</summary>
     public static Odradek.Core.Update.Updater? AutoUpdater { get; private set; }
 
+    /// <summary>A cópia da extensão do navegador na pasta de dados (<c>extension\</c> do pacote → <c>%LOCALAPPDATA%\Odradek\extension</c>).</summary>
+    public static Odradek.Core.Extension.ExtensionFolder ExtensionFolder { get; } = Odradek.Core.Extension.ExtensionFolder.Default(Log);
+
     public static double ProcessAgeMs() => (DateTime.Now - Process.GetCurrentProcess().StartTime).TotalMilliseconds;
 
     [STAThread]
@@ -77,7 +80,11 @@ internal static class Program
         // O servidor local sobe em paralelo com a janela, em outra thread: construir o Kestrel (JIT) na thread da tela atrasava a janela.
         // Subir já aqui também fecha a corrida em que uma segunda execução, logo depois, ainda enxergaria a porta livre.
         // As rotas da extensão e do Qpid usam o banco e os motores já montados (só criados quando uma rota os pede) e o token do Qpid (cofre).
-        var services = new ApiServices(Database, () => Engines.Collector, () => Engines.Assistant, () => QpidTokenValue.Value, () => Engines.Http);
+        var services = new ApiServices(Database, () => Engines.Collector, () => Engines.Assistant, () => QpidTokenValue.Value, () => Engines.Http)
+        {
+            ConfirmPairing = PairingPrompt.AskAsync,
+            ExtensionVersion = ExtensionFolder.Version,
+        };
         _api = services;
         Server = new LocalServer(services);
         ServerStart = Task.Run(async () =>
@@ -85,6 +92,7 @@ internal static class Program
             var timer = Stopwatch.StartNew();
             await Server.StartAsync();
             Log($"Servidor local no ar em {timer.ElapsedMilliseconds} ms ({ProcessAgeMs():F0} ms do início do processo).");
+            ExtensionFolder.Sync(); // depois de uma atualização do app, a extensão carregada no navegador vem junto (nunca lança)
             services.ResumeLinkedIn(); // vagas do LinkedIn que ficaram na fila da última vez continuam sendo lidas
         });
         try
