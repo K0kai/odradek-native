@@ -14,20 +14,44 @@ namespace Odradek.App;
 /// <summary>Pedaços de tela repetidos: rótulo + controle, cartão com borda, botão.</summary>
 public static class Ui
 {
-    public static StackPanel Labeled(string label, Control control, string? hint = null) =>
-        Labeled(new TextBlock { Text = label, Classes = { "muted" } }, control, hint);
+    public static StackPanel Labeled(string label, Control control, string? help = null) =>
+        Labeled(new TextBlock { Text = label, Classes = { "muted" }, VerticalAlignment = VerticalAlignment.Center }, control, help);
 
     /// <summary>Como <see cref="Labeled(string, Control, string?)"/>, com um cabeçalho livre (rótulo + selo, por exemplo).</summary>
-    public static StackPanel Labeled(Control header, Control control, string? hint = null)
+    public static StackPanel Labeled(Control header, Control control, string? help = null)
     {
         var panel = new StackPanel { Spacing = 2 };
-        panel.Children.Add(header);
+        panel.Children.Add(WithHelp(header, help));
         panel.Children.Add(control);
-        if (!string.IsNullOrEmpty(hint)) panel.Children.Add(new TextBlock { Text = hint, Classes = { "muted" }, FontSize = 11, Opacity = 0.8, TextWrapping = TextWrapping.Wrap });
         return panel;
     }
 
+    /// <summary>O controle com o marcador (?) ao lado; sem explicação, o próprio controle.</summary>
+    public static Control WithHelp(Control control, string? help)
+    {
+        if (string.IsNullOrEmpty(help)) return control;
+        var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        row.Children.Add(control);
+        row.Children.Add(new HelpMark { Text = help });
+        return row;
+    }
+
     public static Border Card(Control child) => new() { Child = child, Classes = { "card" } };
+
+    public static async Task<bool> CopyAsync(Control from, string value)
+    {
+        try
+        {
+            if (TopLevel.GetTopLevel(from)?.Clipboard is not { } clipboard) return false;
+            await clipboard.SetTextAsync(value);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Program.Log("Não consegui copiar: " + ex.Message);
+            return false;
+        }
+    }
 
     /// <summary>Selo colorido (fundo e texto pelas cores do tema, que acompanham a troca claro/escuro).</summary>
     public static void Paint(Border badge, TextBlock text, string backgroundKey, string foregroundKey)
@@ -105,11 +129,26 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
         host.SelectedIndex = Math.Min(selected, _tabs.Count - 1);
     }
 
+    private static void OpenGuide(Control from, string id) => GuidesWindow.Show(TopLevel.GetTopLevel(from) as Window, id);
+
     private Control BuildSection(TabState state, SettingSection section, IReadOnlyDictionary<string, string> values)
     {
         var card = new StackPanel { Spacing = 8 };
-        card.Children.Add(new TextBlock { Text = section.Title, Classes = { "h2" } });
-        if (section.Description.Length > 0) card.Children.Add(new TextBlock { Text = section.Description, Classes = { "muted" }, TextWrapping = TextWrapping.Wrap });
+        var title = Ui.WithHelp(new TextBlock { Text = section.Title, Classes = { "h2" }, VerticalAlignment = VerticalAlignment.Center }, section.Help);
+        if (section.Guide.Length == 0) card.Children.Add(title);
+        else
+        {
+            var guide = new Button { Content = section.Guide == Guides.Actors ? "Guia dos actors" : "Guia passo a passo", Classes = { "quiet", "link" } };
+            guide.Click += (_, _) => OpenGuide(guide, section.Guide == SettingsLayout.AiGuide
+                ? (_providerRead?.Invoke() == "openai" ? Guides.OpenAi : Guides.Gemini) // o do provedor escolhido agora na tela
+                : section.Guide);
+            var header = new DockPanel();
+            DockPanel.SetDock(guide, Dock.Right);
+            header.Children.Add(guide);
+            title.HorizontalAlignment = HorizontalAlignment.Left;
+            header.Children.Add(title);
+            card.Children.Add(header);
+        }
         foreach (var field in section.Fields)
         {
             if (field.Key == "__extension_token_hash__") { card.Children.Add(BuildExtension()); continue; }
@@ -129,7 +168,7 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
                 try { var r = await new EmailActions(db).SendTestAsync(); result.Text = r.Notice; notify(r.Notice, !r.Ok); }
                 finally { test.IsEnabled = true; }
             };
-            card.Children.Add(new TextBlock { Text = "O teste usa o que já está salvo: salve a aba antes.", Opacity = 0.55, FontSize = 11 });
+            ToolTip.SetTip(test, "Usa o que já está salvo: salve a aba antes.");
             card.Children.Add(test);
             card.Children.Add(result);
         }
@@ -145,14 +184,14 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
             {
                 var shown = new SelectableTextBlock { Text = SettingsLayout.Display(field, values), TextWrapping = TextWrapping.Wrap };
                 _filterTexts[field.Key] = shown;
-                return (Ui.Labeled(field.Label, shown, "Gerado pela IA a partir do perfil verificado dos currículos; só é trocado quando você pede."), null);
+                return (shown, null); // o título da seção já diz qual filtro é
             }
             case FieldKind.Toggle:
             {
                 var box = new CheckBox { Content = field.Label, IsChecked = raw == "1" };
                 var entry = new Entry(field, () => box.IsChecked == true ? "1" : "0", s => box.IsChecked = s == "1");
                 Attach(box, entry);
-                return (box, entry);
+                return (Ui.WithHelp(box, field.Help), entry);
             }
             case FieldKind.Select:
             {
@@ -221,7 +260,8 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
                 var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
                 header.Children.Add(new TextBlock { Text = field.Label, Classes = { "muted" }, VerticalAlignment = VerticalAlignment.Center });
                 header.Children.Add(badge);
-                return (Ui.Labeled(header, box, "Só de escrita: o valor fica no Cofre de Credenciais do Windows e nunca volta para a tela."), entry);
+                ToolTip.SetTip(badge, "O valor fica no Cofre de Credenciais do Windows e nunca volta para a tela.");
+                return (Ui.Labeled(header, box, field.Help), entry);
             }
             default:
                 if (SettingsLayout.Sliders.TryGetValue(field.Key, out var range))
@@ -252,7 +292,7 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
                     void Refresh()
                     {
                         var isDefault = (prompt.Text ?? "").Trim() == promptDefault.Trim();
-                        status.Text = isDefault ? "Texto padrão (acompanha as melhorias do app)" : "Personalizado";
+                        status.Text = isDefault ? "Texto padrão" : "Personalizado";
                         restore.IsVisible = !isDefault;
                     }
                     prompt.TextChanged += (_, _) => Refresh();
@@ -262,13 +302,13 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
                     bar.Children.Add(status); bar.Children.Add(restore);
                     var box = new StackPanel { Spacing = 4 };
                     box.Children.Add(prompt); box.Children.Add(bar);
-                    return (Ui.Labeled(field.Label, box), promptEntry);
+                    return (Ui.Labeled(field.Label, box, field.Help), promptEntry);
                 }
                 var text = new TextBox { Text = raw, MinWidth = 320, TextWrapping = TextWrapping.Wrap };
                 if (SettingsLayout.MultiLine.Contains(field.Key)) { text.AcceptsReturn = true; text.MinHeight = 110; text.MaxHeight = 260; }
                 var textEntry = new Entry(field, () => text.Text ?? "", s => text.Text = s);
                 Attach(text, textEntry);
-                return (Ui.Labeled(field.Label, text), textEntry);
+                return (Ui.Labeled(field.Label, text, field.Help), textEntry);
         }
     }
 
@@ -331,7 +371,7 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
             if (_secretViews.TryGetValue(entry, out var updateBadge)) updateBadge();
         }
         var dirty = state.Entries.Any(e => e.Dirty);
-        state.State.Text = dirty ? "Alterações não salvas" : "Sem alterações";
+        state.State.Text = dirty ? "Alterações não salvas" : "";
         state.Save.IsEnabled = dirty;
         state.Item.Header = state.Tab.Label + (dirty ? " •" : "");
     }
@@ -383,7 +423,7 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
         panel.Children.Add(ExtensionInstallPanel.Build(notify));
         // O caminho de antes, para quando o "Conectar ao Odradek" da extensão não servir.
         var manual = new StackPanel { Spacing = 6 };
-        manual.Children.Add(Ui.Labeled("URL do painel (cole em “Backend URL” na extensão)", new SelectableTextBlock { Text = "http://127.0.0.1:8765" }));
+        manual.Children.Add(Ui.Labeled("URL do painel (“Backend URL” na extensão)",new SelectableTextBlock { Text = "http://127.0.0.1:8765" }));
         manual.Children.Add(status);
         manual.Children.Add(buttons);
         manual.Children.Add(token);
@@ -391,12 +431,8 @@ public sealed class SettingsEditor(Database db, Action<string, bool> notify)
 
         // O Qpid (assistente do desktop) usa as rotas /api/qpid/* com um token próprio, guardado no Cofre do Windows: aqui só se copia para colar lá.
         var qpid = new StackPanel { Spacing = 6, Margin = new Thickness(0, 12, 0, 0) };
-        qpid.Children.Add(new TextBlock { Text = "Token do Qpid", FontWeight = FontWeight.SemiBold });
-        qpid.Children.Add(new TextBlock
-        {
-            Text = "No Qpid, abra Integrações › Odradek, cole este valor e salve. O Qpid se conecta em http://127.0.0.1:8765 com o Odradek aberto.",
-            Classes = { "muted" }, TextWrapping = TextWrapping.Wrap,
-        });
+        qpid.Children.Add(Ui.WithHelp(new TextBlock { Text = "Token do Qpid", FontWeight = FontWeight.SemiBold, VerticalAlignment = VerticalAlignment.Center },
+            "No Qpid, abra Integrações › Odradek, cole o token e salve. O Qpid se conecta em http://127.0.0.1:8765 com o Odradek aberto."));
         var copyQpid = Ui.Button("Copiar token do Qpid", () => { });
         copyQpid.HorizontalAlignment = HorizontalAlignment.Left;
         copyQpid.Click += async (_, _) =>
@@ -442,7 +478,7 @@ public sealed class RulesEditor(Database db, StackPanel host, TextBlock state, B
     public bool Dirty => Current != _saved;
 
     private string Current => string.Join('\u0002', _rules.Select(r => r.Snapshot()));
-    private void RefreshState() { var dirty = Current != _saved; state.Text = dirty ? "Alterações não salvas" : "Sem alterações"; save.IsEnabled = dirty; }
+    private void RefreshState() { var dirty = Current != _saved; state.Text = dirty ? "Alterações não salvas" : ""; save.IsEnabled = dirty; }
 
     public void Load(IEnumerable<PanelQueries.FormRule> rules)
     {
@@ -477,7 +513,7 @@ public sealed class RulesEditor(Database db, StackPanel host, TextBlock state, B
         var first = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         first.Children.Add(Ui.Labeled("Chave", Box(rule.Key, s => rule.Key = s)));
         first.Children.Add(Ui.Labeled("Modo", mode));
-        first.Children.Add(Ui.Labeled("Valor das configurações", Box(rule.ValueFrom, s => rule.ValueFrom = s), "ex.: candidate_phone"));
+        first.Children.Add(Ui.Labeled("Valor das configurações", Box(rule.ValueFrom, s => rule.ValueFrom = s)));
         first.Children.Add(Ui.Labeled("Valor fixo", Box(rule.Value, s => rule.Value = s)));
         var panel = new StackPanel { Spacing = 6 };
         panel.Children.Add(first);

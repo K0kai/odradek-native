@@ -14,7 +14,7 @@ public partial class MainWindow
     internal void AttachUpdates(UpdateCoordinator updates)
     {
         _updates = updates;
-        UpdateBox.IsVisible = true;
+        UpdateButton.IsVisible = true;
         updates.Changed += () => Dispatcher.UIThread.Post(() => { _confirmingUpdate = false; _updateNote = null; RenderUpdate(); });
         UpdateButton.Click += async (_, _) => await OnUpdateClickAsync();
         RenderUpdate();

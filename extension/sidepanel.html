@@ -115,6 +115,17 @@
     .close-panel:hover, .close-panel:focus-visible { border-color: var(--line2); background: var(--panel2); color: var(--ink); filter: none; }
     .panel-copyright { position: fixed; z-index: 5; right: 0; bottom: 10px; left: 0; color: var(--muted2); text-align: center; font-size: 10px; font-weight: 500; line-height: 1.4; pointer-events: none; }
     [hidden] { display: none !important; }
+    /* (?) help mark: the explanation shows on hover, focus or click, in one floating box kept inside the narrow panel. */
+    button.help { display: inline-flex; flex: 0 0 18px; align-items: center; justify-content: center; width: 18px; height: 18px; padding: 0; border: 1px solid var(--muted2); border-radius: 999px; background: transparent; color: var(--muted); font-size: 11px; line-height: 1; cursor: help; }
+    button.help:hover, button.help:focus-visible { border-color: var(--accent); background: var(--panel2); color: var(--ink); filter: none; }
+    .help-pop { position: fixed; z-index: 20; max-width: min(260px, calc(100vw - 24px)); padding: 8px 10px; border: 1px solid var(--line2); border-radius: 8px; background: var(--panel2); box-shadow: 0 6px 20px #000a; color: var(--ink); font-size: 11px; line-height: 1.45; }
+    .help-row { display: flex; align-items: center; gap: 8px; }
+    .help-row.label-row { margin-top: 9px; }
+    .help-row.label-row label { margin: 0; }
+    .help-row .view-title { margin-right: 0; }
+    .help-row .section-action { flex: 1; }
+    .help-row.action-row .help { margin-top: 10px; }
+    .import-row .help-row .help { margin-top: 0; }
   </style>
 </head>
 <body>
@@ -182,8 +193,10 @@
         <p class="view-subtitle">What would you like to do?</p>
       </header>
       <div id="connect-offer" hidden>
-        <button class="section-action" type="button" data-connect>Connect to Odradek</button>
-        <p class="hint">The Odradek app is open on this computer. Connecting asks for your permission there.</p>
+        <div class="help-row action-row">
+          <button class="section-action" type="button" data-connect>Connect to Odradek</button>
+          <button class="help" type="button" aria-label="Help" data-help="The Odradek app is open on this computer. You allow the connection there.">?</button>
+        </div>
       </div>
       <div class="home-actions">
         <button class="home-action primary" id="home-fill" type="button" aria-label="Assist application" title="Assist application">
@@ -246,8 +259,10 @@
         </div>
       </section>
       <div class="import-row">
-        <button id="import" type="button">Import from Odradek Scraper</button>
-        <p class="hint">Only fills blank fields. Existing extension values are kept.</p>
+        <div class="help-row">
+          <button id="import" type="button">Import from Odradek</button>
+          <button class="help" type="button" aria-label="Help" data-help="Only fills blank fields. The values you already have here are kept.">?</button>
+        </div>
         <ol class="steps" id="process-steps" aria-live="polite" hidden>
           <li>Check panel availability</li>
           <li>Check server and database health</li>
@@ -262,8 +277,10 @@
     </section>
     <section id="whitelist-view" hidden>
       <button class="back-button" id="back-home-whitelist" type="button">← Home</button>
-      <h1 class="view-title">Site settings</h1>
-      <p class="hint">Assist application works on any website. Add a site here only to change how it is filled (phone notation). A setting covers every page of the site. Use <em>Add all subdomains</em> (for example <code>*.inhire.app</code>) to cover every company on a platform.</p>
+      <div class="help-row">
+        <h1 class="view-title">Site settings</h1>
+        <button class="help" type="button" aria-label="Help" data-help="Assist application works on any website. Add a site only to change how it is filled (phone notation); the setting covers all its pages. “Add all subdomains” (e.g. *.inhire.app) covers every company on a platform.">?</button>
+      </div>
       <button class="section-action" id="add-current-site" type="button">+ Add current website</button>
       <button class="section-action" id="add-subdomains" type="button">+ Add all subdomains</button>
       <div id="wildcard-editor" class="wildcard-editor" hidden>
@@ -280,29 +297,38 @@
     <section id="settings-view" hidden>
       <button class="back-button" id="back-home-settings" type="button">← Home</button>
       <h1 class="view-title">Settings</h1>
-      <button class="section-action" type="button" data-connect>Connect to Odradek</button>
-      <p class="hint">Connects to the Odradek desktop app on this computer; you allow it in the app window. No token to copy. The fields below are only needed to connect manually.</p>
-      <p class="hint">Choose the Odradek Scraper server used to import your profile and answer assistant questions. This address is saved on this device.</p>
-      <label for="backend-url">Backend URL</label>
+      <div class="help-row action-row">
+        <button class="section-action" type="button" data-connect>Connect to Odradek</button>
+        <button class="help" type="button" aria-label="Help" data-help="Connects to the Odradek desktop app on this computer, with no token to copy: you allow it in the app window. The fields below are only for connecting manually.">?</button>
+      </div>
+      <div class="help-row label-row">
+        <label for="backend-url">Backend URL</label>
+        <button class="help" type="button" aria-label="Help" data-help="Where your profile and the assistant come from. Use HTTPS; HTTP is allowed only for localhost. Saving asks Chrome to grant access to this address.">?</button>
+      </div>
       <input id="backend-url" type="url" inputmode="url" autocomplete="url" spellcheck="false" placeholder="https://your-odradek-server.example">
-      <p class="hint">Use an HTTPS address. HTTP is allowed only for localhost. Saving asks Chrome to grant this server access.</p>
-      <label for="backend-token">Access token</label>
+      <div class="help-row label-row">
+        <label for="backend-token">Access token</label>
+        <button class="help" type="button" aria-label="Help" data-help="In the Odradek app: Configurações → Contas e chaves → Extensão do navegador → Conectar manualmente. It is sent only to the address above. Leave it empty to remove it.">?</button>
+      </div>
       <input id="backend-token" type="password" autocomplete="off" spellcheck="false" placeholder="odk_…">
-      <p class="hint">In the panel, open Settings → Accounts and keys → Browser extension, generate a token and paste it here. It is saved on this device and sent only to the backend above. Leave it empty to remove it.</p>
-      <label for="resume-language">Resume language</label>
+      <div class="help-row label-row">
+        <label for="resume-language">Resume language</label>
+        <button class="help" type="button" aria-label="Help" data-help="Your resume is attached to upload fields when you press Assist application. Needs a connection or an access token.">?</button>
+      </div>
       <select id="resume-language">
         <option value="auto">Automatic (page language)</option>
         <option value="pt">Português</option>
         <option value="en">English</option>
       </select>
-      <p class="hint">The resume is downloaded from the panel and attached to upload fields when you press Assist application. This needs the access token above.</p>
       <div class="row"><button id="save-backend" type="button">Save settings</button></div>
       <div id="settings-status" role="status" aria-live="polite"></div>
     </section>
     <section id="assistant-view" hidden>
       <button class="back-button" id="back-home-assistant" type="button">← Home</button>
-      <h1 class="view-title">Assistant</h1>
-      <p class="hint">Ask about an application question, or hover over it on the webpage and left-click to add its HTML to the chat. The panel health check runs while you select. Chrome may ask to allow access to this website. Right-click or press Escape to cancel. Review the question and send it when ready.</p>
+      <div class="help-row">
+        <h1 class="view-title">Assistant</h1>
+        <button class="help" type="button" aria-label="Help" data-help="Type an application question, or select one on the page: hover and left-click to add it to the chat (right-click or Esc cancels). Chrome may ask for access to the site.">?</button>
+      </div>
       <button class="assistant-select" id="select-question" type="button">Select a question from this page</button>
       <div class="assistant-messages" id="assistant-messages" aria-live="polite">
         <div class="assistant-empty" id="assistant-empty">Your conversation will appear here.</div>

@@ -43,7 +43,6 @@ public partial class App : Application
         try
         {
             await Program.ServerStart; // já começou em Program.Main, em paralelo com a janela
-            Dispatcher.UIThread.Post(() => _window?.ShowServerState($"●  Servidor local em {LocalServer.Host}:{LocalServer.Port}"));
         }
         catch (Exception ex)
         {
@@ -61,7 +60,6 @@ public partial class App : Application
         }
         StartEngines();
         StartUpdates();
-        if (_window is not null) await _window.LoadDbSummaryAsync();
         if (_window is not null && ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { Args: { } args } && args.Contains("--extensao"))
             await _window.OpenExtensionSettingsAsync();
     }

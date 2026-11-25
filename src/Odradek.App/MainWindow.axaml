@@ -55,23 +55,27 @@
           </StackPanel>
         </Border>
         <StackPanel Grid.Row="3" Spacing="10" Margin="0,10,0,0">
-          <!-- Atualização: uma linha discreta; só aparece no app instalado (com atualização automática ligada) -->
-          <Grid x:Name="UpdateBox" ColumnDefinitions="*,Auto" Margin="4,0,0,0" IsVisible="False">
-            <TextBlock x:Name="UpdateText" Classes="muted" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-            <Button x:Name="UpdateButton" Grid.Column="1" Classes="quiet" Content="Buscar atualização" />
-          </Grid>
           <Grid ColumnDefinitions="Auto,*" Margin="4,0,0,0">
             <TextBlock Text="Tema" Classes="muted" VerticalAlignment="Center" Margin="0,0,10,0" />
             <ComboBox x:Name="ThemeBox" Grid.Column="1" HorizontalAlignment="Stretch" />
           </Grid>
-          <!-- A versão em uso: sempre visível (instalado ou não, com ou sem versão nova esperando); dá para selecionar e copiar -->
-          <SelectableTextBlock x:Name="VersionText" Classes="muted" FontSize="11" Margin="4,0,0,0" />
+          <StackPanel Spacing="2">
+            <!-- O recado da atualização ("Nova versão…", "Procurando…") só ocupa linha quando existe -->
+            <TextBlock x:Name="UpdateText" Classes="muted" FontSize="11" Margin="4,0,0,0" TextTrimming="CharacterEllipsis"
+                       IsVisible="{Binding #UpdateText.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <!-- A versão em uso (sempre visível; dá para selecionar e copiar) e, na mesma linha, a atualização (só no app instalado) -->
+            <Grid ColumnDefinitions="*,Auto" MinHeight="22">
+              <SelectableTextBlock x:Name="VersionText" Classes="muted" FontSize="11" Margin="4,0,0,0" VerticalAlignment="Center" />
+              <Button x:Name="UpdateButton" Grid.Column="1" Classes="quiet" Content="Buscar atualização" Padding="4,2"
+                      VerticalAlignment="Center" VerticalContentAlignment="Center" IsVisible="False" />
+            </Grid>
+          </StackPanel>
         </StackPanel>
       </Grid>
     </Border>
 
     <!-- Conteúdo -->
-    <Grid x:Name="ContentHost" Grid.Column="1" Grid.Row="1" Background="Transparent" Margin="0" RowDefinitions="Auto,Auto,Auto,*,Auto">
+    <Grid x:Name="ContentHost" Grid.Column="1" Grid.Row="1" Background="Transparent" Margin="0,0,0,14" RowDefinitions="Auto,Auto,Auto,*">
       <StackPanel Grid.Row="0" Spacing="4" Margin="28,20,28,0">
         <TextBlock x:Name="StartupText" IsVisible="False" />
         <Border Classes="notice" Margin="0,0,0,12" IsVisible="{Binding #NoticeText.IsVisible}">
@@ -128,13 +132,12 @@
             </StackPanel>
           </Border>
           <Button x:Name="ClearFiltersButton" Classes="quiet icon" Tag="&#xE894;" Content="Limpar filtros" IsVisible="False" Margin="0,0,8,8" VerticalAlignment="Top" Height="36" />
-          <Button x:Name="ReviewedButton" Content="Marcar esta página como conferida" IsVisible="False" Margin="0,0,8,8"  Classes="icon" Tag="&#xE73E;"/>
+          <Button x:Name="ReviewedButton" Content="Marcar página como conferida" IsVisible="False" Margin="0,0,8,8"  Classes="icon" Tag="&#xE73E;"/>
           <Button x:Name="PurgeIgnoredButton" Content="Limpar ignoradas" IsVisible="False" Margin="0,0,8,8" Classes="icon danger" Tag="&#xE74D;" />
           <Button x:Name="PurgeIgnoredCancel" Content="Cancelar" IsVisible="False" Margin="0,0,8,8" />
         </WrapPanel>
-        <Expander x:Name="BulkExpander" Header="Ignorar vagas em revisão por critérios" IsVisible="False" HorizontalAlignment="Stretch">
+        <Expander x:Name="BulkExpander" Header="Ignorar em lote" IsVisible="False" HorizontalAlignment="Stretch">
           <StackPanel Spacing="8">
-            <TextBlock Text="Afeta somente vagas em “Vale a pena olhar”. País procura o texto informado na localização da vaga." TextWrapping="Wrap" Classes="muted" />
             <WrapPanel>
               <TextBox x:Name="BulkCountry" PlaceholderText="País (ex.: Brazil)" MinWidth="150" Margin="0,0,8,8" />
               <TextBox x:Name="BulkFoundFrom" PlaceholderText="Encontrada de" MinWidth="120" Margin="0,0,8,8" />
@@ -149,8 +152,8 @@
               <Button x:Name="BulkPreviewButton" Content="Ver quantidade"  Classes="icon" Tag="&#xE721;"/>
               <TextBlock x:Name="BulkPreviewText" VerticalAlignment="Center" />
               <Button x:Name="BulkApplyButton" Classes="danger" IsVisible="False" />
+              <local:HelpMark Text="Afeta somente vagas em “Vale a pena olhar”. País procura o texto na localização da vaga. Datas no formato AAAA-MM-DD." />
             </StackPanel>
-            <TextBlock Text="Datas no formato AAAA-MM-DD." Classes="muted" />
           </StackPanel>
         </Expander>
       </StackPanel>
@@ -192,6 +195,7 @@
               <Button x:Name="QueueRetryAllButton" Content="Reenfileirar falhas"  Classes="icon" Tag="&#xE72C;"/>
               <Button x:Name="QueueClearButton" Classes="icon danger" Content="Limpar concluídos"  Tag="&#xE74D;"/>
               <Button x:Name="QueueClearCancel" Content="Cancelar" IsVisible="False" />
+              <local:HelpMark Text="Cada vaga nova entra aqui. A IA a compara com os seus currículos e a manda para “Vale a pena olhar” ou para as descartadas. Falhas são tentadas de novo até o limite de tentativas." />
             </StackPanel>
             <Grid Grid.Row="1">
               <ListBox x:Name="QueueList" Classes="cards">
@@ -228,6 +232,7 @@
               <Button x:Name="LinkedInResumeButton" Classes="icon primary" Content="Retomar agora" IsVisible="False" Tag="&#xE768;"/>
               <Button x:Name="LinkedInClearButton" Classes="icon danger" Content="Esvaziar fila" Tag="&#xE74D;"/>
               <Button x:Name="LinkedInClearCancel" Content="Cancelar" IsVisible="False" />
+              <local:HelpMark Text="A extensão envia as vagas e o Odradek lê a página pública de cada uma, importa e manda para a triagem. Se o LinkedIn pedir calma, a fila espera e continua sozinha. Os contadores e o histórico valem desde que o app foi aberto." />
             </StackPanel>
             <Grid Grid.Row="1">
               <ListBox x:Name="LinkedInList" Classes="cards">
@@ -266,6 +271,7 @@
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
           <Button x:Name="RulesAddButton" Content="Adicionar regra"  Classes="icon" Tag="&#xE710;"/>
           <Button x:Name="RulesSaveButton" Classes="icon primary" Content="Salvar regras"  Tag="&#xE74E;"/>
+          <local:HelpMark Text="Cada regra diz à extensão como preencher um campo: os aliases são os nomes que os sites dão a ele, e o valor vem de uma configuração (ex.: candidate_phone) ou é fixo. O modo diz o tipo do campo; “Ignorar” o deixa em branco." />
           <TextBlock x:Name="RulesState" VerticalAlignment="Center" Classes="muted" />
         </StackPanel>
         <ScrollViewer Grid.Row="1"><StackPanel x:Name="RulesHost" Spacing="8" MaxWidth="1000" HorizontalAlignment="Left" /></ScrollViewer>
@@ -293,7 +299,10 @@
           </Border>
           <Border Classes="card">
             <StackPanel Spacing="8">
-              <TextBlock Text="Backup na nuvem" Classes="h2" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Backup na nuvem" Classes="h2" />
+                <local:HelpMark Text="Roda uma vez por dia e ao sair do app. O destino é configurado em Configurações › Contas e chaves." />
+              </StackPanel>
               <TextBlock x:Name="BackupText" TextWrapping="Wrap" />
             </StackPanel>
           </Border>
@@ -304,12 +313,16 @@
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <Button x:Name="CompactButton" Classes="icon" Content="Compactar banco" Tag="&#xE72C;"/>
                 <Button x:Name="CompactCancel" Content="Cancelar" IsVisible="False" />
+                <local:HelpMark Text="Devolve ao disco o espaço livre que ficou dentro do banco." />
               </StackPanel>
             </StackPanel>
           </Border>
           <Border Classes="card">
             <StackPanel Spacing="8">
-              <TextBlock x:Name="AiTitle" Classes="h2" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock x:Name="AiTitle" Classes="h2" />
+                <local:HelpMark Text="Estimativa local, só das chamadas feitas por este aplicativo." />
+              </StackPanel>
               <TextBlock x:Name="AiText" TextWrapping="Wrap" LineHeight="22" />
             </StackPanel>
           </Border>
@@ -317,19 +330,19 @@
       </ScrollViewer>
 
       <!-- Assistente: pergunta de formulário → resposta pronta para colar (perfil + currículos analisados) -->
-      <Grid Grid.Row="3" x:Name="AssistantPane" Classes="page" IsVisible="False" RowDefinitions="Auto,*,Auto" MaxWidth="760" HorizontalAlignment="Left" Margin="28,0">
-        <TextBlock Text="Cole a pergunta de um formulário. A resposta usa seu perfil e os currículos analisados." TextWrapping="Wrap" Classes="muted" FontSize="13" Margin="0,0,0,10" />
-        <ScrollViewer Grid.Row="1" x:Name="AssistantScroll">
+      <Grid Grid.Row="3" x:Name="AssistantPane" Classes="page" IsVisible="False" RowDefinitions="*,Auto" MaxWidth="760" HorizontalAlignment="Left" Margin="28,0">
+        <ScrollViewer x:Name="AssistantScroll">
           <StackPanel x:Name="AssistantHost" Spacing="8">
-            <TextBlock x:Name="AssistantEmpty" Text="A conversa começa quando você enviar uma pergunta." Classes="muted" Margin="0,24,0,0" HorizontalAlignment="Center" />
+            <TextBlock x:Name="AssistantEmpty" Text="Cole a pergunta de um formulário para receber uma resposta pronta." TextWrapping="Wrap" Classes="muted" Margin="0,24,0,0" HorizontalAlignment="Center" />
           </StackPanel>
         </ScrollViewer>
-        <StackPanel Grid.Row="2" Spacing="8" Margin="0,8,0,0">
+        <StackPanel Grid.Row="1" Spacing="8" Margin="0,8,0,0">
           <TextBox x:Name="AssistantInput" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="96" MaxHeight="200" MaxLength="4000"
                    PlaceholderText="Ex.: Quantos anos de experiência você tem com Python?" />
           <StackPanel Orientation="Horizontal" Spacing="12">
             <Button x:Name="AssistantSendButton" Classes="icon primary" Content="Enviar pergunta"  Tag="&#xE724;"/>
             <Button x:Name="AssistantClearButton" Content="Nova conversa"  Classes="icon" Tag="&#xE8BB;"/>
+            <local:HelpMark Text="A resposta usa o seu perfil e os currículos analisados. Ctrl+Enter também envia." />
             <TextBlock x:Name="AssistantState" VerticalAlignment="Center" Classes="muted" />
           </StackPanel>
         </StackPanel>
@@ -399,8 +412,10 @@
               </WrapPanel>
               <Border Classes="notice" IsVisible="{Binding #EmailPanel.IsVisible}">
                 <StackPanel x:Name="EmailPanel" IsVisible="False" Spacing="6">
-                  <TextBlock Text="Candidatura por e-mail" Classes="h2" />
-                  <TextBlock Text="A IA não envia sozinha. Estes contatos foram detectados no texto da vaga; confira se pertencem à empresa. O e-mail leva a carta e o currículo em PDF." TextWrapping="Wrap" Classes="muted" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Candidatura por e-mail" Classes="h2" />
+                    <local:HelpMark Text="Nada é enviado sem você confirmar. Os contatos foram achados no texto da vaga: confira se são da empresa. O e-mail leva a carta e o currículo em PDF." />
+                  </StackPanel>
                   <StackPanel x:Name="EmailList" />
                   <StackPanel Orientation="Horizontal" Spacing="8">
                     <Button x:Name="EmailSendButton" Classes="icon primary" Content="Enviar por e-mail…"  Tag="&#xE715;"/>
@@ -421,13 +436,6 @@
           </ScrollViewer>
         </Border>
       </Grid>
-
-      <!-- Barra de estado: servidor local, banco e pasta de dados -->
-      <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="18" Margin="28,12,28,10">
-        <TextBlock x:Name="ServerText" Classes="muted" />
-        <TextBlock x:Name="DbText" Classes="muted" />
-        <TextBlock x:Name="DataText" Classes="muted" MaxWidth="420" TextTrimming="CharacterEllipsis" />
-      </StackPanel>
     </Grid>
 
     <!-- Barra de título própria (a do Windows foi removida: WindowDecorations="BorderOnly"). Arrastar move a janela; duplo clique maximiza. -->
@@ -435,9 +443,17 @@
     <Grid x:Name="TitleBar" Grid.Column="1" Grid.Row="0" ColumnDefinitions="*,Auto" Background="Transparent">
       <Border x:Name="TitleDrag" Background="Transparent" />
       <StackPanel Grid.Column="1" Orientation="Horizontal">
+        <!-- Guias: na barra de título, à vista em qualquer página -->
+        <Button x:Name="GuidesButton" Classes="caption guides" AutomationProperties.Name="Guias de configuração" ToolTip.Tip="Guias de configuração">
+          <!-- vetor, e não glifo: o traço fino da fonte de ícones saía apagado e com franjas coloridas -->
+          <PathIcon Width="18" Height="18"
+                    Data="M11,18H13V16H11Z M12,2C6.48,2 2,6.48 2,12S6.48,22 12,22 22,17.52 22,12 17.52,2 12,2Z M12,20C7.59,20 4,16.41 4,12S7.59,4 12,4 20,7.59 20,12 16.41,20 12,20Z M12,6C9.79,6 8,7.79 8,10H10C10,8.9 10.9,8 12,8S14,8.9 14,10C14,12 11,11.75 11,15H13C13,12.75 16,12.5 16,10 16,7.79 14.21,6 12,6Z" />
+        </Button>
+        <!-- separa os guias dos controles da janela -->
+        <Border Width="1" Height="16" Margin="6,0" VerticalAlignment="Center" Background="{DynamicResource CardBorder}" />
         <Button x:Name="MinButton" Classes="caption" Content="&#xE921;" ToolTip.Tip="Minimizar" />
         <Button x:Name="MaxButton" Classes="caption" Content="&#xE922;" ToolTip.Tip="Maximizar" />
-        <Button x:Name="CloseButton" Classes="caption close" Content="&#xE8BB;" ToolTip.Tip="Fechar (o Odradek continua na bandeja)" />
+        <Button x:Name="CloseButton" Classes="caption close" Content="&#xE8BB;" ToolTip.Tip="Fechar para a bandeja" />
       </StackPanel>
     </Grid>
   </Grid>

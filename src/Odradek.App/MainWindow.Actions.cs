@@ -299,8 +299,8 @@ public partial class MainWindow
 
         // fila
         QueueEvaluateButton.Click += (_, _) => { ResetConfirmations(); _ = RunAsync(() => new QueueActions(_database).EvaluateNew()); };
-        QueueRetryAllButton.Click += (_, _) => { ResetConfirmations(); _ = RunAsync(() => $"{new QueueActions(_database).RetryAll()} job(s) reenfileirado(s)."); };
-        WireConfirm(QueueClearButton, QueueClearCancel, () => $"{new QueueActions(_database).ClearTerminal()} job(s) removido(s).");
+        QueueRetryAllButton.Click += (_, _) => { ResetConfirmations(); _ = RunAsync(() => $"{new QueueActions(_database).RetryAll()} item(ns) reenfileirado(s)."); };
+        WireConfirm(QueueClearButton, QueueClearCancel, () => $"{new QueueActions(_database).ClearTerminal()} item(ns) removido(s).");
         QueueOpenButton.Click += (_, _) => Format.OpenInBrowser((QueueList.SelectedItem as QueueRow) is { } r ? Sub(r.Item, "url") : null);
         QueueCancelButton.Click += (_, _) => QueueItemAction(id => new QueueActions(_database).Cancel(id));
         QueueRetryButton.Click += (_, _) => QueueItemAction(id => new QueueActions(_database).RetryNow(id));
@@ -308,7 +308,7 @@ public partial class MainWindow
         // banco local (Uso e cotas): a compactação é a mesma que a limpeza de ignoradas faz no fim
         WireConfirm(CompactButton, CompactCancel, () => new JobActions(_database).Compact(),
             () => UsageReader.Storage(_database) is { FreeBytes: > 0 } ? 1 : 0, ask: _ => "Confirmar compactação", nothing: "Não há espaço livre para recuperar.",
-            after: () => { _ = RenderUsageAsync(); _ = LoadDbSummaryAsync(); });
+            after: () => _ = RenderUsageAsync());
 
         // logs
         LogsRefreshButton.Click += (_, _) => _ = LoadLogsAsync();
@@ -316,7 +316,7 @@ public partial class MainWindow
 
         // vagas ignoradas: esvazia descrição, carta e auditoria (a vaga fica, para a coleta não trazê-la de volta)
         WireConfirm(PurgeIgnoredButton, PurgeIgnoredCancel, () => new JobActions(_database).PurgeIgnored(), () => new JobActions(_database).PurgeIgnoredPreview());
-        ToolTip.SetTip(PurgeIgnoredButton, "Esvazia a descrição, a carta e a análise das vagas ignoradas. A vaga, a nota e as anotações ficam, e o banco é compactado no fim. As descartadas pela IA ainda não conferidas não são tocadas.");
+        ToolTip.SetTip(PurgeIgnoredButton, "Apaga descrição, carta e análise das ignoradas. A vaga, a nota e as anotações ficam.");
 
         // regras de formulário
         RulesAddButton.Click += (_, _) => _rulesEditor?.Add();
@@ -327,7 +327,7 @@ public partial class MainWindow
     {
         if (QueueList.SelectedItem is not QueueRow row) return;
         var id = row.Item.Id;
-        Task.Run(() => action(id)).ContinueWith(t => Notify(t.IsCompletedSuccessfully && t.Result ? "Fila atualizada." : "O job não pode ser alterado nesse estado.", !(t.IsCompletedSuccessfully && t.Result)));
+        Task.Run(() => action(id)).ContinueWith(t => Notify(t.IsCompletedSuccessfully && t.Result ? "Fila atualizada." : "Este item não pode ser alterado agora.",!(t.IsCompletedSuccessfully && t.Result)));
     }
 
     // ---------- currículos ----------
@@ -340,13 +340,14 @@ public partial class MainWindow
         {
             resumes.TryGetValue(language, out var record);
             var card = new StackPanel { Spacing = 6 };
-            card.Children.Add(new TextBlock { Text = $"Currículo {language.ToUpperInvariant()}  ·  {record?.Status ?? "Não enviado"}", Classes = { "h2" } });
+            card.Children.Add(Ui.WithHelp(new TextBlock { Text = $"Currículo {language.ToUpperInvariant()}  ·  {record?.Status ?? "Não enviado"}", Classes = { "h2" }, VerticalAlignment = VerticalAlignment.Center },
+                "Depois do envio, a análise pela IA roda na fila (Filas › Processamento de IA); até terminar, o currículo fica pendente."));
             var nl = Environment.NewLine;
             card.Children.Add(new SelectableTextBlock
             {
                 TextWrapping = TextWrapping.Wrap,
                 Text = record is null ? "Envie um PDF para analisar e usar o currículo na triagem."
-                    : $"{(record.Filename.Length > 0 ? record.Filename : "currículo.pdf")}{nl}{(record.Message.Length > 0 ? record.Message : "Sem mensagem de análise.")}{nl}Última análise: {Format.Date(record.AnalyzedAt, true)}"
+                    : $"{(record.Filename.Length > 0 ? record.Filename : "currículo.pdf")}{(record.Message.Length > 0 ? nl + record.Message : "")}{nl}Última análise: {Format.Date(record.AnalyzedAt, true)}"
                       + (record.Provider.Length > 0 ? $"{nl}{record.Provider} · {record.Model}" : "") + (record.Error.Length > 0 ? $"{nl}Erro: {record.Error}" : "")
                       ,
             });
@@ -398,7 +399,8 @@ public partial class MainWindow
             var buttons = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
             buttons.Children.Add(pick); buttons.Children.Add(chosen);
             var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-            actions.Children.Add(send); actions.Children.Add(force);
+            actions.Children.Add(send);
+            actions.Children.Add(Ui.WithHelp(force, "Refaz a análise no envio, mesmo que ela já tenha sido feita para este arquivo."));
             if (record is not null)
             {
                 var reanalyze = new Button { Content = "Reanalisar com IA" };
@@ -408,7 +410,6 @@ public partial class MainWindow
             card.Children.Add(buttons); card.Children.Add(actions);
             ResumesHost.Children.Add(Ui.Card(card));
         }
-        ResumesHost.Children.Add(new TextBlock { Text = "Depois do envio, a análise pela IA roda na fila (Filas › Processamento de IA); enquanto isso o currículo fica como pendente.", Classes = { "muted" }, TextWrapping = TextWrapping.Wrap });
     }
 }
 

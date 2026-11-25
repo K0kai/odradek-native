@@ -157,7 +157,7 @@
     </Style>
     <Style Selector="Button.caption:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="{DynamicResource HoverBg}" /></Style>
     <Style Selector="Button.caption.close:pointerover /template/ ContentPresenter#PART_ContentPresenter"><Setter Property="Background" Value="#C42B1C" /><Setter Property="Foreground" Value="White" /></Style>
-    <Style Selector="Button.quiet.ready"><Setter Property="Foreground" Value="{DynamicResource Accent}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+    <Style Selector="Button.quiet.ready, Button.quiet.link"><Setter Property="Foreground" Value="{DynamicResource Accent}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
     <Style Selector="Button.primary"><Setter Property="Background" Value="{DynamicResource Accent}" /><Setter Property="Foreground" Value="White" /><Setter Property="BorderBrush" Value="{DynamicResource Accent}" /></Style>
     <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AccentHover}" /><Setter Property="Foreground" Value="White" /><Setter Property="BorderBrush" Value="{DynamicResource AccentHover}" />
@@ -177,7 +177,23 @@
         </DataTemplate>
       </Setter>
     </Style>
+    <!-- Entrada dos guias na barra de título: um botão dos controles da janela, com o "?" em círculo na cor do tema -->
+    <Style Selector="Button.caption.guides"><Setter Property="Foreground" Value="{DynamicResource Accent}" /><Setter Property="CornerRadius" Value="6" /></Style>
+    <Style Selector="Button.caption.guides:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentSoft}" /><Setter Property="Foreground" Value="{DynamicResource Accent}" />
+    </Style>
     <Style Selector="Button.page"><Setter Property="Padding" Value="10,4" /></Style>
+    <!-- Marcador de ajuda (?): círculo pequeno ao lado do que ele explica -->
+    <Style Selector="Button.help">
+      <Setter Property="Width" Value="18" /><Setter Property="Height" Value="18" /><Setter Property="MinWidth" Value="0" /><Setter Property="MinHeight" Value="0" />
+      <Setter Property="Padding" Value="0" /><Setter Property="CornerRadius" Value="9" /><Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Muted}" /><Setter Property="Foreground" Value="{DynamicResource Muted}" />
+      <Setter Property="FontSize" Value="11" /><Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" /><Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.help:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentSoft}" /><Setter Property="BorderBrush" Value="{DynamicResource Accent}" /><Setter Property="Foreground" Value="{DynamicResource Accent}" />
+    </Style>
 
     <!-- Campos -->
     <Style Selector="TextBox, ComboBox"><Setter Property="CornerRadius" Value="6" /></Style>

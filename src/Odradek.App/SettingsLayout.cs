@@ -5,36 +5,46 @@ namespace Odradek.App;
 /// <summary>Como um valor é mostrado: texto, ligado/desligado, segredo (só "configurada") ou opção de lista.</summary>
 public enum FieldKind { Text, Toggle, Secret, Select, Filter, Sources }
 
-public sealed record SettingField(string Key, string Label, FieldKind Kind = FieldKind.Text, string Secret = "", (string Value, string Label)[]? Options = null);
+public sealed record SettingField(string Key, string Label, FieldKind Kind = FieldKind.Text, string Secret = "", (string Value, string Label)[]? Options = null, string Help = "");
 
-public sealed record SettingSection(string Title, string Description, SettingField[] Fields);
+/// <summary>Uma seção; <paramref name="Help"/>, quando há, aparece no marcador (?) ao lado do título.</summary>
+public sealed record SettingSection(string Title, string Help, SettingField[] Fields)
+{
+    /// <summary>O guia que o botão "Guia passo a passo" da seção abre (um id de <see cref="Guides"/>); vazio = sem botão.</summary>
+    public string Guide { get; init; } = "";
+}
 
 public sealed record SettingTab(string Label, SettingSection[] Sections);
 
 /// <summary>Abas e seções de Configurações (mesmos títulos e rótulos de <c>Settings.tsx</c>); só leitura nesta fase.</summary>
 public static class SettingsLayout
 {
+    /// <summary>Na seção da IA o guia depende do provedor escolhido.</summary>
+    public const string AiGuide = "ia";
+
     private static readonly (string, string) NotInformed = ("not_informed", "Prefiro não informar");
 
     public static readonly SettingTab[] Tabs =
     [
         new("Busca",
         [
-            new("Filtro principal", "TI e programação, a área de maior experiência. Sem ele a coleta no LinkedIn não roda.",
-                [new("linkedin_main_filter_json", "Filtro principal", FieldKind.Filter)]),
-            new("Filtro secundário", "Opcional: uma área de reserva, menos afetada por crises.",
-                [new("linkedin_secondary_filter_json", "Filtro secundário", FieldKind.Filter), new("secondary_area_hint", "Dica da área para a IA")]),
+            new("Filtro principal", "A busca da sua área de maior experiência; sem ele a coleta no LinkedIn não roda. A IA o gera a partir dos currículos analisados e só o troca quando você pede.",
+                [new("linkedin_main_filter_json", "", FieldKind.Filter)]) { Guide = Guides.Filters },
+            new("Filtro secundário", "Opcional: uma área de reserva, menos afetada por crises. A IA o gera a partir dos currículos analisados e só o troca quando você pede.",
+                [new("linkedin_secondary_filter_json", "", FieldKind.Filter), new("secondary_area_hint", "Dica da área para a IA")]) { Guide = Guides.Filters },
             new("Fontes de vagas", "",
                 [new("sources", "Onde buscar", FieldKind.Sources), new("apify_monthly_credit_limit_usd", "Limite mensal do Apify (USD)"),
                  new("keywords", "Palavras-chave"), new("adzuna_countries", "Países do Adzuna")]),
             new("Alcance", "",
                 [new("linkedin_max_age_days", "Idade máxima das vagas do LinkedIn (dias)"), new("linkedin_preferred_countries", "Países preferidos (até 5)"),
-                 new("geo_eligibility_enabled", "Respeitar elegibilidade geográfica", FieldKind.Toggle),
-                 new("linkedin_search_worldwide", "Buscar também em \"Worldwide\" (traz vagas remotas de qualquer país)", FieldKind.Toggle)]),
+                 new("geo_eligibility_enabled", "Respeitar elegibilidade geográfica", FieldKind.Toggle,
+                     Help: "Barra vagas que não servem de onde você mora: restrição explícita a candidatos, presencial ou híbrido no exterior, ou presencial/híbrido fora da sua cidade."),
+                 new("linkedin_search_worldwide", "Buscar também em \"Worldwide\"", FieldKind.Toggle, Help: "Traz vagas remotas de qualquer país.")]),
             new("Avançado", "",
-                [new("locations", "Locais extras dos actors personalizados"), new("linkedin_main_share", "Fatia do filtro principal (%)"),
+                [new("locations", "Locais extras dos actors personalizados"),
+                 new("linkedin_main_share", "Fatia do filtro principal (%)", Help: "Quanto da busca no LinkedIn vai para o filtro principal (50 a 95). O resto vai para o secundário."),
                  new("apify_job_count", "Vagas por busca (padrão)"), new("apify_actors_json", "Actors do Apify (JSON)"),
-                 new("linkedin_filter_prompt", "Instruções da IA — filtro principal"), new("transferable_prompt", "Instruções da IA — filtro secundário")]),
+                 new("linkedin_filter_prompt", "Instruções da IA — filtro principal"), new("transferable_prompt", "Instruções da IA — filtro secundário")]) { Guide = Guides.Actors },
         ]),
         new("Triagem",
         [
@@ -44,13 +54,14 @@ public static class SettingsLayout
                  new("job_selection_optimism", "Tolerância da seleção (0 rígido a 100 flexível)")]),
             new("Avançado", "",
                 [new("job_selection_prompt", "Instruções da seleção"), new("queue_max_workers", "Triagens simultâneas"),
-                 new("queue_max_attempts", "Tentativas por vaga"), new("queue_ttl_hours", "Validade na fila (horas)")]),
+                 new("queue_max_attempts", "Tentativas por vaga"), new("queue_ttl_hours", "Validade na fila (horas)", Help: "Um item que ficar esperando além desse prazo expira e é marcado como falha.")]),
         ]),
         new("Perfil",
         [
-            new("Contato", "Telefone sem o código do país (ex.: 11 99999-0000); o código (ex.: 55) vai à parte, para os sites que têm um campo para cada. Com + na frente o telefone já traz o próprio código.",
+            new("Contato", "",
                 [new("candidate_name", "Nome"), new("candidate_email", "E-mail"),
-                 new("candidate_phone_country_code", "Código do país (DDI; o + é opcional)"), new("candidate_phone", "Telefone"),
+                 new("candidate_phone_country_code", "DDI", Help: "Ex.: 55 (o + é opcional). Fica à parte porque alguns sites têm um campo só para ele."),
+                 new("candidate_phone", "Telefone", Help: "Sem o código do país (ex.: 11 99999-0000). Se começar com +, vale o código que ele já traz."),
                  new("candidate_linkedin", "LinkedIn"), new("candidate_current_company", "Empresa atual"), new("candidate_cpf", "CPF")]),
             new("Endereço", "A cidade e o país definem a elegibilidade geográfica e onde o LinkedIn é pesquisado.",
                 [new("candidate_city", "Cidade"), new("candidate_state", "Estado"), new("candidate_country", "País"),
@@ -73,19 +84,20 @@ public static class SettingsLayout
         [
             new("Inteligência artificial", "",
                 [new("ai_provider", "Provedor", FieldKind.Select, Options: [("gemini", "Gemini"), ("openai", "OpenAI")]),
-                 new("ai_model", "Modelo"), new("api_key", "Chave da IA", FieldKind.Secret, Secret: "@provider")]),
-            new("TokenHarbor (fallback gratuito)", "Último recurso: só é usado quando todos os modelos do provedor acima falharam.",
+                 new("ai_model", "Modelo"), new("api_key", "Chave da IA", FieldKind.Secret, Secret: "@provider")]) { Guide = AiGuide },
+            new("TokenHarbor", "Último recurso: usado só quando todos os modelos do provedor acima falham.",
                 [new("tokenharbor_api_key", "Chave do TokenHarbor", FieldKind.Secret, Secret: "tokenharbor"),
-                 new("tokenharbor_fallback_models", "Modelos gratuitos (em ordem)")]),
-            new("Apify e Adzuna", "Credenciais das fontes de vagas.",
+                 new("tokenharbor_fallback_models", "Modelos (em ordem)")]) { Guide = Guides.TokenHarbor },
+            new("Apify e Adzuna", "",
                 [new("apify_token", "Apify token", FieldKind.Secret, Secret: "apify_token"),
-                 new("backup_database_url", "Backup na nuvem (URL do banco)", FieldKind.Secret, Secret: "backup_database_url"),
                  new("adzuna_app_id", "Adzuna App ID", FieldKind.Secret, Secret: "adzuna_app_id"),
-                 new("adzuna_app_key", "Adzuna API key", FieldKind.Secret, Secret: "adzuna_app_key")]),
-            new("E-mail (SMTP)", "Também é usado para enviar candidaturas por e-mail a vagas aprovadas que trazem um endereço de contato.",
+                 new("adzuna_app_key", "Adzuna API key", FieldKind.Secret, Secret: "adzuna_app_key")]) { Guide = Guides.Apify },
+            new("Backup na nuvem", "Opcional. A cópia roda uma vez por dia e ao sair do app.",
+                [new("backup_database_url", "URL do banco", FieldKind.Secret, Secret: "backup_database_url")]),
+            new("E-mail (SMTP)", "Usado também para enviar candidaturas a vagas aprovadas que trazem um e-mail de contato.",
                 [new("smtp_host", "Servidor"), new("smtp_port", "Porta"), new("smtp_user", "Usuário"), new("smtp_from", "Remetente"),
                  new("smtp_password", "Senha", FieldKind.Secret, Secret: "smtp_password"), new("smtp_use_tls", "Usar TLS", FieldKind.Toggle)]),
-            new("Extensão do navegador", "Instale a extensão Odradek Autofill no seu navegador; depois, no painel dela, clique em “Connect to Odradek”.",
+            new("Extensão do navegador", "",
                 [new("__extension_token_hash__", "Token da extensão", FieldKind.Secret, Secret: "")]),
         ]),
     ];

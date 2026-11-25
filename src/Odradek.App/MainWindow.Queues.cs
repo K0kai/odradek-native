@@ -140,12 +140,12 @@ public partial class MainWindow
         var left = seconds < 60 ? $"{seconds} s" : $"{seconds / 60} min {seconds % 60:00} s";
         var state = now.Wait switch
         {
-            LinkedInWait.RateLimit => $"Esperando {left}: o LinkedIn pediu calma. A fila continua sozinha depois.",
-            LinkedInWait.Network => $"Esperando {left}: sem acesso à rede ou ao banco. A fila continua sozinha depois.",
-            LinkedInWait.Pace => "Rodando (pausa curta entre os lotes).",
+            LinkedInWait.RateLimit => $"Esperando {left}: o LinkedIn pediu calma.",
+            LinkedInWait.Network => $"Esperando {left}: sem acesso à rede ou ao banco.",
+            LinkedInWait.Pace => "Rodando.",
             _ => now.Running ? "Rodando." : now.Pending.Count > 0 ? "Parada, com vagas guardadas." : "Parada: não há vagas na fila.",
         };
-        LinkedInStateText.Text = $"{state}{Environment.NewLine}{now.Pending.Count} vaga(s) por ler. Os contadores e o histórico valem desde que o Odradek foi aberto.";
+        LinkedInStateText.Text = now.Pending.Count > 0 ? $"{state}{Environment.NewLine}{now.Pending.Count} vaga(s) por ler." : state;
         LinkedInResumeButton.IsVisible = now.Wait is LinkedInWait.RateLimit or LinkedInWait.Network;
     }
 
@@ -156,7 +156,7 @@ public partial class MainWindow
         if (row is null) { LinkedInDetailTitle.Text = "Selecione uma vaga da fila"; LinkedInDetailBody.Text = ""; return; }
         LinkedInDetailTitle.Text = row.Title;
         var body = $"Id no LinkedIn: {row.Id}{Environment.NewLine}{row.Subtitle}";
-        if (row.Outcome is null) body += Environment.NewLine + "A extensão manda só a id: o título aparece depois que a página pública da vaga é lida.";
+        if (row.Outcome is null) body += Environment.NewLine + "O título aparece depois que a vaga for lida.";
         if (!string.Equals(LinkedInDetailBody.Text, body, StringComparison.Ordinal)) LinkedInDetailBody.Text = body; // não desfaz um texto selecionado
     }
 

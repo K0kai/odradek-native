@@ -133,7 +133,7 @@ public partial class MainWindow
     {
         percent = 0;
         if (snapshot["configured"]?.GetValue<bool>() != true)
-            return "Chave não configurada. Salve a chave em Configurações → Contas e chaves para acompanhar a cota dos modelos gratuitos.";
+            return "Chave não configurada (Configurações › Contas e chaves).";
         if (Text.Truthy(snapshot["error"])) return Text.PyStr(snapshot["error"]);
         var onPlan = Text.Truthy(snapshot["on_plan"]);
         percent = Convert.ToDouble(Text.PyStrRaw(snapshot[onPlan ? "plan_used_pct" : "used_pct"]), System.Globalization.CultureInfo.InvariantCulture);
@@ -142,7 +142,7 @@ public partial class MainWindow
         var lines = new List<string> { $"{(plan.Length > 0 ? $"Plano {plan} · " : "")}{percent:0}% usado{(exhausted ? " · esgotado" : "")}" };
         if (Text.PyStr(snapshot["reset_at"]) is { Length: > 0 } reset) lines.Add($"Renova em {Format.Date(reset, true)}");
         var models = (snapshot["models"] as JsonArray)?.Count ?? 0;
-        lines.Add(snapshot["models_enabled"]?.GetValue<bool>() == false ? "Modelos gratuitos desativados no plano." : $"{models} modelo(s) gratuito(s) disponível(is).");
+        lines.Add(snapshot["models_enabled"]?.GetValue<bool>() == false ? "Modelos desativados no plano." : $"{models} modelo(s) disponível(is).");
         return string.Join(Environment.NewLine, lines);
     }
 

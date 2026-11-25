@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using System.Collections.ObjectModel;
 using Avalonia.Threading;
-using Dapper;
 using Odradek.Core;
 using Odradek.Core.Data;
 using Odradek.LocalApi;
@@ -307,7 +306,7 @@ public partial class MainWindow : Window
                         $"{Format.QueueStatus(item.Status)} · tentativas {item.Attempts}/{item.MaxAttempts}" + (item.LastStep.Length > 0 ? " · " + item.LastStep : ""), item));
                 QueueList.SelectedItem = selected is null ? null : _queueRows.FirstOrDefault(r => r.Item.Id == selected);
                 if (QueueList.SelectedItem is null) _ = ShowQueueDetailAsync(null);
-                if (page.Items.Count == 0) QueueDetailTitle.Text = "Nenhum job na fila.";
+                if (page.Items.Count == 0) QueueDetailTitle.Text = ""; // a lista já diz que está vazia
             });
         }
         catch (Exception ex) { Program.Log("Fila: " + ex.Message); }
@@ -402,22 +401,20 @@ public partial class MainWindow : Window
             ApifyBar.Value = a.Percent;
             ApifyBar.Foreground = Palette.Brush(Palette.QuotaBrushKey(a.Percent));
         }
-        else { ApifyText.Text = "Sem consulta registrada ainda. A cota é atualizada durante a coleta."; ApifyBar.Value = 0; }
+        else { ApifyText.Text = "Ainda sem consulta (atualiza durante a coleta)."; ApifyBar.Value = 0; }
         if (string.IsNullOrEmpty(TokenHarborText.Text)) TokenHarborText.Text = "Consultando…";
         StorageText.Text = usage.Storage is { } s
-            ? $"jobs.db: {Format.Bytes(s.DbBytes)}" + (s.WalBytes > 0 ? $" (+ {Format.Bytes(s.WalBytes)} nos arquivos de registro WAL)" : "")
-              + nl + (s.FreeBytes > 0 ? $"{Format.Bytes(s.FreeBytes)} livres dentro do banco, que a compactação devolve ao disco." : "Sem espaço livre para compactar.")
+            ? $"{Format.Bytes(s.DbBytes + s.WalBytes)}" + (s.FreeBytes > 0 ? $" · {Format.Bytes(s.FreeBytes)} para compactar" : "")
               + nl + $"{Format.Number(s.Jobs)} vaga(s), {Format.Number(s.JobsWithDescription)} com descrição, {Format.Number(s.CoverLetters)} carta(s)."
               + nl + $"Pasta: {Path.GetDirectoryName(_database.Path)}"
             : "jobs.db ainda não existe.";
         BackupText.Text = usage.Backup is { } b
             ? (b.Ok ? $"Backup feito em {Format.Date(b.At, true)}: {b.Rows} linha(s) em {b.Seconds:0.##}s." : $"Com falha em {Format.Date(b.At, true)}: {b.Error}")
-            : "Nenhum backup feito ainda. Ele roda uma vez por dia e ao sair do app.";
+            : "Nenhum backup ainda.";
         var ai = usage.Ai;
         AiTitle.Text = $"Inteligência artificial — {(ai.Provider == "gemini" ? "Gemini" : ai.Provider == "openai" ? "OpenAI" : ai.Provider)} {ai.Model}";
-        AiText.Text = $"Estimativa local das chamadas feitas por este aplicativo.{nl}"
-            + $"Chamadas hoje ({ai.DayLabel}): {ai.Day.CallsOk}{nl}Erros de quota hoje: {ai.Day.CallsQuotaError}{nl}Tokens hoje (entrada / saída): {ai.Day.TokensIn} / {ai.Day.TokensOut}{nl}"
-            + $"Chamadas no mês ({ai.MonthLabel}): {ai.Month.CallsOk}{nl}Tokens no mês (entrada / saída): {ai.Month.TokensIn} / {ai.Month.TokensOut}";
+        AiText.Text = $"Hoje ({ai.DayLabel}): {ai.Day.CallsOk} chamada(s) · {ai.Day.CallsQuotaError} erro(s) de cota · tokens {ai.Day.TokensIn} entrada / {ai.Day.TokensOut} saída{nl}"
+            + $"Mês ({ai.MonthLabel}): {ai.Month.CallsOk} chamada(s) · tokens {ai.Month.TokensIn} entrada / {ai.Month.TokensOut} saída";
     }
 
     // ---------- configurações ----------
@@ -449,6 +446,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         VersionText.Text = "Versão " + (System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "desconhecida");
         _settingsEditor = new SettingsEditor(_database, Notify);
+        GuidesButton.Click += (_, _) => GuidesWindow.Show(this, null);
         _rulesEditor = new RulesEditor(_database, RulesHost, RulesState, RulesSaveButton, Notify);
         JobsList.ItemsSource = _jobs;
         // Linhas são contêineres reaproveitados: nenhum deles pode voltar à lista com a opacidade da saída esmaecida (vaga invisível, mas selecionável).
@@ -522,7 +520,6 @@ public partial class MainWindow : Window
         });
         _ = ReloadJobsAsync();
         _ = RefreshQueueBadgeAsync();
-        DataText.Text = $"Dados: {Paths.DataDir}"; ToolTip.SetTip(DataText, Paths.DataDir);
         Opened += (_, _) =>
         {
             if (!_firstOpen) return;
@@ -577,30 +574,6 @@ public partial class MainWindow : Window
         }
         catch (Exception ex) { Program.Log("SMOKE erro: " + ex); }
         if (Avalonia.Application.Current is App app) await app.QuitAsync();
-    }
-
-    public void ShowServerState(string text) => ServerText.Text = text;
-
-    public async Task LoadDbSummaryAsync()
-    {
-        try
-        {
-            var text = await Task.Run(() =>
-            {
-                if (!File.Exists(Paths.DbPath)) return "jobs.db ainda não existe.";
-                using var db = Db.Open(readOnly: true);
-                var jobs = db.ExecuteScalar<long>("SELECT COUNT(*) FROM jobs");
-                var worth = db.ExecuteScalar<long>("SELECT COUNT(*) FROM jobs WHERE status='worth'");
-                var (main, wal) = UsageReader.FileSizes(Paths.DbPath);
-                return $"Banco: {jobs} vagas, {worth} para revisar · {Format.Bytes(main + wal)}";
-            });
-            DbText.Text = text;
-        }
-        catch (Exception ex)
-        {
-            DbText.Text = $"Banco: erro ao ler ({ex.GetType().Name}).";
-            Program.Log("Falha ao ler o banco: " + ex);
-        }
     }
 
     /// <summary>Clique no X esconde na bandeja; <see cref="App.Quit"/> fecha de verdade.</summary>

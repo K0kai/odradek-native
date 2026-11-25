@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input.Platform;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -80,7 +79,7 @@ internal static class ExtensionInstallPanel
                 var folder = Program.ExtensionFolder;
                 if (!await Task.Run(folder.Sync)) { notify("Não consegui preparar a pasta da extensão. Veja desktop.log na pasta de dados.", true); return; }
                 ShowSteps(steps, browser, folder.Target, notify);
-                var copied = await CopyAsync(install, browser.ExtensionsPage);
+                var copied = await Ui.CopyAsync(install, browser.ExtensionsPage);
                 var opened = Open(browser);
                 notify((opened ? $"{browser.Name} aberto. " : $"Abra o {browser.Name}. ")
                     + (copied ? "Endereço copiado: cole na barra de endereço." : "Copie o endereço do passo 1."), !opened);
@@ -95,15 +94,15 @@ internal static class ExtensionInstallPanel
         steps.Children.Clear();
         if (!browser.Tested)
             steps.Children.Add(Text($"Atenção: a extensão ainda não foi testada no {browser.Name}, e o painel lateral dela pode não abrir. Se não abrir, use o Chrome ou o Edge."));
-        steps.Children.Add(Text($"1. No {browser.Name}, clique na barra de endereço, cole (Ctrl+V) e tecle Enter. O endereço é {browser.ExtensionsPage}"));
+        steps.Children.Add(Text($"1. No {browser.Name}, cole na barra de endereço e tecle Enter: {browser.ExtensionsPage}"));
         steps.Children.Add(CopyButton("Copiar endereço", browser.ExtensionsPage, "Endereço copiado.", notify));
         steps.Children.Add(Text($"2. Ligue o “{browser.DeveloperModeLabel}” (Developer mode)."));
-        steps.Children.Add(Text($"3. Clique em “{browser.LoadButtonLabel}” (Load unpacked). Na janela que abrir, cole o caminho no campo “Pasta” e confirme."));
-        steps.Children.Add(CopyButton("Copiar caminho da pasta", folder, "Caminho da pasta copiado.", notify));
+        steps.Children.Add(Text($"3. Clique em “{browser.LoadButtonLabel}” (Load unpacked) e cole o caminho no campo “Pasta”."));
+        steps.Children.Add(Ui.WithHelp(CopyButton("Copiar caminho da pasta", folder, "Caminho da pasta copiado.", notify),
+            "Não apague nem mova essa pasta: o navegador lê a extensão dali, e o Odradek a atualiza sozinho."));
         steps.Children.Add(new SelectableTextBlock { Text = folder, FontFamily = new FontFamily("Consolas"), TextWrapping = TextWrapping.Wrap });
-        steps.Children.Add(Text("4. Fixe o ícone do Odradek na barra do navegador, abra o painel e clique em “Connect to Odradek”. Aqui no app, permita a conexão."));
+        steps.Children.Add(Text("4. Abra o painel da extensão, clique em “Connect to Odradek” e permita a conexão aqui no app."));
         if (browser.Note.Length > 0) steps.Children.Add(Muted(browser.Note));
-        steps.Children.Add(Muted("Não apague nem mova essa pasta: o navegador lê a extensão dali, e o Odradek a atualiza sozinho."));
         steps.IsVisible = true;
     }
 
@@ -123,27 +122,12 @@ internal static class ExtensionInstallPanel
         }
     }
 
-    private static async Task<bool> CopyAsync(Control from, string value)
-    {
-        try
-        {
-            if (TopLevel.GetTopLevel(from)?.Clipboard is not { } clipboard) return false;
-            await clipboard.SetTextAsync(value);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Program.Log("Extensão: não consegui copiar: " + ex.Message);
-            return false;
-        }
-    }
-
     private static Button CopyButton(string label, string value, string done, Action<string, bool> notify)
     {
         var button = new Button { Content = label, HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(16, 0, 0, 0) };
         button.Click += async (_, _) =>
         {
-            var copied = await CopyAsync(button, value);
+            var copied = await Ui.CopyAsync(button, value);
             notify(copied ? done : "Não foi possível acessar a área de transferência.", !copied);
         };
         return button;

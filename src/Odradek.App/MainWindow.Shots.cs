@@ -51,16 +51,28 @@ public partial class MainWindow
                     QueueTabs.SelectedIndex = 0;
                 }
                 if (page == Page.Settings)
+                {
                     for (var tab = 1; tab < SettingsTabs.ItemCount; tab++)
                     {
                         SettingsTabs.SelectedIndex = tab; await Task.Delay(500);
                         Save(Path.Combine(folder, $"{(int)page}-{page}-{tab}.png"));
                     }
+                    await GuideShotsAsync(folder, "");
+                }
             }
             NavList.SelectedIndex = Array.FindIndex(Pages, p => p.Page == Page.Jobs); Width = 1280; Height = 860; ThemeBox.SelectedIndex = 1; await Task.Delay(1000);
             Save(Path.Combine(folder, "11-Tema-claro.png"));
             ThemeBox.SelectedIndex = 2; await Task.Delay(1000);
             Save(Path.Combine(folder, "12-Tema-escuro.png"));
+            await GuideShotsAsync(folder, "-escuro");
+            // A linha de atualização só existe no app instalado (o atualizador fica desligado nas capturas): aqui ela é mostrada à mão.
+            VersionText.Text = "Versão 2026.1231.2359"; UpdateButton.IsVisible = true; // o texto mais largo que a linha precisa caber
+            await Task.Delay(300);
+            Save(Path.Combine(folder, "14-Atualizacao-parada.png"));
+            UpdateText.Text = "Nova versão 2026.1231.2359"; UpdateButton.Content = "Atualizar"; UpdateButton.Classes.Set("ready", true);
+            await Task.Delay(300);
+            Save(Path.Combine(folder, "15-Atualizacao-pronta.png"));
+            UpdateButton.IsVisible = false; UpdateText.Text = "";
             ThemeBox.SelectedIndex = 3; await Task.Delay(1000);
             Save(Path.Combine(folder, "13-Tema-dracula.png"));
             Toast.Show("O Odradek continua rodando na bandeja. Use Sair no menu do ícone para encerrar."); await Task.Delay(1200);
@@ -77,11 +89,31 @@ public partial class MainWindow
         if (Avalonia.Application.Current is App app) await app.QuitAsync();
     }
 
-    private void Save(string path)
+    /// <summary>Cada guia, uma captura por altura de tela até o fim da rolagem.</summary>
+    private async Task GuideShotsAsync(string folder, string suffix)
     {
-        var size = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
+        foreach (var guide in Guides.All)
+        {
+            var window = GuidesWindow.Show(this, guide.Id);
+            await Task.Delay(600);
+            var scroll = window.Page;
+            for (var part = 0; ; part++)
+            {
+                var offset = Math.Min(Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height), scroll.Viewport.Height * part);
+                scroll.Offset = new Vector(0, offset); await Task.Delay(300);
+                Save(Path.Combine(folder, $"guia-{guide.Id}{suffix}-{part}.png"), window);
+                if (offset + scroll.Viewport.Height >= scroll.Extent.Height - 1) break;
+            }
+        }
+        GuidesWindow.Show(this, Guides.Start).Close();
+    }
+
+    private void Save(string path, Window? window = null)
+    {
+        window ??= this;
+        var size = new PixelSize((int)window.Bounds.Width, (int)window.Bounds.Height);
         using var bitmap = new RenderTargetBitmap(size, new Vector(96, 96));
-        bitmap.Render(this);
+        bitmap.Render(window);
         bitmap.Save(path);
     }
 }

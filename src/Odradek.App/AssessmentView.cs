@@ -116,15 +116,14 @@ internal static class AssessmentView
         return new Border { Classes = { "notice" }, Padding = new Thickness(12, 10), Child = grid };
     }
 
-    private static Control Section(string title, string hint, IReadOnlyList<AssessmentItem> items)
+    private static Control Section(string title, IReadOnlyList<AssessmentItem> items, string? help = null)
     {
         var section = new StackPanel { Spacing = 8 };
         var header = new StackPanel { Spacing = 2 };
         var titleRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         titleRow.Children.Add(Text(title, 15, FontWeight.SemiBold, wrap: false));
         titleRow.Children.Add(Text(items.Count.ToString(), 12, foreground: "Muted", wrap: false));
-        header.Children.Add(titleRow);
-        header.Children.Add(Text(hint, 12, foreground: "Muted"));
+        header.Children.Add(Ui.WithHelp(titleRow, help));
         var counts = SummaryOrder
             .Select(o => (o.One, o.Many, N: items.Count(i => i.Realism != "inflated" && i.Status == o.Status)))
             .Where(c => c.N > 0).Select(c => $"{c.N} {(c.N == 1 ? c.One : c.Many)}").ToList();
@@ -161,21 +160,21 @@ internal static class AssessmentView
     {
         var root = new StackPanel { Spacing = 14 };
 
-        var title = new StackPanel { Spacing = 4 };
         var titleRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         titleRow.Children.Add(Text("Por que esta nota", 16, FontWeight.SemiBold, wrap: false));
         titleRow.Children.Add(Badge(a.Track == "transferable" ? "Trilha secundária" : "Trilha principal", "AccentSoft", "Accent"));
         if (a.InflatedPosting) titleRow.Children.Add(Badge("Anúncio inflado", "WarningSoft", "Warning"));
-        title.Children.Add(titleRow);
-        title.Children.Add(Text("Cada exigência da vaga foi conferida com o seu currículo. O selo é o julgamento da IA; as citações mostram em que ele se apoiou.", 12, foreground: "Muted"));
-        root.Children.Add(title);
+        root.Children.Add(Ui.WithHelp(titleRow, "Cada exigência da vaga é conferida com o seu currículo. O selo é o julgamento da IA; as citações mostram em que ele se apoiou."));
 
         var percent = Math.Round(a.MustCov * 100);
         var minimum = Math.Round(a.Threshold * 100);
         var reached = percent >= minimum;
         var coverage = new StackPanel { Spacing = 4 };
         var coverageText = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
-        coverageText.Children.Add(Text("Obrigatórios essenciais cobertos", 13, FontWeight.SemiBold));
+        var coverageLabel = Ui.WithHelp(Text("Obrigatórios essenciais cobertos", 13, FontWeight.SemiBold, wrap: false),
+            "O mínimo vem da “Tolerância da seleção”, em Configurações › Triagem.");
+        coverageLabel.HorizontalAlignment = HorizontalAlignment.Left;
+        coverageText.Children.Add(coverageLabel);
         var figure = Text($"{percent:0}%  ·  mínimo {minimum:0}%", 13, FontWeight.SemiBold, reached ? "Success" : "Danger", wrap: false);
         Grid.SetColumn(figure, 1);
         coverageText.Children.Add(figure);
@@ -192,17 +191,15 @@ internal static class AssessmentView
 
         var musts = a.Requirements.Where(i => i.Kind == "must").ToList();
         var nice = a.Requirements.Where(i => i.Kind != "must").ToList();
-        if (musts.Count > 0) root.Children.Add(Section("Exigências obrigatórias", "O que a vaga exige para ser considerada.", musts));
-        if (a.Responsibilities.Count > 0) root.Children.Add(Section("Responsabilidades da vaga", "O que a pessoa contratada vai fazer, e o quanto da sua experiência já cobre isso.", a.Responsibilities));
-        if (nice.Count > 0) root.Children.Add(Section("Diferenciais", "Desejáveis: ajudam, mas não reprovam.", nice));
+        if (musts.Count > 0) root.Children.Add(Section("Exigências obrigatórias", musts));
+        if (a.Responsibilities.Count > 0) root.Children.Add(Section("Responsabilidades da vaga", a.Responsibilities));
+        if (nice.Count > 0) root.Children.Add(Section("Diferenciais", nice, "Desejáveis: ajudam, mas não reprovam."));
 
         if (a.Objections.Count > 0)
         {
             var section = new StackPanel { Spacing = 8 };
-            var header = new StackPanel { Spacing = 2 };
-            header.Children.Add(Text("Pontos de atenção da revisão", 15, FontWeight.SemiBold, wrap: false));
-            header.Children.Add(Text("Uma segunda leitura cética procurou motivos para a vaga não servir.", 12, foreground: "Muted"));
-            section.Children.Add(header);
+            section.Children.Add(Ui.WithHelp(Text("Pontos de atenção da revisão", 15, FontWeight.SemiBold, wrap: false),
+                "Uma segunda leitura cética procura motivos para a vaga não servir."));
             foreach (var o in a.Objections) section.Children.Add(Objection(o));
             root.Children.Add(section);
         }

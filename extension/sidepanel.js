@@ -267,7 +267,7 @@ function backendFetch(path, init = {}) {
 function panelHttpError(response, what) {
   if (response.status === 401) return new Error(backendToken
     ? "The panel rejected the access token. Generate a new one in the panel and paste it in Settings."
-    : "Add an access token in Settings (generate one in the panel under Accounts and keys → Browser extension).");
+    : "Connect to Odradek in Settings, or paste an access token there.");
   return new Error(`Panel returned ${response.status} for ${what}`);
 }
 
@@ -774,7 +774,7 @@ $("import").onclick = async () => {
     setStep(3, "done", `${imported} blank profile field(s) imported; form aliases updated`);
     status(imported
       ? `Imported ${imported} blank field(s) and refreshed form aliases; existing values were kept.`
-      : "Profile values kept; form aliases were refreshed from Odradek Scraper.");
+      : "Profile values kept; form aliases were refreshed from Odradek.");
   } catch (e) {
     if (activeStep >= 0) setStep(activeStep, "error", e.message || "request failed");
     status(e.message || "Could not complete the panel request.");
@@ -1214,5 +1214,54 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     status("Element selection cancelled.");
   }
 });
+
+// (?) help marks: a single floating box. Absolute pseudo-elements would be clipped by the narrow panel.
+function wireHelpMarks() {
+  const pop = document.createElement("div");
+  pop.className = "help-pop";
+  pop.id = "help-pop";
+  pop.setAttribute("role", "tooltip");
+  pop.hidden = true;
+  document.body.append(pop);
+  let owner = null;
+  let pinned = false; // opened by a click: stays until another click, Escape or scrolling
+
+  const hide = () => {
+    owner?.removeAttribute("aria-describedby");
+    owner = null;
+    pinned = false;
+    pop.hidden = true;
+  };
+  const show = (mark) => {
+    if (owner !== mark) hide();
+    owner = mark;
+    mark.setAttribute("aria-describedby", pop.id);
+    pop.textContent = mark.dataset.help;
+    pop.hidden = false;
+    const anchor = mark.getBoundingClientRect();
+    const left = Math.max(12, Math.min(anchor.right - pop.offsetWidth, window.innerWidth - pop.offsetWidth - 12));
+    const below = anchor.bottom + 6;
+    const top = below + pop.offsetHeight > window.innerHeight - 8 ? Math.max(8, anchor.top - pop.offsetHeight - 6) : below;
+    pop.style.left = `${left}px`;
+    pop.style.top = `${top}px`;
+  };
+
+  document.querySelectorAll(".help").forEach((mark) => {
+    mark.addEventListener("mouseenter", () => { if (!pinned) show(mark); });
+    mark.addEventListener("mouseleave", () => { if (!pinned) hide(); });
+    mark.addEventListener("focus", () => { if (!pinned) show(mark); });
+    mark.addEventListener("blur", hide);
+    mark.addEventListener("click", () => {
+      if (pinned && owner === mark) { hide(); return; }
+      show(mark);
+      pinned = true;
+    });
+  });
+  document.addEventListener("click", (event) => { if (!event.target.closest(".help")) hide(); });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") hide(); });
+  window.addEventListener("scroll", hide, { passive: true });
+}
+
+wireHelpMarks();
 
 const loaded = load();
