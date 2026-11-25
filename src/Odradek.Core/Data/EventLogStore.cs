@@ -37,7 +37,7 @@ public sealed class EventLogStore(Database db)
 
     public IReadOnlyList<LogEntry> List(int limit = 200)
     {
-        limit = Math.Clamp(limit, 1, 500);
+        limit = Math.Clamp(limit, 1, MaxRows);
         using var connection = db.Open();
         return connection.Query<LogEntry>("SELECT id AS Id, created_at AS CreatedAt, level AS Level, source AS Source, message AS Message FROM event_logs ORDER BY id DESC LIMIT @limit", new { limit }).ToList();
     }

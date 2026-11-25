@@ -35,16 +35,17 @@ internal static class AssessmentView
         return control;
     }
 
-    private static TextBlock Text(string text, double size = 13, FontWeight? weight = null, string? foreground = null, bool wrap = true)
+    /// <summary>Todo texto da auditoria pode ser selecionado e copiado.</summary>
+    private static SelectableTextBlock Text(string text, double size = 13, FontWeight? weight = null, string? foreground = null, bool wrap = true)
     {
-        var block = new TextBlock { Text = text, FontSize = size, TextWrapping = wrap ? TextWrapping.Wrap : TextWrapping.NoWrap };
+        var block = new SelectableTextBlock { Text = text, FontSize = size, TextWrapping = wrap ? TextWrapping.Wrap : TextWrapping.NoWrap };
         if (weight is { } w) block.FontWeight = w;
         return foreground is null ? block : Themed(block, TextBlock.ForegroundProperty, foreground);
     }
 
     private static Border Badge(string label, string background, string foreground, double minWidth = 0)
     {
-        var text = Text(label, 11, FontWeight.SemiBold, foreground, wrap: false);
+        var text = Themed(new TextBlock { Text = label, FontSize = 11, FontWeight = FontWeight.SemiBold }, TextBlock.ForegroundProperty, foreground);
         text.HorizontalAlignment = HorizontalAlignment.Center;
         var badge = new Border { Classes = { "badge" }, Child = text, MinWidth = minWidth, VerticalAlignment = VerticalAlignment.Top };
         return Themed(badge, Border.BackgroundProperty, background);

@@ -12,19 +12,19 @@ public sealed record QueueRow(string Title, string Subtitle, QueueItem Item);
 
 public partial class MainWindow : Window
 {
-    private enum Page { Overview, Jobs, Triage, Queue, Assistant, Logs, Usage, Resumes, Settings, Rules }
+    private enum Page { Overview, Jobs, Triage, Queue, Assistant, Logs, Usage, Resumes, Settings }
 
     /// <summary>Ícones do menu (Segoe Fluent Icons; no Windows 10 cai para Segoe MDL2 Assets).</summary>
     private static readonly Dictionary<Page, string> NavGlyphs = new()
     {
         [Page.Overview] = "\uE80F", [Page.Triage] = "\uE71C", [Page.Jobs] = "\uE8FD", [Page.Queue] = "\uE895", [Page.Assistant] = "\uE8BD", [Page.Logs] = "\uE81C",
-        [Page.Usage] = "\uE9D2", [Page.Resumes] = "\uE8A5", [Page.Settings] = "\uE713", [Page.Rules] = "\uE70F",
+        [Page.Usage] = "\uE9D2", [Page.Resumes] = "\uE8A5", [Page.Settings] = "\uE713",
     };
 
     private static readonly (Page Page, string Label)[] Pages =
     [
         (Page.Overview, "Visão geral"), (Page.Jobs, "Vagas"), (Page.Triage, "Não selecionadas"), (Page.Queue, "Filas"), (Page.Assistant, "Assistente"),
-        (Page.Logs, "Logs"), (Page.Usage, "Uso e cotas"), (Page.Resumes, "Currículos"), (Page.Settings, "Configurações"), (Page.Rules, "Regras de formulário"),
+        (Page.Logs, "Logs"), (Page.Usage, "Uso e cotas"), (Page.Resumes, "Currículos"), (Page.Settings, "Configurações"),
     ];
 
     private Page _page = Page.Jobs;
@@ -56,7 +56,6 @@ public partial class MainWindow : Window
     private static readonly (string Label, string Token)[] SortOptions =
         [("Mais recentes", ""), ("Maior nota", "match_desc"), ("Menor nota", "match_asc"), ("Postagem recente", "posted_desc")];
     private SettingsEditor? _settingsEditor;
-    private RulesEditor? _rulesEditor;
 
     // ---------- navegação ----------
 
@@ -75,7 +74,6 @@ public partial class MainWindow : Window
         AssistantPane.IsVisible = page == Page.Assistant;
         SettingsTabs.IsVisible = page == Page.Settings;
         ResumesPane.IsVisible = page == Page.Resumes;
-        RulesPane.IsVisible = page == Page.Rules;
         if (!onJobs) JobsTitle.Text = Pages.First(p => p.Page == page).Label;
         JobsSubtitle.IsVisible = false;
         JobsSubtitle.ClearValue(TextBlock.ForegroundProperty);
@@ -83,7 +81,7 @@ public partial class MainWindow : Window
         FadeIn(page switch
         {
             Page.Overview => OverviewPane, Page.Jobs or Page.Triage => JobsPane, Page.Queue => QueueTabs, Page.Logs => LogsPane, Page.Usage => UsagePane, Page.Assistant => AssistantPane,
-            Page.Resumes => ResumesPane, Page.Settings => SettingsTabs, _ => RulesPane,
+            Page.Resumes => ResumesPane, _ => SettingsTabs,
         });
         switch (page)
         {
@@ -94,7 +92,6 @@ public partial class MainWindow : Window
             case Page.Usage: _ = LoadUsageAsync(); break;
             case Page.Resumes: _ = LoadResumesAsync(); break;
             case Page.Settings: _ = LoadSettingsAsync(); break;
-            case Page.Rules: _ = LoadRulesAsync(); break;
         }
     }
 
@@ -365,20 +362,13 @@ public partial class MainWindow : Window
         catch (Exception ex) { Program.Log("Detalhe da fila: " + ex.Message); }
     }
 
-    // ---------- logs, regras, uso ----------
+    // ---------- logs, uso ----------
 
     private async Task LoadLogsAsync()
     {
         var entries = await Task.Run(() => new EventLogStore(_database).List(200));
         _logs.Clear(); foreach (var entry in entries) _logs.Add(entry);
         LogsEmpty.Text = "Nenhum registro ainda."; LogsEmpty.IsVisible = _logs.Count == 0;
-    }
-
-    private async Task LoadRulesAsync()
-    {
-        if (_rulesEditor is null || _rulesEditor.Dirty) return; // não passa por cima de edição não salva
-        var rules = await Task.Run(() => new PanelQueries(_database).FormRules());
-        _rulesEditor.Load(rules);
     }
 
     private async Task LoadUsageAsync()
@@ -447,7 +437,6 @@ public partial class MainWindow : Window
         VersionText.Text = "Versão " + (System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "desconhecida");
         _settingsEditor = new SettingsEditor(_database, Notify);
         GuidesButton.Click += (_, _) => GuidesWindow.Show(this, null);
-        _rulesEditor = new RulesEditor(_database, RulesHost, RulesState, RulesSaveButton, Notify);
         JobsList.ItemsSource = _jobs;
         // Linhas são contêineres reaproveitados: nenhum deles pode voltar à lista com a opacidade da saída esmaecida (vaga invisível, mas selecionável).
         JobsList.ContainerClearing += (_, e) => e.Container.ClearValue(Avalonia.Visual.OpacityProperty);
@@ -565,7 +554,6 @@ public partial class MainWindow : Window
                     case Page.Logs: Program.Log($"SMOKE {label}: {_logs.Count} linhas"); break;
                     case Page.Usage: Program.Log($"SMOKE {label}: apify='{ApifyText.Text}' barra={ApifyBar.Value:0} ia='{AiTitle.Text}' backup={BackupText.Text?.Length}"); break;
                     case Page.Resumes: Program.Log($"SMOKE {label}: {ResumesHost.Children.Count} cartões"); break;
-                    case Page.Rules: Program.Log($"SMOKE {label}: {RulesHost.Children.Count} regras, estado='{RulesState.Text}'"); break;
                     case Page.Settings: Program.Log($"SMOKE {label}: {SettingsTabs.ItemCount} abas"); break;
                     case Page.Assistant: Program.Log($"SMOKE {label}: visível={AssistantPane.IsVisible}"); break;
                 }

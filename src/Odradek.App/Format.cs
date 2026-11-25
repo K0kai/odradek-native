@@ -25,6 +25,25 @@ public static class Format
     public static string? LogTime(string? value) =>
         Clock.TryParse(value, out var utc) ? TimeZoneInfo.ConvertTimeFromUtc(utc, Brasilia).ToString("dd/MM HH:mm:ss", CultureInfo.InvariantCulture) : value;
 
+    /// <summary>A linha de log como vai para a área de transferência: data, nível, fonte e mensagem.</summary>
+    public static string LogLine(LogEntry entry) => $"{LogTime(entry.CreatedAt)}  {entry.Level}  {entry.Source}  {entry.Message}";
+
+    /// <summary>A vaga em texto puro, para colar fora do app: cabeçalho, link, análise, descrição e carta (o que houver).</summary>
+    public static string Job(JobRecord job)
+    {
+        var nl = Environment.NewLine;
+        var sb = new StringBuilder(job.Title);
+        sb.Append(nl).Append($"{job.Company} · {job.Location} · {SourceName(job.Source)}");
+        sb.Append(nl).Append("Status: ").Append(Defaults.Statuses.FirstOrDefault(s => s.Key == job.Status).Label ?? job.Status);
+        if (job.MatchScore is { } score) sb.Append(" · nota ").Append(score);
+        if (job.Url.Length > 0) sb.Append(nl).Append("Link: ").Append(job.Url);
+        if (job.ContactEmails.Count > 0) sb.Append(nl).Append("Contato: ").Append(string.Join(", ", job.ContactEmails));
+        if (job.Assessment is { } a) sb.Append(nl).Append(nl).Append(Assessment(a));
+        if (job.Description.Trim().Length > 0) sb.Append(nl).Append(nl).Append("Descrição da vaga").Append(nl).Append(job.Description.Trim());
+        if (job.HasCoverLetter) sb.Append(nl).Append(nl).Append("Carta de apresentação").Append(nl).Append(job.CoverLetter.Trim());
+        return sb.ToString();
+    }
+
     /// <summary>"14:05:10" no fuso de Brasília.</summary>
     public static string Time(DateTime utc) => TimeZoneInfo.ConvertTimeFromUtc(utc, Brasilia).ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 

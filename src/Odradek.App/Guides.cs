@@ -123,7 +123,7 @@ internal static class Guides
                 new("Copie o token", "No Console, abra Settings › API & Integrations e copie o token pessoal da API.")
                     { Link = ("Abrir API & Integrations", "https://console.apify.com/settings/integrations") },
                 new("Cole no app", "Em Configurações › Contas e chaves › Apify e Adzuna, cole em “Apify token” e clique em “Salvar”. As chaves da Adzuna são opcionais e só valem para a fonte Adzuna."),
-                new("Ligue a fonte", "Em Configurações › Busca › Fontes de vagas, marque “LinkedIn (via Apify)”. Ela não vem marcada. Essa opção liga todos os actors ativos, inclusive o do Indeed."),
+                new("Ligue a fonte", "Em Configurações › Busca › Fontes de vagas, marque “Apify (LinkedIn e Indeed)”. Ela não vem marcada. Essa opção liga todos os actors ativos; para desligar um só, ponha \"enabled\": false nele, em “Actors do Apify (JSON)”."),
                 new("Defina o teto de gasto", "“Limite mensal do Apify (USD)” começa em 5. O valor é comparado com o gasto do ciclo da sua conta inteira, não só o do Odradek. Ao chegar nele, o app para de iniciar buscas; com 0, não usa o Apify. A busca que já está rodando pode passar um pouco do teto."),
                 new("Prepare a busca", "O LinkedIn precisa do filtro principal. Preencha também a cidade em Configurações › Perfil: sem ela, a busca de vagas presenciais e híbridas na sua cidade é pulada.") { Next = Filters },
                 new("Colete e confira", "Clique em “Iniciar coleta”. Veja o andamento em Logs e o gasto do ciclo em Uso e cotas."),

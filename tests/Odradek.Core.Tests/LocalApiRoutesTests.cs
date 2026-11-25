@@ -83,7 +83,7 @@ public class ExtensionApiTests
     public async Task Extension_routes_only_answer_to_the_pairing_token()
     {
         using var api = ApiHarness.Start();
-        foreach (var path in new[] { "/api/autofill-profile", "/api/autofill-rules", "/api/autofill-resume" })
+        foreach (var path in new[] { "/api/autofill-resume?language=pt" })
         {
             var (status, json) = await api.Json("GET", path, token: null);
             Assert.Equal((HttpStatusCode.Unauthorized, "Token da extensão inválido ou revogado. Gere outro no painel (Configurações)."), (status, json!["error"]!.GetValue<string>()));
@@ -91,34 +91,9 @@ public class ExtensionApiTests
             Assert.Equal(HttpStatusCode.Unauthorized, (await api.Json("GET", path, token: ApiHarness.QpidToken)).Status); // o token do Qpid não vale aqui
         }
         var token = IssueToken(api);
-        Assert.Equal(HttpStatusCode.OK, (await api.Json("GET", "/api/autofill-profile", token)).Status);
+        Assert.Equal(HttpStatusCode.NotFound, (await api.Json("GET", "/api/autofill-resume?language=pt", token)).Status); // autenticado, sem currículo
         new ExtensionTokenActions(api.Temp.Db).Revoke();
-        Assert.Equal(HttpStatusCode.Unauthorized, (await api.Json("GET", "/api/autofill-profile", token)).Status);
-    }
-
-    [Fact]
-    public async Task Autofill_profile_and_rules_expose_only_the_agreed_fields()
-    {
-        using var api = ApiHarness.Start();
-        new SettingsStore(api.Temp.Db).SetMany(new Dictionary<string, string>
-        {
-            ["candidate_name"] = " Ana  Maria  Souza ", ["candidate_email"] = " ana@example.test ", ["candidate_city"] = "Recife", ["candidate_postal_code"] = "50000-000",
-            ["candidate_cpf"] = "000.000.000-00", ["candidate_birthdate"] = "2000-01-01",
-        });
-        var token = IssueToken(api);
-        var (_, profile) = await api.Json("GET", "/api/autofill-profile", token);
-        Assert.Equal("{\"profile\":{\"firstName\":\"Ana\",\"lastName\":\"Maria Souza\",\"fullName\":\"Ana  Maria  Souza\",\"email\":\"ana@example.test\",\"phone\":\"\",\"phoneCountryCode\":\"\",\"phoneNational\":\"\",\"city\":\"Recife\",\"state\":\"\",\"country\":\"\",\"zip\":\"50000-000\",\"linkedin\":\"\"}}",
-            profile!.ToJsonString());
-
-        using (var c = api.Temp.Db.Open())
-        {
-            c.Execute("DELETE FROM form_field_rules");
-            foreach (var (id, key, aliases, mode) in new[] { (1, "full_name", "nome, name; nome completo", "text"), (2, "Salary", "pretensão", "text"), (3, "cpf", "cpf", "skip"),
-                         (4, "hobby", "hobby", "text"), (5, "email", "", "select") })
-                c.Execute("INSERT INTO form_field_rules(id,key,aliases,mode,value_from,value,sort_order) VALUES(@id,@key,@aliases,@mode,'','',@id)", new { id, key, aliases, mode });
-        }
-        var (_, rules) = await api.Json("GET", "/api/autofill-rules", token);
-        Assert.Equal(JsonNode.Parse("{\"fields\":[{\"key\":\"fullName\",\"aliases\":[\"nome\",\"name\",\"nome completo\"]},{\"key\":\"salaryExpectation\",\"aliases\":[\"pretensão\"]},{\"key\":\"email\",\"aliases\":[]}]}")!.ToJsonString(), rules!.ToJsonString());
+        Assert.Equal(HttpStatusCode.Unauthorized, (await api.Json("GET", "/api/autofill-resume?language=pt", token)).Status);
     }
 
     [Fact]

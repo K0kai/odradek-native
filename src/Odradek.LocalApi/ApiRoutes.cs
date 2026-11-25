@@ -254,8 +254,6 @@ public static partial class ApiRoutes
         });
 
         // ---------------------------------------------------------------- extensão
-        app.MapGet("/api/autofill-profile", () => Reply(services.Extension().AutofillProfile()));
-        app.MapGet("/api/autofill-rules", () => Reply(services.Extension().AutofillRules()));
         app.MapGet("/api/autofill-resume", (HttpRequest request) =>
             Language(request, out var error) is { } language ? Reply(services.Extension().AutofillResume(language)) : error!);
         app.MapPost("/api/assistant", async (HttpContext context) =>

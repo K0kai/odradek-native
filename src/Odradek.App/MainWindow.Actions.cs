@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -14,6 +15,7 @@ public partial class MainWindow
 {
     private DispatcherTimer? _noticeTimer;
     private JobRecord? _detailJob;
+    private string _detailSignature = ""; // o que os cartões e a carta mostram: se não muda, não são recriados (e o texto selecionado fica)
     private bool _confirmingEmail;
     private int _bulkPreview = -1;
     private BulkIgnoreCriteria _bulkCriteria = BulkIgnoreCriteria.Empty;
@@ -60,7 +62,7 @@ public partial class MainWindow
         if (job is null)
         {
             DetailTitle.Text = "Selecione uma vaga"; DetailMeta.Text = ""; DetailStatus.IsVisible = false; DetailBody.Text = ""; NotesBox.Text = "";
-            DetailSections.Children.Clear(); DetailLetter.Children.Clear(); DescriptionHeading.IsVisible = false;
+            DetailSections.Children.Clear(); DetailLetter.Children.Clear(); DescriptionHeading.IsVisible = false; _detailSignature = "";
             NotesBox.IsEnabled = NotesSaveButton.IsEnabled = false;
             return;
         }
@@ -83,15 +85,20 @@ public partial class MainWindow
             + (job.MatchScore is { } m ? $" · nota {m}" : "")
             + (job.ContactEmails.Count > 0 ? nl + "Contato: " + string.Join(", ", job.ContactEmails) : "");
         // A auditoria da nota vira cartões (veredito em selo, explicação e citações); a descrição e a carta ficam sob títulos próprios.
-        DetailSections.Children.Clear();
-        if (job.Assessment is { } a) DetailSections.Children.Add(AssessmentView.Build(a));
         DescriptionHeading.IsVisible = job.Description.Trim().Length > 0;
         DetailBody.Text = job.Description;
-        DetailLetter.Children.Clear();
-        if (job.HasCoverLetter)
+        var signature = $"{job.Id}\n{JsonSerializer.Serialize(job.Assessment)}\n{job.HasCoverLetter}\n{job.CoverLetter}";
+        if (signature != _detailSignature)
         {
-            DetailLetter.Children.Add(new TextBlock { Text = "Carta de apresentação", Classes = { "h2" }, FontSize = 16 });
-            DetailLetter.Children.Add(new SelectableTextBlock { Text = job.CoverLetter, TextWrapping = Avalonia.Media.TextWrapping.Wrap, LineHeight = 21 });
+            _detailSignature = signature;
+            DetailSections.Children.Clear();
+            if (job.Assessment is { } a) DetailSections.Children.Add(AssessmentView.Build(a));
+            DetailLetter.Children.Clear();
+            if (job.HasCoverLetter)
+            {
+                DetailLetter.Children.Add(new TextBlock { Text = "Carta de apresentação", Classes = { "h2" }, FontSize = 16 });
+                DetailLetter.Children.Add(new SelectableTextBlock { Text = job.CoverLetter, TextWrapping = Avalonia.Media.TextWrapping.Wrap, LineHeight = 21 });
+            }
         }
         if (!sameJob) NotesBox.Text = job.Notes; // não apaga o que está sendo digitado quando a lista recarrega por outro motivo
 
@@ -310,6 +317,8 @@ public partial class MainWindow
             () => UsageReader.Storage(_database) is { FreeBytes: > 0 } ? 1 : 0, ask: _ => "Confirmar compactação", nothing: "Não há espaço livre para recuperar.",
             after: () => _ = RenderUsageAsync());
 
+        WireCopy();
+
         // logs
         LogsRefreshButton.Click += (_, _) => _ = LoadLogsAsync();
         WireConfirm(LogsClearButton, LogsClearCancel, () => $"{new EventLogStore(_database).Clear()} log(s) removido(s).");
@@ -317,10 +326,6 @@ public partial class MainWindow
         // vagas ignoradas: esvazia descrição, carta e auditoria (a vaga fica, para a coleta não trazê-la de volta)
         WireConfirm(PurgeIgnoredButton, PurgeIgnoredCancel, () => new JobActions(_database).PurgeIgnored(), () => new JobActions(_database).PurgeIgnoredPreview());
         ToolTip.SetTip(PurgeIgnoredButton, "Apaga descrição, carta e análise das ignoradas. A vaga, a nota e as anotações ficam.");
-
-        // regras de formulário
-        RulesAddButton.Click += (_, _) => _rulesEditor?.Add();
-        RulesSaveButton.Click += async (_, _) => { if (_rulesEditor is not null) await _rulesEditor.SaveAsync(); };
     }
 
     private void QueueItemAction(Func<long, bool> action)
@@ -529,13 +534,6 @@ public partial class MainWindow
             Go(Page.Logs); await Task.Delay(900);
             Click(LogsClearButton); await Task.Delay(200); Click(LogsClearButton);
         }, () => $"linhas na tela={_logs.Count}, no banco={Q<long>("SELECT COUNT(*) FROM event_logs")} (logs novos da própria ação contam)");
-
-        await Step("regras", async () =>
-        {
-            Go(Page.Rules); await Task.Delay(900);
-            Click(RulesAddButton); await Task.Delay(300);
-            Click(RulesSaveButton);
-        }, () => $"regras na tela={RulesHost.Children.Count}, estado='{RulesState.Text}', aviso='{NoticeText.Text}', no banco={Q<long>("SELECT COUNT(*) FROM form_field_rules")}");
 
         await Step("configuracoes", async () =>
         {

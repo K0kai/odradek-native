@@ -33,12 +33,6 @@ let resumeLanguage = "auto";
 const HEALTH_TIMEOUT_MS = 12000;
 const HEALTH_WAIT_MS = 120000;
 const ASSISTANT_REQUEST_TIMEOUT_MS = 300000;
-const STEP_LABELS = [
-  "Check panel availability",
-  "Check server and database health",
-  "Request profile and form rules",
-  "Merge and save blank fields",
-];
 let activeStep = -1;
 
 const ASSISTANT_STEP_LABELS = [
@@ -48,7 +42,7 @@ const ASSISTANT_STEP_LABELS = [
   "Receive response",
 ];
 
-function setStep(index, state, detail = "", listId = "process-steps", labels = STEP_LABELS, preserveOther = false) {
+function setStep(index, state, detail = "", listId = "assistant-steps", labels = ASSISTANT_STEP_LABELS, preserveOther = false) {
   const list = $(listId);
   list.hidden = false;
   activeStep = index;
@@ -63,7 +57,7 @@ function setStep(index, state, detail = "", listId = "process-steps", labels = S
   current.textContent = detail ? `${labels[index]} — ${detail}` : labels[index];
 }
 
-function resetSteps(listId = "process-steps", labels = STEP_LABELS) {
+function resetSteps(listId = "assistant-steps", labels = ASSISTANT_STEP_LABELS) {
   const list = $(listId);
   list.hidden = false;
   activeStep = -1;
@@ -73,7 +67,7 @@ function resetSteps(listId = "process-steps", labels = STEP_LABELS) {
   });
 }
 
-async function pingPanel(listId = "process-steps", labels = STEP_LABELS, updateStatus = true) {
+async function pingPanel(listId, labels, updateStatus) {
   await ensureBackendAccess();
   const deadline = Date.now() + HEALTH_WAIT_MS;
   let attempt = 0;
@@ -109,7 +103,7 @@ async function pingPanel(listId = "process-steps", labels = STEP_LABELS, updateS
   throw new Error("The panel did not become ready within two minutes.");
 }
 
-function ensurePanelReady(listId = "process-steps", labels = STEP_LABELS, updateStatus = true) {
+function ensurePanelReady(listId = "assistant-steps", labels = ASSISTANT_STEP_LABELS, updateStatus = true) {
   if (!panelHealthPromise) {
     panelHealthPromise = pingPanel(listId, labels, updateStatus).finally(() => {
       panelHealthPromise = null;
@@ -272,7 +266,7 @@ function panelHttpError(response, what) {
 }
 
 async function ensureBackendAccess() {
-  if (!backendUrl) throw new Error("Configure a backend URL in Settings before using import or the assistant.");
+  if (!backendUrl) throw new Error("Configure a backend URL in Settings before using the assistant.");
   const origins = [backendPermissionPattern(backendUrl)];
   if (!(await chrome.permissions.contains({ origins }))) {
     throw new Error("Backend access is not allowed. Open Settings and save the backend URL to grant access.");
@@ -560,7 +554,7 @@ $("save-backend").onclick = async (event) => {
       await chrome.storage.local.remove("backendUrl");
       backendUrl = "";
       $("backend-url").value = "";
-      status("Backend URL cleared. Set one before importing or using the assistant.");
+      status("Backend URL cleared. Set one before using the assistant.");
       return;
     }
 
@@ -727,62 +721,6 @@ $("save").onclick = async () => {
   status("Saved.");
 };
 
-$("import").onclick = async () => {
-  const button = $("import");
-  button.disabled = true;
-  commitOpenEditors();
-  renderFields();
-  resetSteps();
-  try {
-    setStep(0, "active", "starting health check");
-    await pingPanel();
-
-    setStep(2, "active", "requesting your saved details");
-    status("Panel is awake. Requesting your profile…");
-    const [profileResponse, rulesResponse] = await Promise.all([
-      backendFetch("/api/autofill-profile", { cache: "no-store" }),
-      backendFetch("/api/autofill-rules", { cache: "no-store" }),
-    ]);
-    if (!profileResponse.ok) throw panelHttpError(profileResponse, "profile data");
-    if (!rulesResponse.ok) throw panelHttpError(rulesResponse, "form rules");
-    const [payload, rulePayload] = await Promise.all([profileResponse.json(), rulesResponse.json()]);
-    setStep(2, "done", "profile data and form rules received");
-    setStep(3, "active", "merging without replacing your values");
-    const panelProfile = payload.profile || {};
-    const { profile: savedProfile = {} } = await chrome.storage.local.get("profile");
-    const formProfile = readForm();
-    const merged = { ...savedProfile, ...formProfile };
-    let imported = 0;
-    for (const { key } of fieldDefinitions) {
-      const panelValue = String(panelProfile[key] || "").trim();
-      if (!String(merged[key] || "").trim() && panelValue) {
-        merged[key] = panelValue;
-        imported++;
-      }
-    }
-    const aliasesByKey = new Map((rulePayload.fields || []).map((field) => [
-      field.key,
-      Array.isArray(field.aliases) ? field.aliases : [],
-    ]));
-    const mergedFields = fieldDefinitions.map((field) => ({
-      ...field,
-      aliases: [...new Set([...(field.aliases || []), ...(aliasesByKey.get(field.key) || [])])],
-    }));
-    fieldDefinitions = mergedFields;
-    await chrome.storage.local.set({ profile: merged, fields: fieldDefinitions });
-    renderFields(merged);
-    setStep(3, "done", `${imported} blank profile field(s) imported; form aliases updated`);
-    status(imported
-      ? `Imported ${imported} blank field(s) and refreshed form aliases; existing values were kept.`
-      : "Profile values kept; form aliases were refreshed from Odradek.");
-  } catch (e) {
-    if (activeStep >= 0) setStep(activeStep, "error", e.message || "request failed");
-    status(e.message || "Could not complete the panel request.");
-  } finally {
-    button.disabled = false;
-  }
-};
-
 async function fillCurrentPage() {
   const button = $("home-fill");
   button.disabled = true;
@@ -795,9 +733,10 @@ async function fillCurrentPage() {
     const { tab, origin } = await getActiveTabAndOrigin();
     await ensureSiteAccess(origin);
     const { filled, skipped, frameNote, resumeNote } = await OdradekFill.fillTab(tab.id, {
-      ready: () => {
+      ready: async (url) => {
         status("Fields filled. Checking for a resume upload…");
-        return ensurePanelReady("process-steps", STEP_LABELS, false);
+        await ensureBackendAccess();
+        await OdradekFill.waitForPanel(url);
       },
     });
     if (!filled.length && !skipped.length && !resumeNote) {

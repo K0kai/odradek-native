@@ -193,8 +193,8 @@ public sealed class PairingTests
         Assert.Equal(HttpStatusCode.OK, status);
         var token = json["token"]!.GetValue<string>();
         Assert.True(new ExtensionTokenActions(api.Temp.Db).Verify(token));
-        var (profile, _, _) = await api.Send("GET", "/api/autofill-profile", token);
-        Assert.Equal(HttpStatusCode.OK, profile);
+        var (resume, _, _) = await api.Send("GET", "/api/autofill-resume?language=pt", token);
+        Assert.Equal(HttpStatusCode.NotFound, resume); // passou da autenticação: só não há currículo
     }
 
     [Fact]

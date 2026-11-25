@@ -456,29 +456,8 @@ public class SettingsActionsTests
     }
 }
 
-public class RulesAndTokenTests
+public class ExtensionTokenTests
 {
-    private static PanelQueries.FormRule Rule(string key, string mode = "text") => new(key, "", mode, "", "");
-
-    [Fact]
-    public void FormRules_save_replaces_everything_in_order_and_validates()
-    {
-        using var t = new TempDb();
-        var actions = new FormRuleActions(t.Db);
-        Assert.Equal("Regras de formulário salvas.", actions.Save([Rule("b"), new("a", " x ", "select", " candidate_name ", "v")]));
-        var rows = new PanelQueries(t.Db).FormRules();
-        Assert.Equal(["b", "a"], rows.Select(r => r.Key));
-        Assert.Equal("x", rows[1].Aliases);
-        Assert.Equal("candidate_name", rows[1].ValueFrom);
-        Assert.Equal("select", rows[1].Mode);
-        Assert.Equal([10, 20], t.Db.Open().Query<int>("SELECT sort_order FROM form_field_rules ORDER BY id"));
-        Assert.Equal("Use de 1 a 100 regras", Assert.Throws<ActionException>(() => actions.Save([])).Message);
-        Assert.Equal("Chave vazia, repetida ou longa na regra 2", Assert.Throws<ActionException>(() => actions.Save([Rule("A"), Rule("a")])).Message);
-        Assert.Equal("Modo inválido na regra 1", Assert.Throws<ActionException>(() => actions.Save([Rule("a", "weird")])).Message);
-        Assert.Equal(2, rows.Count); // as falhas não apagaram nada
-        Assert.Equal(2, new PanelQueries(t.Db).FormRules().Count);
-    }
-
     [Fact]
     public void ExtensionToken_is_shown_once_stored_as_a_hash_and_verified()
     {

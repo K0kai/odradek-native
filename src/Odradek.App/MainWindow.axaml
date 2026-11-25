@@ -162,20 +162,21 @@
       <Grid Grid.Row="3" x:Name="LogsPane" Classes="page" IsVisible="False" RowDefinitions="Auto,*" Margin="28,0">
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
           <Button x:Name="LogsRefreshButton" Content="Atualizar"  Classes="icon" Tag="&#xE72C;"/>
+          <Button x:Name="LogsCopyButton" Content="Copiar log inteiro" Classes="icon" Tag="&#xE8C8;"/>
           <Button x:Name="LogsClearButton" Classes="icon danger" Content="Limpar logs"  Tag="&#xE74D;"/>
           <Button x:Name="LogsClearCancel" Content="Cancelar" IsVisible="False" />
         </StackPanel>
         <Border Grid.Row="1" Classes="card" Padding="6">
           <Grid>
-            <ListBox x:Name="LogsList" Classes="log" Background="Transparent">
+            <ListBox x:Name="LogsList" Classes="log" Background="Transparent" SelectionMode="Multiple" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
               <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="d:LogEntry">
                   <Grid ColumnDefinitions="118,72,110,*">
-                    <TextBlock Text="{Binding CreatedAt, Converter={x:Static local:Palette.LogTime}}" Classes="muted" FontFamily="Cascadia Mono, Consolas" />
-                    <TextBlock Grid.Column="1" Text="{Binding Level}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"
+                    <SelectableTextBlock ContextFlyout="{x:Null}" Text="{Binding CreatedAt, Converter={x:Static local:Palette.LogTime}}" Classes="muted" FontFamily="Cascadia Mono, Consolas" />
+                    <TextBlock Grid.Column="1" Text="{Binding Level}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Top" Margin="0,1,0,0"
                                Foreground="{Binding Level, Converter={x:Static local:Palette.LevelForeground}}" />
-                    <TextBlock Grid.Column="2" Text="{Binding Source}" Classes="muted" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
-                    <TextBlock Grid.Column="3" Text="{Binding Message}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                    <SelectableTextBlock ContextFlyout="{x:Null}" Grid.Column="2" Text="{Binding Source}" Classes="muted" TextTrimming="CharacterEllipsis" Margin="0,0,8,0" />
+                    <SelectableTextBlock ContextFlyout="{x:Null}" Grid.Column="3" Text="{Binding Message}" FontSize="13" TextWrapping="Wrap" />
                   </Grid>
                 </DataTemplate>
               </ListBox.ItemTemplate>
@@ -265,18 +266,8 @@
         </TabItem>
       </TabControl>
 
-      <!-- Currículos e Regras de formulário (montados em código) -->
+      <!-- Currículos (montado em código) -->
       <ScrollViewer Grid.Row="3" x:Name="ResumesPane" Classes="page" IsVisible="False" Margin="28,0"><StackPanel x:Name="ResumesHost" Spacing="12" MaxWidth="900" HorizontalAlignment="Left" /></ScrollViewer>
-      <Grid Grid.Row="3" x:Name="RulesPane" Classes="page" IsVisible="False" RowDefinitions="Auto,*" Margin="28,0">
-        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
-          <Button x:Name="RulesAddButton" Content="Adicionar regra"  Classes="icon" Tag="&#xE710;"/>
-          <Button x:Name="RulesSaveButton" Classes="icon primary" Content="Salvar regras"  Tag="&#xE74E;"/>
-          <local:HelpMark Text="Cada regra diz à extensão como preencher um campo: os aliases são os nomes que os sites dão a ele, e o valor vem de uma configuração (ex.: candidate_phone) ou é fixo. O modo diz o tipo do campo; “Ignorar” o deixa em branco." />
-          <TextBlock x:Name="RulesState" VerticalAlignment="Center" Classes="muted" />
-        </StackPanel>
-        <ScrollViewer Grid.Row="1"><StackPanel x:Name="RulesHost" Spacing="8" MaxWidth="1000" HorizontalAlignment="Left" /></ScrollViewer>
-      </Grid>
-
       <!-- Visão geral (montada em código a partir do resumo do banco) -->
       <ScrollViewer Grid.Row="3" x:Name="OverviewPane" Classes="page" IsVisible="False" Margin="28,0"><StackPanel x:Name="OverviewHost" Spacing="14" MaxWidth="1000" HorizontalAlignment="Left" /></ScrollViewer>
 
@@ -396,13 +387,14 @@
         <Border Grid.Column="2" Classes="card">
           <ScrollViewer>
             <StackPanel Spacing="10">
-              <TextBlock x:Name="DetailTitle" Classes="h2" FontSize="18" TextWrapping="Wrap" Text="Selecione uma vaga" />
+              <SelectableTextBlock x:Name="DetailTitle" Classes="h2" FontSize="18" TextWrapping="Wrap" Text="Selecione uma vaga" />
               <Border x:Name="DetailStatus" Classes="badge" HorizontalAlignment="Left" IsVisible="False">
                 <TextBlock x:Name="DetailStatusText" FontSize="12" FontWeight="SemiBold" />
               </Border>
-              <TextBlock x:Name="DetailMeta" Classes="muted" TextWrapping="Wrap" />
+              <SelectableTextBlock x:Name="DetailMeta" Classes="muted" TextWrapping="Wrap" />
               <WrapPanel x:Name="JobButtons" IsVisible="False">
                 <Button x:Name="OpenJobButton" Content="Abrir vaga" Margin="0,0,8,8"  Classes="icon" Tag="&#xE8A7;"/>
+                <Button x:Name="CopyJobButton" Content="Copiar vaga" Margin="0,0,8,8"  Classes="icon" Tag="&#xE8C8;"/>
                 <Button x:Name="AppliedButton" Classes="icon primary" Content="Marcar aplicada" Margin="0,0,8,8"  Tag="&#xE73E;"/>
                 <Button x:Name="SavedButton" Content="Salvar" Margin="0,0,8,8"  Classes="icon" Tag="&#xE734;"/>
                 <Button x:Name="IgnoredButton" Classes="icon danger" Content="Ignorar" Margin="0,0,8,8"  Tag="&#xE711;"/>

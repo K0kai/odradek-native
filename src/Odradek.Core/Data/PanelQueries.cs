@@ -310,16 +310,6 @@ public sealed partial class PanelQueries(Database db)
         return AssessmentReader.Compact(raw);
     }
 
-    public sealed record FormRule(string Key, string Aliases, string Mode, string ValueFrom, string Value);
-
-    /// <summary>Regras de preenchimento de formulário (a extensão usa as mesmas). Ordem: <c>sort_order</c>, depois <c>id</c> (não conferida com o Python).</summary>
-    public IReadOnlyList<FormRule> FormRules()
-    {
-        using var connection = db.Open();
-        return connection.Query<FormRule>(
-            "SELECT key AS Key, aliases AS Aliases, mode AS Mode, value_from AS ValueFrom, value AS Value FROM form_field_rules ORDER BY sort_order, id").ToList();
-    }
-
     // ---- logs, currículos, métricas --------------------------------------------------------------------------------
     public IReadOnlyList<LogEntry> Logs(int limit = 200) => new EventLogStore(db).List(limit);
 

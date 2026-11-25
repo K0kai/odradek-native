@@ -124,7 +124,7 @@ public static class SettingsLayout
     };
 
     public static readonly (string Id, string Label)[] SourceOptions =
-        [("apify", "LinkedIn (via Apify)"), ("remotive", "Remotive"), ("remoteok", "RemoteOK"), ("adzuna", "Adzuna")];
+        [("apify", "Apify (LinkedIn e Indeed)"), ("remotive", "Remotive"), ("remoteok", "RemoteOK"), ("adzuna", "Adzuna")];
 
     /// <summary>Quanto dos requisitos obrigatórios a vaga precisa cobrir para a tolerância dada (curva por trechos de <c>Settings.tsx</c>).</summary>
     public static int Coverage(int value)
@@ -135,7 +135,7 @@ public static class SettingsLayout
         return curve[^1].Y;
     }
 
-    private static readonly string[] SourceLabels = ["apify=LinkedIn (via Apify)", "remotive=Remotive", "remoteok=RemoteOK", "adzuna=Adzuna"];
+    private static readonly string[] SourceLabels = ["apify=Apify (LinkedIn e Indeed)", "remotive=Remotive", "remoteok=RemoteOK", "adzuna=Adzuna"];
 
     /// <summary>Nome e palavras-chave do filtro gerado; se o JSON não for lido, só o tamanho.</summary>
     private static string FilterSummary(string raw)

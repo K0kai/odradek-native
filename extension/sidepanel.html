@@ -30,12 +30,9 @@
     select { width: 100%; margin-top: 5px; padding: 8px 10px; border: 1px solid var(--line2); border-radius: 8px; background: #0e0e10; color: var(--ink); font: inherit; }
     select:focus { outline: none; border-color: var(--accent); }
     .row { display: flex; gap: 8px; margin-top: 12px; }
-    .import-row { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
     .hint { margin: 6px 0 0; color: var(--muted2); font-size: 11px; font-weight: 500; line-height: 1.45; }
     button { flex: 1; padding: 9px 10px; border: 1px solid transparent; border-radius: 8px; background: var(--white); color: #0a0a0a; font: inherit; font-weight: 700; cursor: pointer; transition: filter .12s, background .12s; }
     button:hover { filter: brightness(.92); }
-    #import { width: 100%; background: var(--accent); color: var(--white); }
-    #import:hover { background: var(--accent2); }
     button:disabled { opacity: .6; cursor: wait; }
     #home-status, #fields-status, #whitelist-status, #settings-status, #assistant-status { min-height: 1.4em; margin-top: 9px; color: var(--accent2); font-size: 11px; }
     .steps { margin: 10px 0 0; padding: 0; list-style: none; }
@@ -125,7 +122,6 @@
     .help-row .view-title { margin-right: 0; }
     .help-row .section-action { flex: 1; }
     .help-row.action-row .help { margin-top: 10px; }
-    .import-row .help-row .help { margin-top: 0; }
   </style>
 </head>
 <body>
@@ -258,18 +254,6 @@
           <button class="small-button" id="cancel-create" type="button">Cancel</button>
         </div>
       </section>
-      <div class="import-row">
-        <div class="help-row">
-          <button id="import" type="button">Import from Odradek</button>
-          <button class="help" type="button" aria-label="Help" data-help="Only fills blank fields. The values you already have here are kept.">?</button>
-        </div>
-        <ol class="steps" id="process-steps" aria-live="polite" hidden>
-          <li>Check panel availability</li>
-          <li>Check server and database health</li>
-          <li>Request profile data</li>
-          <li>Merge and save blank fields</li>
-        </ol>
-      </div>
       <div class="row">
         <button id="save" type="button">Save</button>
       </div>
@@ -303,7 +287,7 @@
       </div>
       <div class="help-row label-row">
         <label for="backend-url">Backend URL</label>
-        <button class="help" type="button" aria-label="Help" data-help="Where your profile and the assistant come from. Use HTTPS; HTTP is allowed only for localhost. Saving asks Chrome to grant access to this address.">?</button>
+        <button class="help" type="button" aria-label="Help" data-help="Where your resume and the assistant come from. Use HTTPS; HTTP is allowed only for localhost. Saving asks Chrome to grant access to this address.">?</button>
       </div>
       <input id="backend-url" type="url" inputmode="url" autocomplete="url" spellcheck="false" placeholder="https://your-odradek-server.example">
       <div class="help-row label-row">
