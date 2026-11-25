@@ -9,7 +9,7 @@ namespace Odradek.Core.Tests;
 /// <summary>Responde às chamadas de IA com o que o teste enfileirar e guarda cada requisição (URL sem chave, corpo).</summary>
 public sealed class FakeAiHandler : HttpMessageHandler
 {
-    public sealed record Seen(string Host, string Model, JsonObject Body, string? Bearer);
+    public sealed record Seen(string Host, string Model, JsonObject Body, string? Bearer, string Url, string? GoogleKey);
 
     private readonly Queue<Func<HttpRequestMessage, HttpResponseMessage>> _script = new();
     public List<Seen> Requests { get; } = [];
@@ -29,7 +29,8 @@ public sealed class FakeAiHandler : HttpMessageHandler
         var body = JsonNode.Parse(request.Content!.ReadAsStringAsync(cancellationToken).Result) as JsonObject ?? [];
         var path = request.RequestUri!.AbsolutePath;
         var model = body["model"]?.ToString() ?? path.Split('/').Last().Split(':')[0];
-        Requests.Add(new Seen(request.RequestUri.Host, model, body, request.Headers.Authorization?.Parameter));
+        var googleKey = request.Headers.TryGetValues("x-goog-api-key", out var values) ? values.Single() : null;
+        Requests.Add(new Seen(request.RequestUri.Host, model, body, request.Headers.Authorization?.Parameter, request.RequestUri.ToString(), googleKey));
         if (_script.Count == 0) throw new InvalidOperationException("sem resposta enfileirada para " + request.RequestUri.Host + path);
         return Task.FromResult(_script.Dequeue()(request));
     }
@@ -114,6 +115,17 @@ public class AiClientTests
         Assert.DoesNotContain("SECRET-KEY-123", ex.Message);
         Assert.Contains("[chave omitida]", ex.Message);
         Assert.Contains("UNAUTHENTICATED", ex.Message);
+    }
+
+    [Fact]
+    public async Task Gemini_key_goes_in_the_header_and_never_in_the_url()
+    {
+        var handler = new FakeAiHandler().Gemini("ok");
+        var (client, _) = Build(handler);
+        await client.TextAsync("p", Call);
+        Assert.Equal("SECRET-KEY-123", handler.Requests[0].GoogleKey);
+        Assert.DoesNotContain("SECRET-KEY-123", handler.Requests[0].Url);
+        Assert.Null(handler.Requests[0].Bearer);
     }
 
     [Fact]

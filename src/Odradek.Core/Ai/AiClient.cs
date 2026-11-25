@@ -254,6 +254,7 @@ public sealed partial class AiClient
         string endpoint;
         JsonObject body;
         string? bearer = null;
+        string? googleKey = null;
         switch (provider)
         {
             case "openai":
@@ -291,7 +292,8 @@ public sealed partial class AiClient
                 }
                 if (thinkingBudget is { } budget && model.StartsWith("gemini-2.5", StringComparison.OrdinalIgnoreCase))
                     config["thinkingConfig"] = new JsonObject { ["thinkingBudget"] = budget };
-                endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/{WebUtility.UrlEncode(model)}:generateContent?key={WebUtility.UrlEncode(apiKey)}";
+                endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/{WebUtility.UrlEncode(model)}:generateContent";
+                googleKey = apiKey; // no cabeçalho: as chaves novas do AI Studio não funcionam na URL, e assim a chave não vai parar em logs
                 body = new JsonObject
                 {
                     ["contents"] = new JsonArray(new JsonObject { ["parts"] = new JsonArray(new JsonObject { ["text"] = prompt }) }),
@@ -310,6 +312,7 @@ public sealed partial class AiClient
         {
             using var request = new HttpRequestMessage(HttpMethod.Post, endpoint) { Content = new StringContent(body.ToJsonString(Json), Encoding.UTF8, "application/json") };
             if (bearer is not null) request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {bearer}");
+            if (googleKey is not null) request.Headers.TryAddWithoutValidation("x-goog-api-key", googleKey);
             using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseContentRead, timeout.Token);
             responseText = await response.Content.ReadAsStringAsync(timeout.Token);
             if (!response.IsSuccessStatusCode)
