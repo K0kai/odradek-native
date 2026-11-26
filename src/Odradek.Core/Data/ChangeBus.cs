@@ -34,6 +34,9 @@ public sealed record QueueChanged(long? Id) : Change;
 /// <summary>A fila em segundo plano das vagas do LinkedIn mudou (entrou ou saiu vaga, começou ou acabou uma espera).</summary>
 public sealed record LinkedInQueueChanged : Change;
 
+/// <summary>O envio do Indeed pela extensão mudou (vagas anunciadas ou recebidas, ou a extensão parou).</summary>
+public sealed record IndeedQueueChanged : Change;
+
 public sealed record LogAppended(LogEntry Entry) : Change;
 
 public sealed record LogsCleared : Change;

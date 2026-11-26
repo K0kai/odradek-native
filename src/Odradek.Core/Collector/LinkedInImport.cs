@@ -102,7 +102,6 @@ public static partial class LinkedInImport
         Func<CancellationToken, Task>? pause = null, Func<string>? evaluateNew = null, CancellationToken ct = default, Action<ImportOutcome>? report = null)
     {
         pause ??= RandomPauseAsync;
-        evaluateNew ??= () => new QueueActions(db).EvaluateNew();
         var known = KnownIds(db);
         var seen = new HashSet<string>(StringComparer.Ordinal);
         int duplicates = 0, inserted = 0, dropped = 0, failed = 0, pending = 0;
@@ -151,16 +150,20 @@ public static partial class LinkedInImport
             Save(card, parsed.Title.Length > 0 ? parsed.Title : card.Title, parsed.Company.Length > 0 ? parsed.Company : card.Company,
                 parsed.Location.Length > 0 ? parsed.Location : card.Location, parsed.Description, PostedIso(parsed.Posted));
         }
-        var triage = "";
-        if (inserted > 0)
-        {
-            db.Bus.Publish(new JobsChanged(inserts));
-            if ((new SettingsStore(db).All().GetValueOrDefault("auto_apply") ?? "") == "1") triage = evaluateNew();
-        }
+        var triage = TriageNew(db, inserts, evaluateNew);
         new EventLogStore(db).Add(blocked ? "warning" : "success", "collector",
             $"Importação do LinkedIn: {cards.Count} recebida(s), {inserted} nova(s), {duplicates} já conhecida(s), {dropped} descartada(s), {failed} com falha, {pending} pendente(s)"
             + (blocked ? " (o LinkedIn limitou os pedidos; tente de novo mais tarde)." : "."));
         return new ImportSummary(cards.Count, duplicates, inserted, dropped, failed, pending, triage);
+    }
+
+    /// <summary>Depois de uma importação (LinkedIn ou Indeed): avisa a tela e, com <c>auto_apply</c> ligado, faz a triagem. Devolve o texto da triagem.</summary>
+    internal static string TriageNew(Database db, IReadOnlyList<long> inserts, Func<string>? evaluateNew = null)
+    {
+        if (inserts.Count == 0) return "";
+        db.Bus.Publish(new JobsChanged(inserts));
+        if ((new SettingsStore(db).All().GetValueOrDefault("auto_apply") ?? "") != "1") return "";
+        return evaluateNew is null ? new QueueActions(db).EvaluateNew() : evaluateNew();
     }
 
     /// <summary>

@@ -9,9 +9,12 @@ using Odradek.Core.Engines;
 namespace Odradek.Core.Api;
 
 /// <summary>Rotas que a extensão do navegador chama com o token de pareamento (<c>web/extension_token.py:EXTENSION_PATHS</c>).</summary>
-public sealed class ExtensionApi(Database db, Func<Assistant> assistant, Func<HttpClient>? http = null, LinkedInQueue? queue = null)
+public sealed class ExtensionApi(Database db, Func<Assistant> assistant, Func<HttpClient>? http = null, LinkedInQueue? queue = null, IndeedQueue? indeedQueue = null)
 {
-    public static readonly IReadOnlyList<string> Paths = ["/api/assistant", "/api/autofill-resume", "/api/linkedin-import"];
+    public static readonly IReadOnlyList<string> Paths = ["/api/assistant", "/api/autofill-resume", "/api/linkedin-import", "/api/indeed-import"];
+
+    /// <summary>Vagas do Indeed lidas pela extensão na aba do usuário (já com descrição). Ver <see cref="IndeedImport.Handle"/>.</summary>
+    public ApiResult ImportIndeed(JsonObject body) => IndeedImport.Handle(db, body, indeedQueue);
 
     /// <summary>
     /// Recebe da extensão as vagas da página do LinkedIn do usuário (ex.: "Recomendadas para você"), busca os detalhes no endpoint público

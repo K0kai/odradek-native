@@ -103,6 +103,9 @@
     #open-settings .home-action-label { --label-width: 52px; }
     .home-action:hover .home-action-content, .home-action:focus-visible .home-action-content { gap: 8px; }
     .home-action:hover .home-action-label, .home-action:focus-visible .home-action-label { width: var(--label-width); opacity: 1; }
+    .home-limit { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: -6px; }
+    .home-limit label { margin: 0; }
+    .home-limit input { width: 72px; margin: 0; padding: 4px 8px; text-align: center; }
     /* In the normal flow, under the buttons: long messages (LinkedIn import) can neither cover a button nor the fixed copyright line (the body's bottom padding clears it when scrolled). */
     #home-view #home-status { margin-top: 14px; padding: 0 4px; text-align: center; overflow-wrap: anywhere; }
     @media (prefers-reduced-motion: reduce) { .home-action, .home-action::before, .home-action-label { transition: none; } }
@@ -211,6 +214,23 @@
           <span class="home-action-content">
             <svg class="home-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
             <span class="home-action-label">LinkedIn diagnostics</span>
+          </span>
+        </button>
+        <button class="home-action" id="home-indeed" type="button" aria-label="Send these Indeed jobs to Odradek" title="Send these Indeed jobs to Odradek" hidden>
+          <span class="home-action-content">
+            <svg class="home-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v3h16v-3"/></svg>
+            <span class="home-action-label">Send Indeed jobs</span>
+          </span>
+        </button>
+        <div class="home-limit" id="home-indeed-limit-row" hidden>
+          <label for="home-indeed-limit">Max new jobs</label>
+          <input id="home-indeed-limit" type="number" inputmode="numeric" min="1" max="500" step="1" value="25" placeholder="all">
+          <button class="help" type="button" aria-label="Help" data-help="How many jobs Odradek does not have yet are read when you press Send Indeed jobs. Leave it blank to read all of them (up to 500). Press again to read the next ones.">?</button>
+        </div>
+        <button class="home-action" id="home-indeed-debug" type="button" aria-label="Copy Indeed import diagnostics" title="Copy Indeed import diagnostics" hidden>
+          <span class="home-action-content">
+            <svg class="home-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+            <span class="home-action-label">Indeed diagnostics</span>
           </span>
         </button>
         <button class="home-action" id="open-fields" type="button" aria-label="Fields" title="Fields">

@@ -69,6 +69,7 @@ public partial class MainWindow : Window
         QueueTabs.IsVisible = page == Page.Queue;
         ResetConfirmations(); // uma confirmação armada não sobrevive à troca de tela
         UpdateLinkedInTimer();
+        UpdateIndeedTimer();
         LogsPane.IsVisible = page == Page.Logs;
         UsagePane.IsVisible = page == Page.Usage;
         AssistantPane.IsVisible = page == Page.Assistant;
@@ -498,6 +499,7 @@ public partial class MainWindow : Window
             {
                 case QueueChanged: if (_page == Page.Queue) _ = LoadQueueAsync(); else _ = RefreshQueueBadgeAsync(); break;
                 case LinkedInQueueChanged: RenderQueueBadge(); if (_page == Page.Queue) RenderLinkedInQueue(); break;
+                case IndeedQueueChanged: RenderQueueBadge(); if (_page == Page.Queue) RenderIndeedQueue(); break;
                 case LogAppended appended: _logs.Insert(0, appended.Entry); if (_logs.Count > 500) _logs.RemoveAt(_logs.Count - 1); break;
                 case LogsCleared: _logs.Clear(); break;
                 case JobsChanged: _ = ReloadJobsAsync(); if (_page == Page.Overview) _ = LoadOverviewAsync(); break;
@@ -547,6 +549,9 @@ public partial class MainWindow : Window
                         QueueTabs.SelectedIndex = 1; await Task.Delay(500);
                         LinkedInList.SelectedIndex = _linkedInRows.Count > 0 ? 0 : -1; await Task.Delay(300);
                         Program.Log($"SMOKE {label} › LinkedIn: {_linkedInRows.Count} itens, subtítulo='{JobsSubtitle.Text}', cabeçalho='{QueueLinkedInTab.Header}', detalhe {LinkedInDetailBody.Text?.Length ?? 0} caracteres");
+                        QueueTabs.SelectedIndex = IndeedTabIndex; await Task.Delay(500);
+                        IndeedList.SelectedIndex = _indeedRows.Count > 0 ? 0 : -1; await Task.Delay(300);
+                        Program.Log($"SMOKE {label} › Indeed: {_indeedRows.Count} itens, subtítulo='{JobsSubtitle.Text}', cabeçalho='{QueueIndeedTab.Header}', detalhe {IndeedDetailBody.Text?.Length ?? 0} caracteres");
                         QueueTabs.SelectedIndex = 0;
                         break;
                     case Page.Overview: Program.Log($"SMOKE {label}: {OverviewHost.Children.Count} blocos"); break;

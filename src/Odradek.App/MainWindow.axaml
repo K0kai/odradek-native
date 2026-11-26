@@ -264,6 +264,42 @@
             </Border>
           </Grid>
         </TabItem>
+        <TabItem x:Name="QueueIndeedTab" Header="Vagas do Indeed">
+          <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,12,1.3*" Margin="0,8,0,0">
+            <StackPanel Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10" MinHeight="36">
+              <Button x:Name="IndeedClearButton" Classes="icon danger" Content="Esvaziar fila" Tag="&#xE74D;"/>
+              <Button x:Name="IndeedClearCancel" Content="Cancelar" IsVisible="False" />
+              <local:HelpMark Text="Quem lê as vagas do Indeed é a sua própria aba, pela extensão: deixe o painel e a aba abertos até terminar. O Odradek mostra o andamento, importa as vagas que chegam e manda para a triagem; ele não acessa o Indeed. “Esvaziar fila” faz a extensão parar depois do lote em andamento. A lista, os contadores e o histórico valem desde que o app foi aberto." />
+            </StackPanel>
+            <Grid Grid.Row="1">
+              <ListBox x:Name="IndeedList" Classes="cards">
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="local:LinkedInRow">
+                    <StackPanel Spacing="2">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Subtitle}" Classes="muted" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+              <TextBlock x:Name="IndeedEmpty" Text="Nenhuma vaga do Indeed enviada pela extensão nesta sessão." Classes="muted" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+            </Grid>
+            <Border Grid.Row="1" Grid.Column="2" Classes="card">
+              <ScrollViewer>
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Estado do envio" Classes="h2" />
+                  <TextBlock x:Name="IndeedStateText" TextWrapping="Wrap" LineHeight="21" />
+                  <TextBlock x:Name="IndeedDetailTitle" Classes="h2" FontSize="18" TextWrapping="Wrap" Margin="0,10,0,0" Text="Selecione uma vaga da fila" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button x:Name="IndeedOpenButton" Content="Abrir no Indeed" IsVisible="False" Classes="icon" Tag="&#xE8A7;"/>
+                    <Button x:Name="IndeedViewJobButton" Content="Ver vaga" IsVisible="False" Classes="icon primary" Tag="&#xE8FD;"/>
+                  </StackPanel>
+                  <SelectableTextBlock x:Name="IndeedDetailBody" TextWrapping="Wrap" LineHeight="21" />
+                </StackPanel>
+              </ScrollViewer>
+            </Border>
+          </Grid>
+        </TabItem>
       </TabControl>
 
       <!-- Currículos (montado em código) -->

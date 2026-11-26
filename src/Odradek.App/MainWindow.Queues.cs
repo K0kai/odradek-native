@@ -6,10 +6,13 @@ using Odradek.Core.Data;
 
 namespace Odradek.App;
 
-/// <summary>Linha da subaba "Vagas do LinkedIn": em leitura, na fila ou já processada (<see cref="Outcome"/> preenchido).</summary>
-public sealed record LinkedInRow(string Id, string Title, string Subtitle, ImportOutcome? Outcome, DateTime? ProcessedAt);
+/// <summary>
+/// Linha das subabas de vagas que a extensão envia (LinkedIn e Indeed): em leitura, na fila ou já processada (<see cref="Outcome"/> preenchido).
+/// <see cref="Url"/> só é usada pelo Indeed, onde o endereço depende do país.
+/// </summary>
+public sealed record LinkedInRow(string Id, string Title, string Subtitle, ImportOutcome? Outcome, DateTime? ProcessedAt, string Url = "");
 
-/// <summary>Página "Filas": as duas subabas, o selo do menu e a tela da fila de vagas do LinkedIn que a extensão alimenta.</summary>
+/// <summary>Página "Filas": as subabas, o selo do menu e a tela da fila de vagas do LinkedIn que a extensão alimenta (a do Indeed fica em outro arquivo).</summary>
 public partial class MainWindow
 {
     private const int LinkedInTabIndex = 1;
@@ -31,8 +34,9 @@ public partial class MainWindow
             if (!ReferenceEquals(e.Source, QueueTabs)) return; // a seleção das listas de dentro também sobe até aqui
             ResetConfirmations();
             ShowQueueTab();
-            if (!OnLinkedInTab) _ = LoadQueueAsync();
+            if (!OnLinkedInTab && !OnIndeedTab) _ = LoadQueueAsync();
         };
+        WireIndeedTab();
         LinkedInList.SelectionChanged += (_, _) => { if (!_updatingLinkedIn) ShowLinkedInDetail(LinkedInList.SelectedItem as LinkedInRow); };
         LinkedInResumeButton.Click += (_, _) => { ResetConfirmations(); Program.LinkedIn?.SkipWait(); };
         WireConfirm(LinkedInClearButton, LinkedInClearCancel,
@@ -52,6 +56,7 @@ public partial class MainWindow
     private void ShowQueueTab()
     {
         RenderLinkedInQueue();
+        RenderIndeedQueue();
         RenderQueueSubtitle();
     }
 
@@ -66,15 +71,24 @@ public partial class MainWindow
                 ? $"Pendentes: {now.Pending.Count}  ·  Importadas: {now.Inserted}  ·  Já conhecidas: {now.Duplicates}  ·  Descartadas: {now.Dropped}  ·  Com falha: {now.Failed}"
                 : "";
         }
+        else if (OnIndeedTab)
+        {
+            text = Program.Indeed?.Snapshot() is { } now
+                ? $"Pendentes: {now.Pending.Count}  ·  Importadas: {now.Inserted}  ·  Já conhecidas: {now.Duplicates}  ·  Descartadas: {now.Dropped}  ·  Com falha: {now.Failed}"
+                : "";
+        }
         JobsSubtitle.Text = text;
         JobsSubtitle.IsVisible = text.Length > 0;
     }
 
-    /// <summary>Selo do menu: o que ainda falta nas duas filas; cada subaba mostra o seu número.</summary>
+    /// <summary>Selo do menu: o que ainda falta nas filas; cada subaba mostra o seu número.</summary>
     private void RenderQueueBadge()
     {
         long linkedIn = Program.LinkedIn?.Pending ?? 0;
-        if (_queueNav is not null && _queueNav.Badge != _aiActive + linkedIn) _queueNav.Badge = _aiActive + linkedIn;
+        long indeed = Program.Indeed?.Pending ?? 0;
+        var total = _aiActive + linkedIn + indeed;
+        if (_queueNav is not null && _queueNav.Badge != total) _queueNav.Badge = total;
+        QueueIndeedTab.Header = indeed > 0 ? $"Vagas do Indeed ({indeed})" : "Vagas do Indeed";
         QueueAiTab.Header = _aiActive > 0 ? $"Processamento de IA ({_aiActive})" : "Processamento de IA";
         QueueLinkedInTab.Header = linkedIn > 0 ? $"Vagas do LinkedIn ({linkedIn})" : "Vagas do LinkedIn";
     }
@@ -92,40 +106,42 @@ public partial class MainWindow
         foreach (var done in now.History)
         {
             var outcome = done.Outcome;
-            var what = outcome.Kind switch
-            {
-                ImportResult.Inserted => "Importada",
-                ImportResult.Duplicate => "Já conhecida",
-                ImportResult.Dropped => "Descartada — " + outcome.Detail,
-                _ => "Falhou — " + outcome.Detail,
-            };
             rows.Add(new LinkedInRow(outcome.Id, outcome.Title.Length > 0 ? outcome.Title : $"Vaga {outcome.Id}",
-                $"{Format.Time(done.ProcessedAt)} · {what}", outcome, done.ProcessedAt));
+                $"{Format.Time(done.ProcessedAt)} · {OutcomeText(outcome)}", outcome, done.ProcessedAt));
         }
         return rows;
     }
 
+    private static string OutcomeText(ImportOutcome outcome) => outcome.Kind switch
+    {
+        ImportResult.Inserted => "Importada",
+        ImportResult.Duplicate => "Já conhecida",
+        ImportResult.Dropped => "Descartada — " + outcome.Detail,
+        _ => "Falhou — " + outcome.Detail,
+    };
+
     /// <summary>Atualiza a lista mexendo só nas linhas que mudaram (a rolagem fica onde está) e devolve a seleção à mesma vaga.</summary>
+    private static void SyncRows(ListBox list, ObservableCollection<LinkedInRow> rows, List<LinkedInRow> wanted)
+    {
+        var selected = list.SelectedItem as LinkedInRow;
+        for (var i = 0; i < wanted.Count; i++)
+        {
+            if (i == rows.Count) rows.Add(wanted[i]);
+            else if (rows[i] != wanted[i]) rows[i] = wanted[i];
+        }
+        while (rows.Count > wanted.Count) rows.RemoveAt(rows.Count - 1);
+        // A mesma id pode voltar à fila depois de uma falha: primeiro procura a mesma linha, depois a vaga (que passou da fila ao histórico).
+        list.SelectedItem = selected is null ? null
+            : rows.FirstOrDefault(r => r.Id == selected.Id && r.ProcessedAt == selected.ProcessedAt) ?? rows.FirstOrDefault(r => r.Id == selected.Id);
+    }
+
     private void RenderLinkedInQueue()
     {
         var queue = Program.LinkedIn;
         if (queue is null) return;
         var now = queue.Snapshot();
-        var wanted = LinkedInRows(now);
-        var selected = LinkedInList.SelectedItem as LinkedInRow;
         _updatingLinkedIn = true;
-        try
-        {
-            for (var i = 0; i < wanted.Count; i++)
-            {
-                if (i == _linkedInRows.Count) _linkedInRows.Add(wanted[i]);
-                else if (_linkedInRows[i] != wanted[i]) _linkedInRows[i] = wanted[i];
-            }
-            while (_linkedInRows.Count > wanted.Count) _linkedInRows.RemoveAt(_linkedInRows.Count - 1);
-            // A mesma id pode voltar à fila depois de uma falha: primeiro procura a mesma linha, depois a vaga (que passou da fila ao histórico).
-            LinkedInList.SelectedItem = selected is null ? null
-                : _linkedInRows.FirstOrDefault(r => r.Id == selected.Id && r.ProcessedAt == selected.ProcessedAt) ?? _linkedInRows.FirstOrDefault(r => r.Id == selected.Id);
-        }
+        try { SyncRows(LinkedInList, _linkedInRows, LinkedInRows(now)); }
         finally { _updatingLinkedIn = false; }
         LinkedInEmpty.IsVisible = _linkedInRows.Count == 0;
         RenderLinkedInState(now);

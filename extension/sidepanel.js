@@ -769,14 +769,14 @@ function isLinkedInJobsUrl(url) {
   return LINKEDIN_JOBS_URL.test(url || "");
 }
 
-async function refreshLinkedInButton() {
-  let visible = false;
+async function refreshJobImportButtons() {
+  let url = "";
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    visible = isLinkedInJobsUrl(tab?.url);
-  } catch (_) { /* no readable tab: keep the button hidden */ }
-  $("home-linkedin").hidden = !visible;
-  $("home-linkedin-debug").hidden = !visible;
+    url = tab?.url || "";
+  } catch (_) { /* no readable tab: keep the buttons hidden */ }
+  $("home-linkedin").hidden = $("home-linkedin-debug").hidden = !isLinkedInJobsUrl(url);
+  $("home-indeed").hidden = $("home-indeed-limit-row").hidden = $("home-indeed-debug").hidden = !isIndeedJobsUrl(url);
 }
 
 // Runs inside the LinkedIn tab (injected, so it must not use anything from this file). Scrolls the job list so lazy cards render and
@@ -835,11 +835,15 @@ async function collectLinkedInJobsInPage() {
   return { ids: [...ids.keys()], how, scroller: scroller ? scroller.tagName.toLowerCase() : "window", steps, fallback };
 }
 
-async function postLinkedInImport(body) {
+function postLinkedInImport(body) {
+  return postJobImport("/api/linkedin-import", body, "the LinkedIn import");
+}
+
+async function postJobImport(path, body, what) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), LINKEDIN_IMPORT_TIMEOUT_MS);
   try {
-    const response = await backendFetch("/api/linkedin-import", {
+    const response = await backendFetch(path, {
       method: "POST",
       cache: "no-store",
       signal: controller.signal,
@@ -847,7 +851,7 @@ async function postLinkedInImport(body) {
       body: JSON.stringify(body),
     });
     const payload = await response.json().catch(() => ({}));
-    if (response.status === 401) throw panelHttpError(response, "the LinkedIn import");
+    if (response.status === 401) throw panelHttpError(response, what);
     if (!response.ok || !payload.ok) throw Object.assign(new Error(payload.error || `Panel returned ${response.status}`), { httpStatus: response.status });
     return payload;
   } finally {
@@ -1009,11 +1013,309 @@ async function copyLinkedInDiagnostics() {
   }
 }
 
+// ---- Indeed: same idea, one difference. Indeed has no public job page the app could read on its own (it is behind bot protection), so
+// the user's own tab reads each job page, at a human pace, and sends Odradek the complete job. Odradek itself never contacts Indeed.
+// That is why the panel has to stay open: every batch is saved as soon as it is sent.
+const INDEED_JOBS_URL = /^https:\/\/([a-z]{2}\.|www\.)?indeed\.com\/(jobs|m\/jobs|q-|\?|#|$)/i;
+const INDEED_BATCH_SIZE = 5;
+const INDEED_MAX_IDS = 500;
+
+function isIndeedJobsUrl(url) {
+  return INDEED_JOBS_URL.test(url || "");
+}
+
+// "Max new jobs": how many to read on this press. Blank means all. A value the field rejects is an error, never "all"
+// (a number field reports text it cannot parse as blank).
+function indeedLimit() {
+  const input = $("home-indeed-limit");
+  if (!input.checkValidity()) throw new Error("Max new jobs must be a whole number from 1 to 500, or blank for all.");
+  return input.value ? Number(input.value) : INDEED_MAX_IDS;
+}
+
+// Runs inside the Indeed tab (injected: nothing from this file). Scrolls so lazy cards render and reads what each card shows.
+async function collectIndeedJobsInPage() {
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const jobs = new Map(); // jobkey -> card
+  const keyFromHref = (href) => (String(href || "").match(/[?&]jk=([0-9a-f]{16})(?![0-9a-z])/i) || [])[1] || "";
+  const textOf = (root, selector) => (root?.querySelector(selector)?.textContent || "").replace(/\s+/g, " ").trim();
+  const harvest = () => {
+    for (const el of document.querySelectorAll("[data-jk], a[href*='jk=']")) {
+      const id = String(el.getAttribute("data-jk") || keyFromHref(el.getAttribute("href"))).toLowerCase();
+      if (!/^[0-9a-f]{16}$/.test(id)) continue;
+      const card = el.closest(".job_seen_beacon, [data-testid='slider_item'], li, [role='listitem']") || el;
+      const found = {
+        id,
+        title: textOf(card, "h2.jobTitle span[title], [id^='jobTitle-'], h2.jobTitle, [data-testid='job-title']"),
+        company: textOf(card, "[data-testid='company-name'], .companyName"),
+        location: textOf(card, "[data-testid='text-location'], .companyLocation"),
+        posted: textOf(card, "[data-testid='myJobsStateDate'], span.date"),
+      };
+      const previous = jobs.get(id);
+      if (!previous) jobs.set(id, found);
+      else for (const key of Object.keys(found)) previous[key] ||= found[key];
+    }
+  };
+  harvest();
+  let stable = 0;
+  for (let step = 0; step < 30 && stable < 3; step += 1) {
+    const before = jobs.size;
+    window.scrollBy(0, Math.max(300, window.innerHeight * 0.8));
+    await sleep(600);
+    harvest();
+    const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 5;
+    stable = jobs.size === before && atBottom ? stable + 1 : 0;
+  }
+  window.scrollTo(0, 0);
+  return { host: location.hostname.toLowerCase(), jobs: [...jobs.values()] };
+}
+
+// Runs inside the Indeed tab. Reads the job pages of one batch, one at a time with a pause. Stops at the first sign that Indeed
+// wants the user to prove they are human; it never tries to get around that.
+async function fetchIndeedDetailsInPage(cards, host, pauseFirst) {
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const clean = (value) => String(value || "").replace(/\s+/g, " ").trim();
+  const result = { jobs: [], skipped: [], read: 0, blocked: false, wrongPage: false };
+  const jsonLd = (doc) => {
+    for (const script of doc.querySelectorAll("script[type='application/ld+json']")) {
+      try {
+        const data = [JSON.parse(script.textContent)].flat().find((item) => item?.["@type"] === "JobPosting");
+        if (data) return data;
+      } catch (_) { /* another script may hold the posting */ }
+    }
+    return {};
+  };
+  // The current job page has no element holding just the description: it is whatever sits between the section heading and the
+  // "seen" marker (or the report link) that follows it, however those are nested. Older pages have #jobDescriptionText.
+  const descriptionOf = (doc) => {
+    const classic = doc.querySelector("#jobDescriptionText")?.innerHTML.trim();
+    if (classic) return classic;
+    const heading = doc.querySelector("[data-testid='vj-job-description-heading']");
+    if (!heading) return "";
+    for (const selector of ["[data-testid='vj-rcv-flag-sentinel-jobDescriptionSeen']", "[data-testid='vj-report-job']", "[data-testid='relatedLinks']"]) {
+      const end = doc.querySelector(selector);
+      const position = end ? heading.compareDocumentPosition(end) : 0;
+      if (!(position & Node.DOCUMENT_POSITION_FOLLOWING) || (position & Node.DOCUMENT_POSITION_CONTAINED_BY)) continue;
+      const range = doc.createRange();
+      range.setStartAfter(heading);
+      range.setEndBefore(end);
+      const holder = doc.createElement("div");
+      holder.append(range.cloneContents());
+      for (const extra of holder.querySelectorAll("script, style, noscript, button, svg, form, [data-testid^='vj-rcv-flag'], [data-testid='vj-report-job']")) extra.remove();
+      if (clean(holder.textContent).length >= 80) return holder.innerHTML.trim(); // shorter than that, the marker was not at the end
+    }
+    return "";
+  };
+  for (const [index, card] of cards.entries()) {
+    if (location.hostname.toLowerCase() !== host) { result.wrongPage = true; break; }
+    if (pauseFirst || index > 0) await sleep(2500 + Math.random() * 2000);
+    let status = 0;
+    let html = "";
+    try {
+      const response = await fetch(`/viewjob?jk=${card.id}`, { credentials: "same-origin", cache: "no-store" });
+      status = response.status;
+      html = await response.text();
+    } catch (_) { /* network error: counted below as unreadable */ }
+    if (status === 403 || status === 429) { result.blocked = true; break; }
+    if (status === 404 || status === 410) { result.read += 1; result.skipped.push({ id: card.id, reason: "gone" }); continue; }
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const posting = jsonLd(doc);
+    const description = (descriptionOf(doc) || String(posting.description || "")).trim();
+    if (status !== 200 || !description) {
+      if (doc.querySelector("#challenge-form, #challenge-running, .g-recaptcha, .h-captcha") || /just a moment/i.test(doc.title)) { result.blocked = true; break; }
+      result.read += 1;
+      result.skipped.push({ id: card.id, reason: "unreadable" });
+      continue;
+    }
+    result.read += 1;
+    const textOf = (selector) => clean(doc.querySelector(selector)?.textContent);
+    const address = [posting.jobLocation].flat()[0]?.address || {};
+    result.jobs.push({
+      id: card.id,
+      host,
+      title: card.title || clean(posting.title) || textOf("[data-testid='vj-job-title'], [data-testid='jobsearch-JobInfoHeader-title'], h1").replace(/\s*-\s*job post$/i, ""),
+      company: card.company || clean(posting.hiringOrganization?.name) || textOf("[data-testid='inlineHeader-companyName'], [data-company-name='true']"),
+      location: card.location || textOf("[data-testid='inlineHeader-companyLocation'], [data-testid='job-location']") || [address.addressLocality, address.addressRegion].filter(Boolean).join(", "),
+      posted: clean(posting.datePosted) || card.posted,
+      description: description.slice(0, 60000),
+    });
+  }
+  return result;
+}
+
+async function runInTab(tabId, func, args = []) {
+  const [injected] = await chrome.scripting.executeScript({ target: { tabId }, func, args });
+  if (!injected?.result) throw new Error("The page changed while it was being read. Keep the Indeed list open and try again.");
+  return injected.result;
+}
+
+async function postIndeedImport(body) {
+  try {
+    return await postJobImport("/api/indeed-import", body, "the Indeed import");
+  } catch (e) {
+    if (e?.httpStatus === 404) throw new Error("This Odradek is an older version without the Indeed import. Update and restart Odradek, then try again.");
+    throw e;
+  }
+}
+
+// News for the "Vagas do Indeed" tab in Odradek (what is going to be read, what could not be, why it stopped). It is only for that
+// screen, so a failure here (an older Odradek, for instance) never interrupts the import.
+async function tellOdradek(body) {
+  try {
+    return await postIndeedImport(body);
+  } catch (_) {
+    return {};
+  }
+}
+
+async function importIndeedJobs() {
+  const button = $("home-indeed");
+  button.disabled = true;
+  status("");
+  const totals = { inserted: 0, duplicates: 0, dropped: 0, failed: 0 };
+  let sent = false;
+  let announced = false;
+  const summary = () => `${totals.inserted} new, ${totals.duplicates} already known, ${totals.dropped} discarded, ${totals.failed} failed`;
+  try {
+    const limit = indeedLimit(); // read at the press: editing the field later does not change a run in progress
+    $("home-indeed-limit").disabled = true;
+    await ensureBackendAccess();
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id || !isIndeedJobsUrl(tab.url)) throw new Error("Open an Indeed jobs page first (a search, or the home page with recommended jobs).");
+    await ensureSiteAccess(new URL(tab.url).origin);
+
+    status("Reading the jobs listed on this page…");
+    const found = await runInTab(tab.id, collectIndeedJobsInPage);
+    if (!found.jobs.length) throw new Error("No jobs were found on this page. Wait for the list to load and try again.");
+    const listed = found.jobs.slice(0, INDEED_MAX_IDS);
+    const asked = await postIndeedImport({ ids: listed.map((job) => job.id) });
+    const unknown = new Set(asked.unknown);
+    const fresh = listed.filter((job) => unknown.has(job.id));
+    const wanted = fresh.slice(0, limit);
+    const left = fresh.length - wanted.length;
+    if (!wanted.length) {
+      status(`Found ${listed.length} jobs: Odradek already has all of them.`);
+      return;
+    }
+
+    await tellOdradek({ queue: wanted.map((job) => ({ id: job.id, title: job.title, company: job.company, location: job.location, host: found.host })) });
+    announced = true;
+
+    let done = 0;
+    let stopped = "";
+    let reason = "done";
+    for (let start = 0; start < wanted.length && !stopped; start += INDEED_BATCH_SIZE) {
+      status(`${wanted.length} new job(s): ${done} read so far (${summary()}). Keep this panel open.`);
+      const batch = await runInTab(tab.id, fetchIndeedDetailsInPage, [wanted.slice(start, start + INDEED_BATCH_SIZE), found.host, start > 0]);
+      done += batch.read;
+      const gone = batch.skipped.filter((item) => item.reason === "gone").length;
+      const unreadable = batch.skipped.length - gone;
+      totals.dropped += gone;
+      totals.failed += unreadable;
+      let cancelled = false;
+      if (batch.jobs.length) {
+        const saved = await postIndeedImport({ jobs: batch.jobs });
+        sent = true;
+        for (const key of Object.keys(totals)) totals[key] += Number(saved[key]) || 0;
+        cancelled = !!saved.cancelled;
+      }
+      if (batch.skipped.length) cancelled = !!(await tellOdradek({ skipped: batch.skipped })).cancelled || cancelled;
+      if (batch.blocked) [reason, stopped] = ["blocked", "Indeed asked for a verification. Solve it in the tab (opening any job there helps), then press the button again."];
+      else if (batch.wrongPage) [reason, stopped] = ["left", "The tab left the Indeed page. Go back to the list and press the button again."];
+      else if (unreadable >= INDEED_BATCH_SIZE) [reason, stopped] = ["unreadable", "The job pages could not be read; Indeed may have changed its layout. Use Indeed diagnostics."];
+      else if (cancelled) stopped = "The list was cleared in Odradek.";
+    }
+    await tellOdradek({ finished: reason });
+    const known = Number(asked.known) > 0 ? ` ${asked.known} listed job(s) were already in Odradek.` : "";
+    const rest = left > 0 ? ` ${left} more new job(s) were left out by the limit; press again to read them.` : "";
+    status(`${stopped ? `Stopped after ${done} of ${wanted.length} job(s)` : `Read ${done} job(s)`}: ${summary()}.${known}${rest}${stopped ? ` ${stopped}` : ""}`);
+  } catch (e) {
+    if (announced) await tellOdradek({ finished: "error" });
+    const message = e?.name === "AbortError" ? "Odradek took too long to answer. Try again." : `Could not send the jobs: ${String(e?.message || "unknown error")}`;
+    status(sent ? `${message} Already saved: ${summary()}.` : message);
+  } finally {
+    button.disabled = false;
+    $("home-indeed-limit").disabled = false;
+  }
+}
+
+// Diagnostics for the Indeed import: structure and one request result only. No job text is copied.
+async function diagnoseIndeedInPage(testId) {
+  const count = (selector) => document.querySelectorAll(selector).length;
+  const testIds = (root) => [...new Set([...root.querySelectorAll("[data-testid]")].map((el) => el.getAttribute("data-testid").slice(0, 60)))].slice(0, 40);
+  const report = { url: location.hostname + location.pathname, when: new Date().toISOString() };
+  report.counts = Object.fromEntries([
+    "[data-jk]", "a[href*='jk=']", ".job_seen_beacon", "[data-testid='slider_item']", "h2.jobTitle", "[id^='jobTitle-']",
+    "[data-testid='company-name']", "[data-testid='text-location']", "[data-testid='myJobsStateDate']",
+  ].map((selector) => [selector, count(selector)]));
+  report.testIdSamples = testIds(document);
+  // Tags, test ids and text sizes around the description, never the text itself.
+  const skeleton = (el, depth) => ({
+    tag: el.tagName.toLowerCase(),
+    ...(el.id ? { id: el.id.slice(0, 60) } : {}),
+    ...(el.getAttribute("data-testid") ? { testid: el.getAttribute("data-testid").slice(0, 60) } : {}),
+    text: el.textContent.trim().length,
+    ...(depth > 0 && el.children.length ? { children: [...el.children].slice(0, 12).map((child) => skeleton(child, depth - 1)) } : {}),
+  });
+  if (testId) {
+    try {
+      const response = await fetch(`/viewjob?jk=${testId}`, { credentials: "same-origin", cache: "no-store" });
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      report.jobPage = {
+        status: response.status,
+        bytes: html.length,
+        hasDescription: !!doc.querySelector("#jobDescriptionText"),
+        hasJsonLd: [...doc.querySelectorAll("script[type='application/ld+json']")].some((s) => s.textContent.includes("JobPosting")),
+        challenge: !!doc.querySelector("#challenge-form, #challenge-running, .g-recaptcha, .h-captcha") || /just a moment/i.test(doc.title),
+        testIds: testIds(doc),
+        structure: doc.querySelector("[data-testid='viewjob-job-content']") ? skeleton(doc.querySelector("[data-testid='viewjob-job-content']"), 4) : null,
+      };
+    } catch (e) {
+      report.jobPage = { error: String(e?.message || e) };
+    }
+  }
+  return report;
+}
+
+async function copyIndeedDiagnostics() {
+  const button = $("home-indeed-debug");
+  button.disabled = true;
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id || !isIndeedJobsUrl(tab.url)) throw new Error("Open an Indeed jobs page first.");
+    await ensureSiteAccess(new URL(tab.url).origin);
+    status("Collecting diagnostics…");
+    const found = await runInTab(tab.id, collectIndeedJobsInPage);
+    const report = await runInTab(tab.id, diagnoseIndeedInPage, [found.jobs[0]?.id || ""]);
+    // What the import itself gets from that job page: only sizes are reported.
+    if (found.jobs.length) {
+      const trial = await runInTab(tab.id, fetchIndeedDetailsInPage, [found.jobs.slice(0, 1), found.host, true]);
+      report.importTrial = { read: trial.jobs.length, blocked: trial.blocked, descriptionLength: trial.jobs[0]?.description.length || 0 };
+    }
+    report.cards = { total: found.jobs.length };
+    for (const key of ["title", "company", "location", "posted"]) report.cards[`with ${key}`] = found.jobs.filter((job) => job[key]).length;
+    await navigator.clipboard.writeText(JSON.stringify(report, null, 2));
+    status("Diagnostics copied to the clipboard. Paste them in the chat.");
+  } catch (e) {
+    status(`Could not collect diagnostics: ${String(e?.message || "unknown error")}`);
+  } finally {
+    button.disabled = false;
+  }
+}
+
 $("home-linkedin").onclick = importLinkedInJobs;
 $("home-linkedin-debug").onclick = copyLinkedInDiagnostics;
-chrome.tabs.onActivated.addListener(refreshLinkedInButton);
-chrome.tabs.onUpdated.addListener((_tabId, change) => { if (change.url || change.status === "complete") refreshLinkedInButton(); });
-refreshLinkedInButton();
+$("home-indeed").onclick = importIndeedJobs;
+$("home-indeed-limit").onchange = (event) => {
+  if (event.target.checkValidity()) chrome.storage.local.set({ indeedLimit: event.target.value });
+};
+chrome.storage.local.get("indeedLimit").then(({ indeedLimit: saved }) => {
+  if (typeof saved === "string") $("home-indeed-limit").value = saved; // "" is a saved "all"
+});
+$("home-indeed-debug").onclick = copyIndeedDiagnostics;
+chrome.tabs.onActivated.addListener(refreshJobImportButtons);
+chrome.tabs.onUpdated.addListener((_tabId, change) => { if (change.url || change.status === "complete") refreshJobImportButtons(); });
+refreshJobImportButtons();
 
 function appendAssistantMessage(role, text, isError = false) {
   $("assistant-empty").hidden = true;

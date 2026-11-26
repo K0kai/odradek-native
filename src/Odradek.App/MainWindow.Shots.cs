@@ -48,6 +48,9 @@ public partial class MainWindow
                     QueueTabs.SelectedIndex = LinkedInTabIndex; await Task.Delay(600);
                     LinkedInList.SelectedIndex = _linkedInRows.Count > 0 ? 0 : -1; await Task.Delay(500);
                     Save(Path.Combine(folder, $"{(int)page}-{page}-linkedin.png"));
+                    QueueTabs.SelectedIndex = IndeedTabIndex; await Task.Delay(600);
+                    IndeedList.SelectedIndex = _indeedRows.Count > 0 ? 0 : -1; await Task.Delay(500);
+                    Save(Path.Combine(folder, $"{(int)page}-{page}-indeed.png"));
                     QueueTabs.SelectedIndex = 0;
                 }
                 if (page == Page.Settings)

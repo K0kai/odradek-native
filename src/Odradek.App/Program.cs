@@ -29,6 +29,8 @@ internal static class Program
     private static ApiServices? _api;
     /// <summary>A fila das vagas do LinkedIn que as rotas da extensão alimentam; a janela mostra e controla a mesma instância.</summary>
     public static Odradek.Core.Collector.LinkedInQueue? LinkedIn => _api?.LinkedIn();
+    /// <summary>O andamento do envio do Indeed, que a janela mostra.</summary>
+    public static Odradek.Core.Collector.IndeedQueue? Indeed => _api?.Indeed;
     /// <summary><c>null</c> quando a atualização automática está desligada (o app não foi instalado por <c>install.ps1</c>).</summary>
     public static Odradek.Core.Update.Updater? AutoUpdater { get; private set; }
 

@@ -20,7 +20,10 @@ public sealed class ApiServices(Database db, Func<JobCollector> collector, Func<
 {
     public Database Db { get; } = db;
     public QpidApi Qpid() => new(Db, collector(), http);
-    public ExtensionApi Extension() => new(Db, assistant, http, LinkedIn());
+    public ExtensionApi Extension() => new(Db, assistant, http, LinkedIn(), Indeed);
+
+    /// <summary>O andamento do envio do Indeed, um só para o app inteiro, como a fila do LinkedIn.</summary>
+    public IndeedQueue Indeed { get; } = new(db);
 
     private LinkedInQueue? _linkedIn;
     private readonly object _linkedInGate = new();
@@ -276,6 +279,12 @@ public static partial class ApiRoutes
         {
             var (body, error) = await ReadObject(context.Request);
             return body is null ? error! : Reply(await services.Extension().ImportLinkedInAsync(body, context.RequestAborted));
+        });
+
+        app.MapPost("/api/indeed-import", async (HttpContext context) =>
+        {
+            var (body, error) = await ReadObject(context.Request);
+            return body is null ? error! : Reply(services.Extension().ImportIndeed(body));
         });
 
         // ---------------------------------------------------------------- Qpid
